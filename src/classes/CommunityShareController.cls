@@ -62,6 +62,10 @@ global with sharing class CommunityShareController {
 			shareLinkUrl = Page.CommunityNewsDetail.getUrl().replace('/apex/','') + '?id=' + (String)sobj.get('Id');
 			shareLinkName = (String)sobj.get('Title__c');
 		}
+		else if (sobj instanceof Community_Resource__c) {
+			shareLinkUrl = Page.communityresourcedetail.getUrl().replace('/apex/','') + '?id=' + (String)sobj.get('Id');
+			shareLinkName = (String)sobj.get('Name');
+		}
 		availableGroups = getMyGroupsInGroupFinderWrapper(null, true);
 	}
 
@@ -72,14 +76,21 @@ global with sharing class CommunityShareController {
 		List<String> groupsIds = idsGroups.split(',');
 		String shareLinkUrl;
 		String message;
+		
+		if(sobjId.contains('&')){
+			sobjId = sobjId.split('&')[0];
+		}
+		
 		String obj = String.valueOf(((Id)sobjId).getSObjectType());
 		obj = obj.split('__').size() > 2 ? obj.split('__')[1] : obj.split('__')[0];
 		if (obj.equalsIgnoreCase('Community_Events')) {
 			shareLinkUrl = Page.CommunityEventDetail.getUrl().replace('/apex/','') + '?id=' + sobjId;
 			shareLinkName = shareLinkName;
-		}
-		else {
+		}else if(obj.equalsIgnoreCase('Community_News')){
 			shareLinkUrl = Page.CommunityNewsDetail.getUrl().replace('/apex/','') + '?id=' +  sobjId;
+			shareLinkName = shareLinkName;
+		}else if(obj.equalsIgnoreCase('Community_Resource')){
+			shareLinkUrl = Page.communityresourcedetail.getUrl().replace('/apex/','') + '?id=' +  sobjId;
 			shareLinkName = shareLinkName;
 		}
 		try {
@@ -154,7 +165,7 @@ global with sharing class CommunityShareController {
 				message	= 'SUCCESS';
 			}
 			else if(!shareLinkProfile){
-				return 'ERR Something wrong with group name';
+				message = 'ERR Something wrong with group name';
 			}
 		}
 		catch(Exception e) {
