@@ -360,11 +360,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Community_Group_Control__c.Automatic_Archive__c</field>
-        <readable>false</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
         <field>Community_Group_Control__c.Chatter_Group_ID__c</field>
         <readable>false</readable>
     </fieldPermissions>
