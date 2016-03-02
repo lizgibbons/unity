@@ -43,7 +43,7 @@ trigger CommunityGroupManagerTrigger on Community_Group_Manager__c (after insert
 
 		Map<Id,Id> chatterGroupToUnityGroupMap2 = new Map<Id,Id>();
 		Map<Id,Id> unityGroupToChatterGroupMap2 = new Map<Id,Id>();
-		if (groupIds.size() > 0 && CommunityUtils.isGroupTriggerWorked != true) {
+		if (groupIds.size() > 0) {
 			for (Community_Group_Control__c cgc : [SELECT Id, Chatter_Group_ID__c FROM Community_Group_Control__c WHERE Id IN :groupIds]) {
 				try {
 					chatterGroupToUnityGroupMap2.put(Id.valueOf(cgc.Chatter_Group_ID__c), cgc.Id);
@@ -53,14 +53,16 @@ trigger CommunityGroupManagerTrigger on Community_Group_Manager__c (after insert
 			}
 		}
 		Map<Id,Id> unityGroupToNetworkId = new Map<Id,Id>();
+		Set<Id> networkIds = new Set<Id>();
 		if (chatterGroupToUnityGroupMap2.size() > 0) {
-			Set<Id> networkIds = new Set<Id>();
 			for (CollaborationGroup cga : [SELECT Id, NetworkId FROM CollaborationGroup WHERE Id IN :chatterGroupToUnityGroupMap2.keySet()]) {
 				unityGroupToNetworkId.put(chatterGroupToUnityGroupMap2.get(cga.Id), cga.NetworkId);
 				if (cga.NetworkId != null) {
 					networkIds.add(cga.NetworkId);
 				}
 			}
+		}
+		if (chatterGroupToUnityGroupMap2.size() > 0 && CommunityUtils.isGroupTriggerWorked != true) {
 			Map<String, CollaborationGroupMember> chatterGroupMemberUniqueMap = new Map<String, CollaborationGroupMember>();
 			for (CollaborationGroupMember cgm4 : [
 				SELECT Id, CollaborationGroupId, MemberId, CollaborationRole
