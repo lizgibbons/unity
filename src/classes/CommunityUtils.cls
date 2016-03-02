@@ -584,4 +584,7 @@ public with sharing class CommunityUtils {
 		public String lnkIcon { get; set; }
 		public String lnkStyle { get; set; }
 	}
+
+	public static Boolean isGroupTriggerWorked = false;
+	public static Boolean isChatterGroupTriggerWorked = false;
 }

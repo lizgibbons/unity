@@ -95,8 +95,10 @@
     </types>
     <types>
         <members>CollaborationGroup</members>
+        <members>CollaborationGroupMemberTrigger</members>
         <members>CommunityAdmin</members>
         <members>CommunityGroupControl</members>
+        <members>CommunityGroupManagerTrigger</members>
         <members>CommunityNews</members>
         <members>CommunityProfile</members>
         <members>CommunityResource</members>
