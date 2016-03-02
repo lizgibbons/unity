@@ -160,7 +160,6 @@
         <members>Community_Group_Control_Tag__c.Theme__c</members>
         <members>Community_Group_Control__c.Active__c</members>
         <members>Community_Group_Control__c.Auto_Follow__c</members>
-        <members>Community_Group_Control__c.Automatic_Archive__c</members>
         <members>Community_Group_Control__c.Automatic_Archiving__c</members>
         <members>Community_Group_Control__c.Chatter_Group_ID__c</members>
         <members>Community_Group_Control__c.Description__c</members>
