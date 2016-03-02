@@ -50,7 +50,7 @@ public class CommunityTest3 {
 			Description = 'testDescription'
 		);
 		insert testGroup;
-		System.assert(testGroup.id!= null);
+		System.assert(testGroup.Id != null);
 		Community_Group_Control__c testGroupControl = new Community_Group_Control__c(
 			Name = 'controlName',
 			Discoverable__c = true,
@@ -60,16 +60,25 @@ public class CommunityTest3 {
 			Chatter_Group_ID__c = testGroup.Id
 		);
 		insert testGroupControl;
-		System.assert(testGroupControl.id!= null);
+		System.assert(testGroupControl.id != null);
 		testGroup.Description = 'Description Test';
+		CommunityUtils.isChatterGroupTriggerWorked = false;
 		update testGroup;
 		System.assert(testGroup.Description == 'Description Test');
 	}
 
 	static testMethod void test_CommunityGroupControlTrigger() {
-		insert new Community_Group_Control__c(Name='t',Discoverable__c=true,Type__c='Public',Network__c='Internal');
+		insert new List<Community_Group_Control__c> {
+			new Community_Group_Control__c(Name='ts1',Discoverable__c=true,Type__c='Public',Network__c='Internal'),
+			new Community_Group_Control__c(Name='ts2',Discoverable__c=true,Type__c='Public',Network__c='Internal')
+		};
+		Community_Group_Control__c cf = new Community_Group_Control__c(Name='t',Discoverable__c=true,Type__c='Public',Network__c='Internal', Information__c='i');
+		insert cf;
+		cf.Information__c = 'rt';
+		cf.Name = 'tu';
+		update cf;
 		try {
-			insert new Community_Group_Control__c(Name='t',Discoverable__c=true,Type__c='Public',Network__c='Internal');
+			insert new Community_Group_Control__c(Name='tu',Discoverable__c=true,Type__c='Public',Network__c='Internal');
 		}
 		catch(Exception e) {}
 		try {
@@ -79,7 +88,7 @@ public class CommunityTest3 {
 			};
 		}
 		catch(Exception e) {}
-		System.assert( [SELECT Id,Name FROM Community_Group_Control__c LIMIT 10].size()>0 );
+		System.assert(cf != null);
 	}
 
 	static testMethod void test_CommunityAdminTrigger() {
@@ -100,7 +109,7 @@ public class CommunityTest3 {
 	}
 
 	static testMethod void test_UserTrigger() {
-	  	UserRole ur = [Select Id, Name From UserRole where Name = 'CEO'];
+		UserRole ur = [Select Id, Name From UserRole where Name = 'CEO'];
 		Profile profile = [SELECT Id FROM Profile WHERE Name = 'System Administrator'];
 		User u = new User(alias='alias', email='email@email.com', emailencodingkey='UTF-8', lastname='lastname', firstname = 'firstName', languagelocalekey='en_US',
 			localesidkey='en_US', profileid = profile.Id, timezonesidkey='America/Los_Angeles', username='ttsde.tedf2@testmail.com',

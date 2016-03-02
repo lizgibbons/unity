@@ -31,7 +31,7 @@ trigger CommunityGroupControl on Community_Group_Control__c (before insert, afte
 
 	if (Trigger.isBefore && Trigger.isInsert) {
 		Boolean validationPassed = true;
-		Map<Id, CollaborationGroup> newChatterGroupsByGCid = new Map<Id, CollaborationGroup>();
+		Map<String, CollaborationGroup> newChatterGroupsByGCid = new Map<String, CollaborationGroup>();
 		Map<String, Community_Group_Control__c> checkUniqueNamesMap = new Map<String, Community_Group_Control__c>();
 		Map<String, Id> communityIdByName = new Map<String, Id>();
 		Boolean firstCommunity = true;
@@ -63,7 +63,7 @@ trigger CommunityGroupControl on Community_Group_Control__c (before insert, afte
 			}
 			// Operation block
 			if (validationPassed && cgcItem.Chatter_Group_ID__c == NULL) {
-				newChatterGroupsByGCid.put(cgcItem.Id, new CollaborationGroup(
+				newChatterGroupsByGCid.put(cgcItem.Name, new CollaborationGroup(
 					CollaborationType = cgcItem.Type__c,
 					Description = cgcItem.Description__c,
 					InformationTitle = 'Information',
@@ -87,7 +87,7 @@ trigger CommunityGroupControl on Community_Group_Control__c (before insert, afte
 			insert newChatterGroupsByGCid.values();
 			for (Community_Group_Control__c cgcItem3 : Trigger.new) {
 				if (cgcItem3.Chatter_Group_ID__c == NULL ) {
-					cgcItem3.Chatter_Group_ID__c = newChatterGroupsByGCid.get(cgcItem3.Id).Id;
+					cgcItem3.Chatter_Group_ID__c = newChatterGroupsByGCid.get(cgcItem3.Name).Id;
 				}
 			}
 		}
@@ -95,7 +95,6 @@ trigger CommunityGroupControl on Community_Group_Control__c (before insert, afte
 
 	if (Trigger.isAfter && Trigger.isInsert) {
 		Map<Id, Community_Group_Control__c> GroupControlIdByChatterGroupId = new Map<Id, Community_Group_Control__c>();
-        List<EntitySubscription> subscriptionsListToInsert = new List<EntitySubscription>();
 		for (Community_Group_Control__c cgcItem : Trigger.new) {
 			if (cgcItem.Chatter_Group_ID__c != NULL) {
 				GroupControlIdByChatterGroupId.put(Id.valueOf(cgcItem.Chatter_Group_ID__c), cgcItem);
@@ -104,10 +103,10 @@ trigger CommunityGroupControl on Community_Group_Control__c (before insert, afte
 		if (GroupControlIdByChatterGroupId.size() > 0) {
 			List<Community_Group_Manager__c> membersCommunityGroup = new List<Community_Group_Manager__c>();
 			for (CollaborationGroupMember cgmItem : [
-						SELECT MemberId, CollaborationGroup.OwnerId
-						FROM CollaborationGroupMember
-						WHERE CollaborationGroupId IN :GroupControlIdByChatterGroupId.keySet() AND CollaborationRole = 'Admin']
-							) {
+				SELECT MemberId, CollaborationGroup.OwnerId
+				FROM CollaborationGroupMember
+				WHERE CollaborationGroupId IN :GroupControlIdByChatterGroupId.keySet() AND CollaborationRole = 'Admin']
+			) {
 				Community_Group_Control__c cgcFromMap = GroupControlIdByChatterGroupId.get(cgmItem.CollaborationGroupId);
 				membersCommunityGroup.add(
 					new Community_Group_Manager__c(
@@ -116,20 +115,16 @@ trigger CommunityGroupControl on Community_Group_Control__c (before insert, afte
 						Manager_Role__c = (cgmItem.CollaborationGroup.OwnerId == cgmItem.MemberId ? 'Owner' : 'Manager')
 					)
 				);
-                subscriptionsListToInsert.add(new EntitySubscription(
-                    SubscriberId = cgcFromMap.OwnerId,
-                    ParentId = cgcFromMap.Id,
-                    NetworkId = Network.getNetworkId()
-                ));
 			}
 			if (membersCommunityGroup.size() > 0) {
+				CommunityUtils.isGroupTriggerWorked = true;
 				insert membersCommunityGroup;
-                insert subscriptionsListToInsert;
 			}
 		}
 	}
 
 	if (Trigger.isAfter && Trigger.isUpdate) {
+		CommunityUtils.isChatterGroupTriggerWorked = true;
 		Boolean validationPassed2 = true;
 		Map<String, Community_Group_Control__c> checkUniqueNamesMap2 = new Map<String, Community_Group_Control__c>();
 		Map<String,String> changedCollaborationType = new Map<String,String>();
@@ -219,9 +214,10 @@ trigger CommunityGroupControl on Community_Group_Control__c (before insert, afte
 			Set<String> groupManagersUniqueId = new Set<String>();
 			List<Community_Group_Manager__c> cgmListToUpsert = new List<Community_Group_Manager__c>();
 			for (Community_Group_Manager__c cgmItem : [
-								SELECT Id, Group_Manager_User__c, Group_Control__c, Manager_Role__c FROM Community_Group_Manager__c
-								WHERE (Group_Manager_User__c IN :newLuckyOnes OR Manager_Role__c = 'Owner')
-									AND Group_Control__c IN :groupControlsWithNewOwners.keySet()]) {
+				SELECT Id, Group_Manager_User__c, Group_Control__c, Manager_Role__c FROM Community_Group_Manager__c
+				WHERE (Group_Manager_User__c IN :newLuckyOnes OR Manager_Role__c = 'Owner')
+					AND Group_Control__c IN :groupControlsWithNewOwners.keySet()
+			]) {
 				Id currentNewGroupOwnerId = groupControlsWithNewOwners.get(cgmItem.Group_Control__c);
 				if (cgmItem.Group_Manager_User__c != currentNewGroupOwnerId && cgmItem.Manager_Role__c == 'Owner') {
 					cgmItem.Manager_Role__c = 'Manager';
@@ -234,24 +230,17 @@ trigger CommunityGroupControl on Community_Group_Control__c (before insert, afte
 				groupManagersUniqueId.add('' + cgmItem.Group_Control__c + cgmItem.Group_Manager_User__c);
 			}
 
-			Set<String> groupSubscriptionUniqueId = new Set<String>();
-			for (EntitySubscription esItem : [
-								SELECT ParentId, SubscriberId FROM EntitySubscription
-								WHERE SubscriberId IN :newLuckyOnes AND ParentId IN :groupControlsWithNewOwners.keySet()]) {
-				groupSubscriptionUniqueId.add('' + esItem.ParentId + esItem.SubscriberId);
-			}
-
 			Set<String> existingChatterGroupManagers = new Set<String>();
 			Map<String,CollaborationGroupMember> chatterMemberUniqueIdMap = new Map<String,CollaborationGroupMember>();
 			if (chatterGroupsWithNewOwners.size() > 0) {
 				for (CollaborationGroupMember cgmItem2 : [
-								SELECT Id, MemberId, CollaborationGroupId, CollaborationRole FROM CollaborationGroupMember
-								WHERE MemberId IN :newLuckyOnes AND CollaborationGroupId IN :chatterGroupsWithNewOwners.keySet()]) {
+					SELECT Id, MemberId, CollaborationGroupId, CollaborationRole FROM CollaborationGroupMember
+					WHERE MemberId IN :newLuckyOnes AND CollaborationGroupId IN :chatterGroupsWithNewOwners.keySet()
+				]) {
 					chatterMemberUniqueIdMap.put('' + cgmItem2.CollaborationGroupId + cgmItem2.MemberId, cgmItem2);
 				}
 			}
 
-			List<EntitySubscription> subscriptionsListToInsert = new List<EntitySubscription>();
 			List<CollaborationGroupMember> chatterMembersToUpsert = new List<CollaborationGroupMember>();
 			for (Community_Group_Control__c cgcItem : groupControlsList) {
 				if (!groupManagersUniqueId.contains('' + cgcItem.Id + cgcItem.OwnerId)) {
@@ -259,13 +248,6 @@ trigger CommunityGroupControl on Community_Group_Control__c (before insert, afte
 						Group_Manager_User__c = cgcItem.OwnerId,
 						Group_Control__c = cgcItem.Id,
 						Manager_Role__c = 'Owner'
-					));
-				}
-				if (!groupSubscriptionUniqueId.contains('' + cgcItem.Id + cgcItem.OwnerId)) {
-					subscriptionsListToInsert.add(new EntitySubscription(
-						SubscriberId = cgcItem.OwnerId,
-                        ParentId = cgcItem.Id,
-                        NetworkId = Network.getNetworkId()
 					));
 				}
 				CollaborationGroupMember tCgm = chatterMemberUniqueIdMap.get('' + cgcItem.Chatter_Group_ID__c + cgcItem.OwnerId);
@@ -282,18 +264,13 @@ trigger CommunityGroupControl on Community_Group_Control__c (before insert, afte
 				}
 			}
 
+			CommunityUtils.isGroupTriggerWorked = true;
 			if (chatterMembersToUpsert.size() > 0) {
 				upsert chatterMembersToUpsert;
 			}
 			if (cgmListToUpsert.size() > 0) {
 				upsert cgmListToUpsert;
 			}
-			try {
-				if (subscriptionsListToInsert.size() > 0) {
-					insert subscriptionsListToInsert;
-				}
-			}
-			catch (Exception e) {}
 
 			if (chatterGroupsWithNewOwners.size() > 0) {
 				List<CollaborationGroup> updateOwnerList = [SELECT Id, OwnerId FROM CollaborationGroup WHERE Id IN :chatterGroupsWithNewOwners.keySet()];
@@ -302,37 +279,29 @@ trigger CommunityGroupControl on Community_Group_Control__c (before insert, afte
 				}
 				update updateOwnerList;
 			}
+
 		}
 
-		// sync
-		List<CollaborationGroup> cgListForUpdate = new List<CollaborationGroup>();
-		List<Id> chatterGroupIdList = new List<Id>();
+		// synchronize "Description" and "Information" fields
+		Map<Id, Community_Group_Control__c> cgcMap = new Map<Id, Community_Group_Control__c>();
 		for (Community_Group_Control__c cgcItem : Trigger.new) {
-			chatterGroupIdList.add(cgcItem.Chatter_Group_Id__c);
+			Community_Group_Control__c oldValue = Trigger.oldMap.get(cgcItem.Id);
+			if (cgcItem.Description__c != oldValue.Description__c || cgcItem.Information__c != oldValue.Information__c) {
+				cgcMap.put(cgcItem.Chatter_Group_Id__c, cgcItem);
+			}
 		}
-		List<CollaborationGroup> cgList = [SELECT Id, Name, Description,InformationBody FROM CollaborationGroup WHERE Id IN :chatterGroupIdList];
-		if(cgList.Size()>0){
-			for (Community_Group_Control__c cgcItem : Trigger.new){
-				for(CollaborationGroup cgItem : cgList){
-					if(cgItem.Id == cgcItem.Chatter_Group_ID__c){
-						if((cgcItem.Description__c != cgItem.Description) ||(cgcItem.Information__c != cgItem.InformationBody)) {
-							System.Debug('Same changes control');
-							cgItem.Description = cgcItem.Description__c;
-							cgItem.InformationBody = cgcItem.Information__c;
-							cgItem.InformationTitle = 'Information';
-							cgListForUpdate.add(cgItem);
-						}
-					}
-				}
+		if (cgcMap.size() > 0) {
+			List<CollaborationGroup> cgList = [SELECT Id, Name, Description, InformationBody, InformationTitle FROM CollaborationGroup WHERE Id IN :cgcMap.keySet()];
+			for (CollaborationGroup cg : cgList) {
+				Community_Group_Control__c cgcv = cgcMap.get(cg.Id);
+				cg.Description = cgcv.Description__c;
+				cg.InformationBody = cgcv.Information__c;
+				cg.InformationTitle = cg.InformationTitle == null ? 'Information' : cg.InformationTitle;
 			}
-			if(cgListForUpdate.Size()>0){
-				try{
-					update cgListForUpdate;
-				}
-				catch(Exception e){
-                    System.debug(e);
+			try {
+				update cgList;
 			}
+			catch (Exception e) {}
 		}
 	}
-}
 }
