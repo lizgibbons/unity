@@ -166,35 +166,6 @@ public without sharing class CommunityHelperWithoutSharing {
 		// 2 - Delete Chatter Group Member
 		if (inmm < 3) {
 			if (inmm == 2) {
-				// delete manager if exist
-				if (!SObjectType.Community_Group_Manager__c.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.Community_Group_Manager__c);
-				if (!SObjectType.EntitySubscription.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.EntitySubscription);
-				List<Community_Group_Manager__c> cgmList2 = [SELECT Id FROM Community_Group_Manager__c WHERE Group_Manager_User__c =:queryInUserId AND Group_Control__c =:cgc.Id];
-				List<EntitySubscription> esList2 = [SELECT Id FROM EntitySubscription WHERE ParentId = :cgc.Id AND SubscriberId = :queryInUserId LIMIT 1];
-				//delete cgmList2;
-				CommunityAccess.DeleteWithoutSharing(
-					cgmList2,
-					'CommunityHelperWithoutSharing.cls [membershipWOSH]'
-				);
-				//delete esList2;
-				CommunityAccess.DeleteWithoutSharing(
-					esList2,
-					'CommunityHelperWithoutSharing.cls [membershipWOSH]'
-				);
-				if (cgmList.size() > 0 && cgmList[0].CollaborationRole == 'Admin') {
-					cgmList[0].CollaborationRole = 'Standard';
-					//update cgmList;
-					CommunityAccess.UpdateWithoutSharing(
-						cgmList,
-						'CommunityHelperWithoutSharing.cls [membershipWOSH]',
-						new List<Schema.DescribeFieldResult> {
-							CollaborationGroupMember.CollaborationRole.getDescribe()
-						}
-					);
-				}
-				resultType = ConnectApi.GroupMembershipType.StandardMember;
-				//
-				//delete cgmList;
 				CommunityAccess.DeleteWithoutSharing(
 					cgmList,
 					'CommunityHelperWithoutSharing.cls [membershipWOSH]'
@@ -205,7 +176,6 @@ public without sharing class CommunityHelperWithoutSharing {
 				if (!SObjectType.NetworkMember.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.NetworkMember);
 				NetworkMember nm = Test.isRunningTest() ? new NetworkMember()
 									: [SELECT Id, DefaultGroupNotificationFrequency FROM NetworkMember WHERE MemberId = :queryInUserId AND NetworkId = :Network.getNetworkId()];
-				//insert 
 				CollaborationGroupMember cgm = new CollaborationGroupMember(MemberId = inUserId, CollaborationGroupId = cgc.Chatter_Group_ID__c, NotificationFrequency = nm.DefaultGroupNotificationFrequency);
 				CommunityAccess.InsertWithoutSharing(
 					cgm,
@@ -223,64 +193,17 @@ public without sharing class CommunityHelperWithoutSharing {
 		// 4 - Delete Group Manager
 		else if (inmm < 5) {
 			if (!SObjectType.Community_Group_Manager__c.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.Community_Group_Manager__c);
-			if (!SObjectType.EntitySubscription.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.EntitySubscription);
 			List<Community_Group_Manager__c> cgmList2 = [SELECT Id FROM Community_Group_Manager__c WHERE Group_Manager_User__c =:queryInUserId AND Group_Control__c =:cgc.Id];
-			List<EntitySubscription> esList2 = [SELECT Id FROM EntitySubscription WHERE ParentId = :cgc.Id AND SubscriberId = :queryInUserId LIMIT 1];
 			if (inmm == 4) {
-				//delete cgmList2;
 				CommunityAccess.DeleteWithoutSharing(
 					cgmList2,
 					'CommunityHelperWithoutSharing.cls [membershipWOSH]'
 				);
-				//delete esList2;
-				CommunityAccess.DeleteWithoutSharing(
-					esList2,
-					'CommunityHelperWithoutSharing.cls [membershipWOSH]'
-				);
-				if (cgmList.size() > 0 && cgmList[0].CollaborationRole == 'Admin') {
-					cgmList[0].CollaborationRole = 'Standard';
-					//update cgmList;
-					CommunityAccess.UpdateWithoutSharing(
-						cgmList,
-						'CommunityHelperWithoutSharing.cls [membershipWOSH]',
-						new List<Schema.DescribeFieldResult> {
-							CollaborationGroupMember.CollaborationRole.getDescribe()
-						}
-					);
-				}
 				resultType = ConnectApi.GroupMembershipType.StandardMember;
 			}
 			else {
-				if (cgmList.size() == 0) {
-					if (!SObjectType.NetworkMember.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.NetworkMember);
-					NetworkMember nm = [SELECT Id, DefaultGroupNotificationFrequency FROM NetworkMember WHERE MemberId = :queryInUserId AND NetworkId = :Network.getNetworkId()];
-					//insert 
-					CollaborationGroupMember cgm1 = new CollaborationGroupMember(MemberId = inUserId, CollaborationGroupId = cgc.Chatter_Group_ID__c, NotificationFrequency = nm.DefaultGroupNotificationFrequency);
-					CommunityAccess.InsertWithoutSharing(
-						cgm1,
-						'CommunityHelperWithoutSharing.cls [membershipWOSH]',
-						new List<Schema.DescribeFieldResult> {
-							CollaborationGroupMember.MemberId.getDescribe(),
-							CollaborationGroupMember.CollaborationGroupId.getDescribe(),
-							CollaborationGroupMember.NotificationFrequency.getDescribe()
-						}
-					);
-				}
-				else if (cgmList[0].CollaborationRole == 'Standard') {
-					cgmList[0].CollaborationRole = 'Admin';
-					//update cgmList;
-					CommunityAccess.UpdateWithoutSharing(
-						cgmList,
-						'CommunityHelperWithoutSharing.cls [membershipWOSH]',
-						new List<Schema.DescribeFieldResult> {
-							CollaborationGroupMember.CollaborationRole.getDescribe()
-						}
-					);
-				}
 				if (cgmList2.size() == 0) {
-					//insert 
 					Community_Group_Manager__c cgmn = new Community_Group_Manager__c(Group_Manager_User__c = inUserId, Group_Control__c = cgc.Id, Manager_Role__c = 'Manager');
-					
 					CommunityAccess.InsertWithoutSharing(
 						cgmn,
 						'CommunityHelperWithoutSharing.cls [membershipWOSH]',
@@ -288,18 +211,6 @@ public without sharing class CommunityHelperWithoutSharing {
 							Community_Group_Manager__c.Group_Manager_User__c.getDescribe(),
 							Community_Group_Manager__c.Group_Control__c.getDescribe(),
 							Community_Group_Manager__c.Manager_Role__c.getDescribe()
-						}
-					);
-				}
-				if (esList2.size() == 0) {
-					//insert 
-					EntitySubscription es = new EntitySubscription(ParentId = cgc.Id, SubscriberId = inUserId, NetworkId = Network.getNetworkId());
-					CommunityAccess.InsertWithoutSharing(
-						es,
-						'CommunityHelperWithoutSharing.cls [membershipWOSH]',
-						new List<Schema.DescribeFieldResult> {
-							EntitySubscription.ParentId.getDescribe(),
-							EntitySubscription.SubscriberId.getDescribe()
 						}
 					);
 				}
@@ -312,7 +223,6 @@ public without sharing class CommunityHelperWithoutSharing {
 			if (!SObjectType.CollaborationGroupMemberRequest.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.CollaborationGroupMemberRequest);
 			List<CollaborationGroupMemberRequest> cgmrList = [SELECT Id FROM CollaborationGroupMemberRequest WHERE CollaborationGroupId =:cgc.Chatter_Group_ID__c AND RequesterId =:queryInUserId AND Status = 'Pending'];
 			if (inmm == 6) {
-				//delete cgmrList;
 				if (!cgmrList.isEmpty()) {
 					CommunityAccess.DeleteWithoutSharing(
 						cgmrList,
@@ -323,7 +233,6 @@ public without sharing class CommunityHelperWithoutSharing {
 			}
 			else {
 				if (cgmList.size() == 0 && cgmrList.size() == 0) {
-					//insert 
 					CollaborationGroupMemberRequest cgmr = new CollaborationGroupMemberRequest(CollaborationGroupId = cgc.Chatter_Group_ID__c, RequesterId = inUserId);
 					CommunityAccess.InsertWithoutSharing(
 						cgmr,
@@ -345,7 +254,6 @@ public without sharing class CommunityHelperWithoutSharing {
 			if (inmm == 8) {
 				if (!cgmrList.isEmpty()) {
 					cgmrList[0].Status = 'Declined';
-					//update cgmrList;
 					CommunityAccess.UpdateWithoutSharing(
 						cgmrList,
 						'CommunityHelperWithoutSharing.cls [membershipWOSH]',
@@ -359,7 +267,6 @@ public without sharing class CommunityHelperWithoutSharing {
 			else {
 				if (!cgmrList.isEmpty()) {
 					cgmrList[0].Status = 'Accepted';
-					//update cgmrList;
 					CommunityAccess.UpdateWithoutSharing(
 						cgmrList,
 						'CommunityHelperWithoutSharing.cls [membershipWOSH]',

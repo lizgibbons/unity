@@ -196,4 +196,35 @@ public with sharing class CommunityFeedNavigationController {
 	public static String getTwitterDataWidgetId() {
 		return Community_Settings__c.getInstance().Twitter_Data_Widget_ID__c;
 	}
+
+	public List<AlertWrapper> getHomeAlerts() {
+		DateTime Now = DateTime.now();
+		if (!SObjectType.Community_News__c.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.Community_News__c);
+		List<Community_News__c> newsList = [
+			SELECT Id, Title__c, Teaser__c
+			FROM Community_News__c
+			WHERE Alert__c = true AND Status__c != 'Pending'
+			AND Entry_Date__c <= :Now AND (Expiration_Date__c >= :Now OR Expiration_Date__c = NULL)
+			ORDER BY Entry_Date__c ASC
+			LIMIT 20
+		];
+		List<AlertWrapper> aList = new List<AlertWrapper>();
+		for(Community_News__c cNews : newsList){
+			aList.add(new alertWrapper(cNews));
+		}
+		return aList;
+	}
+
+	public class AlertWrapper{
+		public String title {get; set;}
+		public String teaser {get; set;}
+		public String id { get; set; }
+
+		public alertWrapper(Community_News__c cNews){
+			this.teaser = cNews.Teaser__c;
+			this.title = cNews.Title__c;
+			this.id = cNews.Id;
+		}
+	}
+
 }

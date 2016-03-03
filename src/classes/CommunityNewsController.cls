@@ -395,7 +395,7 @@ public with sharing class CommunityNewsController {
 		Datetime nNow = Datetime.now();
 		if (!SObjectType.Community_News__c.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.Community_News__c);
 		String nQuery = 'SELECT Id, Image_Path__c, Title__c, Teaser__c, Entry_Date__c, Make_Entry_Sticky__c FROM Community_News__c';
-		nQuery += ' WHERE Entry_Date__c <= :nNow AND Expiration_Date__c > :nNow AND Alert__c = false AND Status__c != \'Pending\'';
+		nQuery += ' WHERE Entry_Date__c <= :nNow AND (Expiration_Date__c > :nNow OR Expiration_Date__c = NULL) AND Alert__c = false AND Status__c != \'Pending\'';
 		Set<Id> cnIds = new Set<Id>();
 		try {
 			Map<String, String> pageParams = ApexPages.currentPage().getParameters();

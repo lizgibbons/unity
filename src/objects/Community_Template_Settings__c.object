@@ -27,6 +27,15 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>Enable_Unity2_0_Template__c</fullName>
+        <defaultValue>false</defaultValue>
+        <description>Enable Unity2.0 Template</description>
+        <externalId>false</externalId>
+        <label>Enable Unity2.0 Template</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
         <fullName>Footer_Logo_ImageID__c</fullName>
         <description>Represents the Document ID that will be displayed as the Logo in the Footer of the Community Portal. The Document must follow the size restrictions outlined and must be marked as &apos;Externally Available Image = TRUE&quot; to be viewable.</description>
         <externalId>false</externalId>
