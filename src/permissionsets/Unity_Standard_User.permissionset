@@ -995,7 +995,15 @@
         <enabled>true</enabled>
     </pageAccesses>
     <pageAccesses>
+        <apexPage>Unity2SiteTemplate</apexPage>
+        <enabled>false</enabled>
+    </pageAccesses>
+	<pageAccesses>
         <apexPage>UnityAdmin</apexPage>
+        <enabled>false</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>UnityHome</apexPage>
         <enabled>false</enabled>
     </pageAccesses>
     <pageAccesses>

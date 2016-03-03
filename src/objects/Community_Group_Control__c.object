@@ -291,17 +291,6 @@
         <type>Checkbox</type>
     </fields>
     <fields>
-        <fullName>Automatic_Archive__c</fullName>
-        <defaultValue>true</defaultValue>
-        <description>This field defines whether automatic group archiving rules will apply to the related group.</description>
-        <externalId>false</externalId>
-        <label>Automatic Archive</label>
-        <trackFeedHistory>false</trackFeedHistory>
-        <trackHistory>false</trackHistory>
-        <trackTrending>false</trackTrending>
-        <type>Checkbox</type>
-    </fields>
-    <fields>
         <fullName>Automatic_Archiving__c</fullName>
         <defaultValue>true</defaultValue>
         <description>This field defines whether automatic group archiving rules will apply to the related group.</description>

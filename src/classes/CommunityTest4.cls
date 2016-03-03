@@ -500,7 +500,7 @@ private class CommunityTest4 {
 		);
 		System.runAs(df.communityUser) {
 		ApexPages.currentPage().getParameters().put('fieldSetName','EditGroup');
-			ApexPages.currentPage().getParameters().put('objectId',df.groupControl.Id);
+		ApexPages.currentPage().getParameters().put('objectId',df.groupControl.Id);
 		ApexPages.currentPage().getParameters().put('objectName','Community_Group_Control__c');
 			CommunityObjectController coc3 = new CommunityObjectController();
 			System.assert(coc3 != NULL);
@@ -513,7 +513,7 @@ private class CommunityTest4 {
 			}
 		);
 		System.runAs(df2.communityUser) {
-			Community_Profile__c cp = [SELECT Id FROM Community_Profile__c WHERE Contact__c = :df2.communityUser.ContactId LIMIT 1];
+		Community_Profile__c cp = [SELECT Id FROM Community_Profile__c WHERE Contact__c = :df2.communityUser.ContactId LIMIT 1];
 		ApexPages.currentPage().getParameters().put('fieldSetName',CommunityUtils.getPackagePrefix()+'Student_About_Me_1');
 		ApexPages.currentPage().getParameters().put('objectId',cp.Id);
 		ApexPages.currentPage().getParameters().put('objectName',CommunityUtils.getPackagePrefix()+'Community_Profile__c');
@@ -521,6 +521,8 @@ private class CommunityTest4 {
 		ApexPages.currentPage().getParameters().put('tfn','wrong');
 			CommunityObjectController coc2 = new CommunityObjectController();
 			System.assert(coc2 != NULL);
+			coc2.setName = '';
+			coc2.getItems();
 			coc2.saveAction();
 		}
 	}

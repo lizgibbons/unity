@@ -1,0 +1,51 @@
+<!--  
+ * Unity - Communities
+ * 
+ * Community is critical to the student experience--but building community is 
+ * just plain hard. Built on Communities and designed specifically for higher ed, 
+ * Unity is a powerful networking tool to help you generate engagement and 
+ * connect your campus.
+ * 
+ * Copyright (C) 2015 Motivis Learning Systems Inc.
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * To contact Motivis Learning Systems Inc.
+ * 25 Pelham Road
+ * Salem, NH 03790
+ * unity@motivislearning.com
+-->
+
+<apex:component controller="CommunityHomeComponentController">
+<apex:outputPanel StyleClass="block" layout="block" rendered="{!HomeNews.size > 0}">
+    <h2>{!$Label.LBL_Current_News}</h2>
+        <apex:repeat value="{!HomeNews}" var="hn">
+            <div class="news-item">
+                <strong><a href="{!$Page.CommunityNewsDetail}?id={!hn.id}">{!hn.title}</a></strong>
+                <time>{!hn.entryDate}</time>
+                <p>{!hn.teaser}</p>
+            </div>
+        </apex:repeat>
+    <div class="text-center">
+        <a href="#" class="btn-outline-gray it-viewAllNews" onclick="window.open('{!$Page.CommunityNews}','_self');">{!$Label.LBL_View_All}</a>
+    </div>  
+</apex:outputPanel>
+<script>
+    $(document).ready(function() {
+        if(!{!HomeNews.size > 0}){
+            $('#newsBlock').prev().hide()
+        }
+    });
+</script>    
+</apex:component>

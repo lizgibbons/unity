@@ -29,58 +29,41 @@
 
 trigger CollaborationGroup on CollaborationGroup (after update) {
 
-	if (Trigger.isAfter && (Trigger.isUpdate )) {
-		// get list of Chatter Group Id 
-		List<Id> chatterGroupIdList = new List<Id>();
-		for (CollaborationGroup cgItem : Trigger.new) {
-			chatterGroupIdList.add(cgItem.Id);
-		}		
-		//put all cgc groups in to map with key Chatter_Group_ID__c
-		Map<Id,Community_Group_Control__c> CGCMap = new Map<Id,Community_Group_Control__c>();
-		List<Community_Group_Control__c> cgcList = [Select Id, Name, Chatter_Group_ID__c, Type__c,Description__c,Information__c, Automatic_Archiving__c, OwnerID, Network__c From Community_Group_Control__c Where Chatter_Group_ID__c in :chatterGroupIdList];
-		System.Debug(cgcList);
-		if(cgcList.size()>0){
-			for (Community_Group_Control__c cgItem : cgcList) {
-				CGCMap.put(cgItem.Chatter_Group_ID__c, cgItem);
-			}
-			
-			// put tr9igger data to maps
-			Map<Id,CollaborationGroup> OldMap = new Map<Id,CollaborationGroup>(Trigger.Old);
-			Map<Id,CollaborationGroup> NewMap = new Map<Id,CollaborationGroup>(Trigger.New);
-			
-			System.Debug(CGCMap);
-			System.Debug(OldMap);
-			System.Debug(NewMap);
-			
-			// list Community_Group_Control__c for update if some changes found
-			List<Community_Group_Control__c> CGCListForUpdate = new List<Community_Group_Control__c>();
-			for (Id key : CGCMap.keySet()){
-				if( (NewMap.get(key).Description != CGCMap.get(key).Description__c) 
-					|| (NewMap.get(key).Name != CGCMap.get(key).Name)
-					|| (NewMap.get(key).CollaborationType != CGCMap.get(key).Type__c)
-					|| (NewMap.get(key).InformationBody != OldMap.get(key).InformationBody)
-					|| (NewMap.get(key).IsAutoArchiveDisabled != OldMap.get(key).IsAutoArchiveDisabled)
-					){
-					Community_Group_Control__c obj = CGCMap.get(key);
-					obj.Description__c = NewMap.get(key).Description;
-					obj.Name = NewMap.get(key).Name;
-					obj.Type__c = NewMap.get(key).CollaborationType;
-					obj.Information__c = NewMap.get(key).InformationBody;
-					obj.OwnerId = NewMap.get(key).OwnerId;
-					obj.Automatic_Archiving__c = !NewMap.get(key).IsAutoArchiveDisabled;
-					CGCListForUpdate.add(obj);
-				}
-			}
-			
-			//update fields to 
-			if(CGCListForUpdate.Size()>0){
-				try{
-					update CGCListForUpdate;
-				}
-				catch(Exception e){
-					System.Debug(e);
-				}
+	if (Trigger.isAfter && Trigger.isUpdate && CommunityUtils.isChatterGroupTriggerWorked != true) {
+		Map<Id, CollaborationGroup> changedGroupMap = new Map<Id, CollaborationGroup>();
+		for (CollaborationGroup cg : Trigger.new) {
+			CollaborationGroup ocg = Trigger.oldMap.get(cg.Id);
+			Boolean fieldChanged = cg.Description != ocg.Description;
+			fieldChanged = cg.Name != ocg.Name ? true : fieldChanged;
+			fieldChanged = cg.CollaborationType != ocg.CollaborationType ? true : fieldChanged;
+			fieldChanged = cg.InformationBody != ocg.InformationBody ? true : fieldChanged;
+			fieldChanged = cg.IsAutoArchiveDisabled != ocg.IsAutoArchiveDisabled ? true : fieldChanged;
+			fieldChanged = cg.OwnerId != ocg.OwnerId ? true : fieldChanged;
+			if (fieldChanged) {
+				changedGroupMap.put(cg.Id, cg);
 			}
 		}
+		List<Community_Group_Control__c> cgcList = [
+			SELECT Id, Name, Chatter_Group_ID__c, Type__c, Description__c, Information__c, Automatic_Archiving__c, OwnerId, Network__c
+			FROM Community_Group_Control__c
+			WHERE Chatter_Group_ID__c IN :changedGroupMap.keySet()
+		];
+		if (cgcList.size() > 0) {
+			for (Community_Group_Control__c cgc : cgcList) {
+				CollaborationGroup cg2 = changedGroupMap.get(cgc.Chatter_Group_ID__c);
+				cgc.Description__c = cg2.Description;
+				cgc.Name = cg2.Name;
+				cgc.Type__c = cg2.CollaborationType;
+				cgc.Information__c = cg2.InformationBody;
+				cgc.Automatic_Archiving__c = cg2.IsAutoArchiveDisabled == false;
+				cgc.OwnerId = cg2.OwnerId;
+			}
+			try {
+				update cgcList;
+			}
+			catch(Exception e) {}
+		}
+		CommunityUtils.isChatterGroupTriggerWorked = true;
 	}
+
 }

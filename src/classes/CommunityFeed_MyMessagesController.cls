@@ -161,7 +161,8 @@ public with sharing class CommunityFeed_MyMessagesController {
 	} */
 	public ChatterMessage newConversation(String message, String recipients) {
 		ConnectApi.ChatterMessage cm = ConnectApi.ChatterMessages.sendMessage(Network.getNetworkId(), message, recipients);
-		return new ChatterMessage(cm);
+		Map<Id, String> userIdAndRoleMap = getUserIdAndRoleMap(cm);
+		return new ChatterMessage(cm, userIdAndRoleMap);
 	}
 	public class ChatterConversation {
 		public String ConversationId { get; set; }
@@ -181,9 +182,10 @@ public with sharing class CommunityFeed_MyMessagesController {
 		public String NextPageToken { get; set; }
 
 		private String getRecipientsString(List<ConnectApi.UserSummary> recipients) {
+			Map<Id, String> userIdAndRoleMap = getUserIdAndRoleMap(recipients);
 			List<ChatterGroupMember> members = new List<ChatterGroupMember>();
 			for (ConnectApi.UserSummary summary : recipients) {
-				members.add(new ChatterGroupMember(summary));
+				members.add(new ChatterGroupMember(summary, userIdAndRoleMap));
 			}
 			return getRecipientsString(members);
 		}
@@ -227,7 +229,8 @@ public with sharing class CommunityFeed_MyMessagesController {
 		public ChatterConversation(String cPageToken, String nPageToken,ConnectApi.ChatterConversationSummary summary) {
 			this.ConversationId = summary.Id;
 			this.IsRead = summary.Read;
-			this.LatestMessage = new ChatterMessage(summary.LatestMessage);
+			Map<Id, String> userIdAndRoleMap = getUserIdAndRoleMap(summary);
+			this.LatestMessage = new ChatterMessage(summary.LatestMessage, userIdAndRoleMap);
 			this.CurrentPageToken = cPageToken;
 			this.NextPageToken = nPageToken;
 		}
@@ -240,8 +243,9 @@ public with sharing class CommunityFeed_MyMessagesController {
 			this.NextPageToken = summary.Messages.NextPageToken;
 
 			this.Messages = new List<ChatterMessage>();
+			Map<Id, String> userIdAndRoleMap = getUserIdAndRoleMap(summary);
 			for (Integer i = summary.Messages.Messages.size() - 1; i >= 0; i--) {
-				this.Messages.add(new ChatterMessage(summary.Messages.Messages.get(i)));
+				this.Messages.add(new ChatterMessage(summary.Messages.Messages.get(i), userIdAndRoleMap));
 			}
 		}
 	}
@@ -271,16 +275,16 @@ public with sharing class CommunityFeed_MyMessagesController {
 			);
 		}
 
-		public ChatterMessage(ConnectApi.ChatterMessage message) {
+	public ChatterMessage(ConnectApi.ChatterMessage message, Map<Id, String> userIdAndRoleMap) {
 			this.MessageId = message.Id;
 			this.ConversationId = message.ConversationId;
 			this.MessageBody = new ChatterMessageBody(message.Body);
 			this.SentDate = message.SentDate;
 			this.SentDateFormatted = formatSentDate();
-			this.Sender = new ChatterGroupMember(message.Sender);
+			this.Sender = new ChatterGroupMember(message.Sender, userIdAndRoleMap);
 			this.Recipients = new List<ChatterGroupMember>();
 			for (ConnectApi.UserSummary summary : message.Recipients) {
-				this.Recipients.add(new ChatterGroupMember(summary));
+				this.Recipients.add(new ChatterGroupMember(summary, userIdAndRoleMap));
 			}
 		}
 	}
@@ -326,7 +330,7 @@ public with sharing class CommunityFeed_MyMessagesController {
 		public String SubscriptionId { get; set; }
 		public Boolean MemberIsFollowing { get; set; }
 
-		public ChatterGroupMember(ConnectApi.GroupMember member) {
+		public ChatterGroupMember(ConnectApi.GroupMember member, Map<Id, String> userIdAndRoleMap) {
 			this.MemberId = member.User.Id;
 			this.MemberName = String.format('{0}{1}',
 				new List<String> {
@@ -334,7 +338,7 @@ public with sharing class CommunityFeed_MyMessagesController {
 					!String.isBlank(member.User.LastName) ? member.User.LastName : ''
 				}
 			);
-			String roleMember = (CommunityFeedController.getUserRoles(new List<String>{this.MemberId})).get(this.MemberId);
+			String roleMember = userIdAndRoleMap.get(this.MemberId);
 			if(roleMember != null){
 				this.MemberRole = '('+roleMember+')';
 			}else{
@@ -343,7 +347,7 @@ public with sharing class CommunityFeed_MyMessagesController {
 			this.MemberPhotoUrl = (member.User.Photo != NULL) ? member.User.Photo.SmallPhotoUrl : NULL;
 		}
 
-		public ChatterGroupMember(ConnectApi.UserSummary member) {
+		public ChatterGroupMember(ConnectApi.UserSummary member, Map<Id, String> userIdAndRoleMap) {
 			this.MemberId = member.Id;
 			this.MemberName = String.format('{0}{1}',
 				new List<String> {
@@ -351,7 +355,7 @@ public with sharing class CommunityFeed_MyMessagesController {
 					!String.isBlank(member.LastName) ? member.LastName : ''
 				}
 			);
-			String roleMember = (CommunityFeedController.getUserRoles(new List<String>{this.MemberId})).get(this.MemberId);
+			String roleMember = userIdAndRoleMap.get(this.MemberId);
 			if(roleMember != null){
 				this.MemberRole = '('+roleMember+')';
 			}else{
@@ -435,7 +439,8 @@ public with sharing class CommunityFeed_MyMessagesController {
 	@RemoteAction
 	public static List<ChatterMessage> postMessage(String conversationId, String messageBody, String lastMessageId) {
 		ConnectApi.ChatterMessage chatterMessage = ConnectApi.ChatterMessages.replyToMessage(Network.getNetworkId(), messageBody, lastMessageId);
-		ChatterMessage message = new ChatterMessage(chatterMessage);
+		Map<Id, String> userIdAndRoleMap = getUserIdAndRoleMap(chatterMessage);
+		ChatterMessage message = new ChatterMessage(chatterMessage, userIdAndRoleMap);
 		return new List<ChatterMessage> { message };
 	}
 	@RemoteAction
@@ -449,7 +454,62 @@ public with sharing class CommunityFeed_MyMessagesController {
 	}
 	@RemoteAction
 	public static String sendMessage(String messageText, String recipients) {
-		ChatterMessage msg = new ChatterMessage(ConnectApi.ChatterMessages.sendMessage(Network.getNetworkId(), messageText, recipients));
+		ConnectApi.ChatterMessage chatterMessage = ConnectApi.ChatterMessages.sendMessage(Network.getNetworkId(), messageText, recipients);
+		Map<Id, String> userIdAndRoleMap = getUserIdAndRoleMap(chatterMessage);
+		ChatterMessage msg = new ChatterMessage(chatterMessage, userIdAndRoleMap);
 		return msg.ConversationId;
 	}
+	
+	private static Map<Id, String> getUserIdAndRoleMap (ConnectApi.ChatterMessage chatterMessage) {
+		Map<Id, String> userIdAndRoleMap = new Map<Id, String>();
+		List <String> userIds = new List <String>();
+		for (ConnectApi.UserSummary userSummary : chatterMessage.Recipients) {
+			userIds.add(userSummary.id);
+		}
+		if (!userIds.isEmpty()) {
+			userIdAndRoleMap = CommunityFeedController.getUserRoles(userIds);
+		}
+		return userIdAndRoleMap;	
+	}
+	
+	private static Map<Id, String> getUserIdAndRoleMap (ConnectApi.ChatterConversationSummary summary) {
+		Map<Id, String> userIdAndRoleMap = new Map<Id, String>();
+		List <String> userIds = new List <String>();
+		for (ConnectApi.UserSummary userSummary : summary.members) {
+			userIds.add(userSummary.id);
+		}
+		if (!userIds.isEmpty()) {
+			userIdAndRoleMap = CommunityFeedController.getUserRoles(userIds);
+		}
+		return userIdAndRoleMap;
+	}
+	
+	private static Map<Id, String> getUserIdAndRoleMap (ConnectApi.ChatterConversation summary) {
+		Map<Id, String> userIdAndRoleMap = new Map<Id, String>();
+		List <String> userIds = new List <String>();
+		ConnectApi.ChatterMessage message;
+		for (Integer i = summary.Messages.Messages.size() - 1; i >= 0; i--) {
+			message = summary.Messages.Messages.get(i);
+			for (ConnectApi.UserSummary userSummary : message.Recipients) {
+				userIds.add(userSummary.id);
+			}
+		}
+		if (!userIds.isEmpty()) {
+			userIdAndRoleMap = CommunityFeedController.getUserRoles(userIds);
+		}
+		return userIdAndRoleMap;
+	}
+	
+	private static Map<Id, String> getUserIdAndRoleMap (List<ConnectApi.UserSummary> recipients) {
+		Map<Id, String> userIdAndRoleMap = new Map<Id, String>();
+		List <String> userIds = new List <String>();
+		for (ConnectApi.UserSummary userSummary : recipients) {
+			userIds.add(userSummary.id);
+		}
+		if (!userIds.isEmpty()) {
+			userIdAndRoleMap = CommunityFeedController.getUserRoles(userIds);
+		}
+		return userIdAndRoleMap;	
+	}	
+	
 }
