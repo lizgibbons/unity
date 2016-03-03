@@ -571,6 +571,10 @@ public with sharing class CommunityUtils {
 		return new Community_Resource__c(Description__c = String.isNotBlank(value) ? value.unescapeHtml4() : '');
 	}
 
+	public static User getUser (){
+		return [SELECT Id, SmallPhotoURL, Name FROM User WHERE Id =: UserInfo.getUserId() LIMIT 1];
+	}
+
 	//wrapper classes
 
 	public class GroupAction {
