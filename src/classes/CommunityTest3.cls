@@ -31,16 +31,52 @@
 public class CommunityTest3 {
 /*Triggers Tests*/
 
+	@testSetup static void prepareData() {
+		CommunityTest3.testDataFactory df = new CommunityTest3.testDataFactory(
+			new Set<String> {
+				'internalUser',
+				'secondInternalUser',
+				'communitySuperUser',
+				'addRoleToContact'
+			}
+		);
+		System.assert(df != null);
+	}
+
 	static testMethod void test_CommunityNewsTrigger() {
-		insert new Community_News__c(Title__c='t',Teaser__c='t',Entry_Date__c=Datetime.now(),Expiration_Date__c=Datetime.now().addDays(1),
-			Alert__c=true);
+		insert new Community_News__c(Title__c='t',Teaser__c='t',Entry_Date__c=Datetime.now(),Expiration_Date__c=Datetime.now().addDays(1),Alert__c=true);
 		try {
-			insert new Community_News__c(Title__c='t',Teaser__c='t',Entry_Date__c=Datetime.now().addDays(-1),Expiration_Date__c=Datetime.now().addDays(2),
-				Alert__c=true);
+			insert new Community_News__c(Title__c='t',Teaser__c='t',Entry_Date__c=Datetime.now().addDays(-1),Expiration_Date__c=Datetime.now().addDays(2),Alert__c=true);
 		}
 		catch(Exception e) {}
-		System.assert( [SELECT Id,Name FROM Community_News__c WHERE Title__c='t'  LIMIT 10].size()>0 );
-		
+		insert new List<Community_News__c> {
+			new Community_News__c(Title__c='t',Teaser__c='t',Entry_Date__c=Datetime.now(),Expiration_Date__c=Datetime.now().addDays(1),Feature_on_Home_Page_Slot__c='1'),
+			new Community_News__c(Title__c='t',Teaser__c='t',Entry_Date__c=Datetime.now(),Expiration_Date__c=Datetime.now().addDays(1),Feature_on_Home_Page_Slot__c='2'),
+			new Community_News__c(Title__c='t',Teaser__c='t',Entry_Date__c=Datetime.now(),Expiration_Date__c=Datetime.now().addDays(1),Feature_on_Home_Page_Slot__c='3')
+		};
+		try {
+			insert new List<Community_News__c> {
+				new Community_News__c(Title__c='t',Teaser__c='t',Entry_Date__c=Datetime.now(),Expiration_Date__c=Datetime.now().addDays(1),Feature_on_Home_Page_Slot__c='1'),
+				new Community_News__c(Title__c='t',Teaser__c='t',Entry_Date__c=Datetime.now(),Expiration_Date__c=Datetime.now().addDays(1),Feature_on_Home_Page_Slot__c='2'),
+				new Community_News__c(Title__c='t',Teaser__c='t',Entry_Date__c=Datetime.now(),Expiration_Date__c=Datetime.now().addDays(1),Feature_on_Home_Page_Slot__c='3')
+			};
+		}
+		catch(Exception e) {}
+		try {
+			insert new List<Community_News__c> {
+				new Community_News__c(Title__c='t',Teaser__c='t',Entry_Date__c=Datetime.now(),Expiration_Date__c=Datetime.now().addDays(1),Feature_on_Home_Page_Slot__c='1'),
+				new Community_News__c(Title__c='t',Teaser__c='t',Entry_Date__c=Datetime.now(),Expiration_Date__c=Datetime.now().addDays(1),Feature_on_Home_Page_Slot__c='1')
+			};
+		}
+		catch(Exception e) {}
+		try {
+			insert new List<Community_News__c> {
+				new Community_News__c(Title__c='t',Teaser__c='t',Entry_Date__c=Datetime.now(),Expiration_Date__c=Datetime.now().addDays(1),Alert__c=true),
+				new Community_News__c(Title__c='t',Teaser__c='t',Entry_Date__c=Datetime.now(),Expiration_Date__c=Datetime.now().addDays(1),Alert__c=true)
+			};
+		}
+		catch(Exception e) {}
+		System.assert([SELECT Id,Name FROM Community_News__c WHERE Title__c='t'  LIMIT 10].size() > 0);
 	}
 
 	static testMethod void test_CollaborationGroupTrigger() {
@@ -50,7 +86,7 @@ public class CommunityTest3 {
 			Description = 'testDescription'
 		);
 		insert testGroup;
-		System.assert(testGroup.id!= null);
+		System.assert(testGroup.Id != null);
 		Community_Group_Control__c testGroupControl = new Community_Group_Control__c(
 			Name = 'controlName',
 			Discoverable__c = true,
@@ -60,16 +96,25 @@ public class CommunityTest3 {
 			Chatter_Group_ID__c = testGroup.Id
 		);
 		insert testGroupControl;
-		System.assert(testGroupControl.id!= null);
+		System.assert(testGroupControl.id != null);
 		testGroup.Description = 'Description Test';
+		CommunityUtils.isChatterGroupTriggerWorked = false;
 		update testGroup;
 		System.assert(testGroup.Description == 'Description Test');
 	}
 
 	static testMethod void test_CommunityGroupControlTrigger() {
-		insert new Community_Group_Control__c(Name='t',Discoverable__c=true,Type__c='Public',Network__c='Internal');
+		insert new List<Community_Group_Control__c> {
+			new Community_Group_Control__c(Name='ts1',Discoverable__c=true,Type__c='Public',Network__c='Internal'),
+			new Community_Group_Control__c(Name='ts2',Discoverable__c=true,Type__c='Public',Network__c='Internal')
+		};
+		Community_Group_Control__c cf = new Community_Group_Control__c(Name='t',Discoverable__c=true,Type__c='Public',Network__c='Internal', Information__c='i');
+		insert cf;
+		cf.Information__c = 'rt';
+		cf.Name = 'tu';
+		update cf;
 		try {
-			insert new Community_Group_Control__c(Name='t',Discoverable__c=true,Type__c='Public',Network__c='Internal');
+			insert new Community_Group_Control__c(Name='tu',Discoverable__c=true,Type__c='Public',Network__c='Internal');
 		}
 		catch(Exception e) {}
 		try {
@@ -79,7 +124,41 @@ public class CommunityTest3 {
 			};
 		}
 		catch(Exception e) {}
-		System.assert( [SELECT Id,Name FROM Community_Group_Control__c LIMIT 10].size()>0 );
+		System.assert(cf != null);
+	}
+
+	static testMethod void test_CommunityGroupManagerTrigger() {
+		Community_Group_Control__c tCgc = new Community_Group_Control__c(Name='t',Discoverable__c=true,Type__c='Public',Network__c='Internal', Information__c='i');
+		insert tCgc;
+		List<Community_Group_Manager__c> newUnityGroupManagers = new List<Community_Group_Manager__c>();
+		Profile p = [SELECT Id FROM Profile WHERE Name = 'System Administrator' LIMIT 1];
+		List<User> users = [SELECT Id, ProfileId FROM User WHERE Id != :UserInfo.getUserId()];
+		Community_Group_Manager__c secondAdminCgm;
+		Community_Group_Manager__c portalUserCgm;
+		for (User u : users) {
+			Community_Group_Manager__c sd = new Community_Group_Manager__c(
+				Group_Manager_User__c = u.Id,
+				Group_Control__c = tCgc.Id,
+				Manager_Role__c = 'Owner'
+			);
+			if (u.ProfileId == p.Id) {
+				secondAdminCgm = sd;
+			}
+			else {
+				portalUserCgm = sd;
+			}
+		}
+		CommunityUtils.isGroupTriggerWorked = false;
+		insert secondAdminCgm;
+		CommunityUtils.isGroupTriggerWorked = false;
+		try {
+			insert portalUserCgm;
+		}
+		catch (Exception e) {}
+		Community_Group_Control__c tCgc2 = [SELECT Chatter_Group_ID__c FROM Community_Group_Control__c WHERE Id = :tCgc.Id LIMIT 1];
+		CommunityUtils.isGroupTriggerWorked = false;
+		delete [SELECT Id FROM CollaborationGroupMember WHERE MemberId = :UserInfo.getUserId() AND CollaborationGroupId = :tCgc2.Chatter_Group_ID__c];
+		System.assert(tCgc != null);
 	}
 
 	static testMethod void test_CommunityAdminTrigger() {
@@ -100,7 +179,7 @@ public class CommunityTest3 {
 	}
 
 	static testMethod void test_UserTrigger() {
-	  	UserRole ur = [Select Id, Name From UserRole where Name = 'CEO'];
+		UserRole ur = [Select Id, Name From UserRole where Name = 'CEO'];
 		Profile profile = [SELECT Id FROM Profile WHERE Name = 'System Administrator'];
 		User u = new User(alias='alias', email='email@email.com', emailencodingkey='UTF-8', lastname='lastname', firstname = 'firstName', languagelocalekey='en_US',
 			localesidkey='en_US', profileid = profile.Id, timezonesidkey='America/Los_Angeles', username='ttsde.tedf2@testmail.com',

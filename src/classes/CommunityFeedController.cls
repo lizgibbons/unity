@@ -39,6 +39,12 @@ global with sharing class CommunityFeedController {
 	public static Boolean fromEmail { get; set; }
 	public static String feedfromEmailId { get; set; }
 	public static Map<String, String> parentManagerId { get; set;}
+	public static Boolean unity20_Template_Use { 
+		get{
+			Community_Template_Settings__c cts = Community_Template_Settings__c.getOrgDefaults();
+			return cts.Enable_Unity2_0_Template__c; 
+		}
+	}
 	public Boolean grID { get; set; }
 	public Boolean hideEventBtn { get { return hideEventBtn == true; } set; }
 	public String parentId { get { return parentId == NULL ? UserInfo.getUserId() : parentId; } set; }
@@ -1701,13 +1707,14 @@ global with sharing class CommunityFeedController {
 	}
 	
 	private static List<List<String>> CHATTER_ACTIONS = new List<List<String>> {
-		new List<String> { label.LBL_Post, 'FeedItem.TextPost', 'fa-comment', 'TextPost'},
-		new List<String> { label.LBL_File, 'FeedItem.ContentPost', 'fa-file-o', 'ContentPost'},
-		new List<String> { label.LBL_Link, 'FeedItem.LinkPost', 'fa-link', 'LinkPost'},
-		new List<String> { Label.LBL_Poll, 'FeedItem.PollPost', 'fa-bar-chart', 'PollPost'},
-		new List<String> { 'Create Event', 'Create_Event', 'fa-calendar', 'Create_Event'}
+		new List<String> { label.LBL_Post, 'FeedItem.TextPost', 'fa-comment', 'TextPost', '', ''},
+		new List<String> { unity20_Template_Use ? 'Upload' : label.LBL_File, 'FeedItem.ContentPost', 'fa-file-o', 'ContentPost', unity20_Template_Use ? 'upload-btn' : '', unity20_Template_Use ? 'post-upload-content-holder' : ''},
+		new List<String> { label.LBL_Link, 'FeedItem.LinkPost', 'fa-link', 'LinkPost', unity20_Template_Use ? 'link-btn' : '', unity20_Template_Use ? 'post-link-content-holder' : ''},
+		new List<String> { Label.LBL_Poll, 'FeedItem.PollPost', 'fa-bar-chart', 'PollPost', unity20_Template_Use ? 'poll-btn' : '', unity20_Template_Use ? 'post-poll-content-holder' : ''},
+		new List<String> { unity20_Template_Use ? 'News' : 'Create Event', unity20_Template_Use ? 'Create_News' : 'Create_Event', 'fa-calendar', unity20_Template_Use ? 'Create_News' : 'Create_Event', '', ''}
 	};
 
+	
 	private static Map<String, ChatterActionLayout> ACTION_LAYOUT = new Map<String, ChatterActionLayout> {
 		'FeedItem.TextPost' => new ChatterActionLayout(
 			'FeedItem.TextPost', 
@@ -1727,7 +1734,10 @@ global with sharing class CommunityFeedController {
 			},
 			NULL, // after fields
 			NULL, //post
-			NULL //button text
+			NULL, //button text
+			NULL, // div class for Unity new design
+			unity20_Template_Use ? label.LBL_Post_InputBox : NULL //placeholder for Unity new design
+
 		),
 		'FeedItem.LinkPost' => new ChatterActionLayout(
 			'FeedItem.LinkPost', //name
@@ -1738,7 +1748,7 @@ global with sharing class CommunityFeedController {
 					'Link URL',
 					'message-link-url',	//fieldName
 					'input',	//ftype
-					'url',	//inputtype
+					unity20_Template_Use ? 'text' : 'url',	//inputtype
 					null,	//value
 					'http://',	//placeholder
 					true,	//required
@@ -1771,7 +1781,9 @@ global with sharing class CommunityFeedController {
 			},
 			NULL, // after fields
 			NULL, //post
-			NULL //button text
+			NULL, //button text
+			unity20_Template_Use ? 'post-link-content' : NULL, // div class for Unity new design
+			unity20_Template_Use ? 'http://' : NULL //placeholder for Unity new design
 		),
 		'FeedItem.ContentPost' => new ChatterActionLayout(
 			'FeedItem.ContentPost', //name
@@ -1803,7 +1815,9 @@ global with sharing class CommunityFeedController {
 			},
 			NULL, // after fields
 			NULL, //post
-			NULL //button text
+			NULL, //button text
+			unity20_Template_Use ? 'post-upload-content' : NULL, // div class for Unity new design
+			unity20_Template_Use ? label.LBL_File_InputBox : NULL //placeholder for Unity new design
 		),
 		'FeedItem.PollPost' => new ChatterActionLayout(
 			'FeedItem.PollPost', //name
@@ -1846,7 +1860,9 @@ global with sharing class CommunityFeedController {
 			},
 			true, // after fields
 			NULL, //post
-			NULL //button text
+			NULL, //button text
+			unity20_Template_Use ? 'post-poll-content' : NULL, // div class for Unity new design
+			unity20_Template_Use ? 'What would you like to ask?' : NULL //placeholder for Unity new design
 		)
 	};
 	private static Map<String, String> getAvailableQuickActions() {
@@ -1865,13 +1881,13 @@ global with sharing class CommunityFeedController {
 		
 		for (List<String> caa : CHATTER_ACTIONS) {
 			for(String key : actionAvailable.keySet()){
-				if (actionAvailable.get(key).contains(caa[3])
+				if (actionAvailable.get(key).contains(caa[3]) && caa[3] != ''
 					&& ( (caa[3] != 'ContentPost' && caa[3] != 'Create_Event')
 					|| (caa[3] == 'ContentPost' && showFileUpload && CommunityUtils.checkAPIEnable())
 					|| (caa[3] == 'Create_Event' && hideEventBtn != true && CommunityUtils.checkCRUDforObject(CommunityUtils.getPackagePrefix()+'Community_Events__c').get('isCreateable') && CommunityUtils.checkAPIEnable())
 				)
 			) {
-				resultList.add(new ChatterActionItem(caa[0],caa[1],caa[2]));
+					resultList.add(new ChatterActionItem(caa[0],caa[1],caa[2], caa[4], caa[5]));
 			}
 		}
 		}
@@ -1882,11 +1898,15 @@ global with sharing class CommunityFeedController {
 		public String label { get; set; }
 		public String name { get; set; }
 		public String icon { get; set; }
+		public String actionClass { get; set; }
+		public String holderClass { get; set; }
 
-		public ChatterActionItem(String l, String n, String i) {
+		public ChatterActionItem(String l, String n, String i, String c, String h) {
 			label = l;
 			name = n;
 			icon = i;
+			actionClass = c;
+			holderClass = h;
 		}
 	}
 
@@ -1898,6 +1918,9 @@ global with sharing class CommunityFeedController {
 		public Boolean afterFields { get { return afterFields == NULL ? false : afterFields; } set; }
 		public Boolean post { get { return post == NULL ? true : post; } set; }
 		public String btntxt { get { return btntxt == NULL ? 'Share' : btntxt; } set; }
+		public User user { get{ return CommunityUtils.getUser();} set; }
+		public String divClass { get; set; }
+		public String unPlaceholder { get; set; }
 
 		public ChatterActionLayout(QuickAction.DescribeQuickActionResult inDqar) {
 			name = inDqar.getName();
@@ -1923,7 +1946,7 @@ global with sharing class CommunityFeedController {
 			}
 		}
 
-		public ChatterActionLayout(String n,  String obn, Boolean bf, List<ChatterActionLayoutItem> i, Boolean af, Boolean p, String bt) {
+		public ChatterActionLayout(String n,  String obn, Boolean bf, List<ChatterActionLayoutItem> i, Boolean af, Boolean p, String bt, String cl, String pl) {
 			this.name = n;
 			this.objectName = obn;
 			this.beforeFields = bf;
@@ -1931,6 +1954,8 @@ global with sharing class CommunityFeedController {
 			this.afterFields = af;
 			this.post = p;
 			this.btntxt = bt;
+			this.divClass = cl;
+			this.unPlaceholder = pl;
 		}
 	}
 
@@ -2040,7 +2065,7 @@ global with sharing class CommunityFeedController {
 						lc.getValidationClass()));
 				}
 			}
-			result = new ChatterActionLayout(fName, objName, null, chatActionLI, null, false, 'Save'); 
+			result = new ChatterActionLayout(fName, objName, null, chatActionLI, null, false, 'Save', null, null); 
 		}
 
 		return JSON.serialize(result);
