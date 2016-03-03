@@ -35,12 +35,78 @@ public with sharing class CommunityHomeComponentController {
 		for (Community_News__c cnItem : [
 						SELECT Id, Title__c, Teaser__c, Image_Path__c
 						FROM Community_News__c
-						WHERE Feature_on_Home_Page_Slot__c != NULL AND Expiration_Date__c > :Datetime.now()
+						WHERE Feature_on_Home_Page_Slot__c != NULL AND (Expiration_Date__c > :Datetime.now() OR Expiration_Date__c = NULL)
 						AND Status__c != 'Pending' AND Entry_Date__c <= :Datetime.now()
 						ORDER BY Feature_on_Home_Page_Slot__c ASC NULLS LAST
 						LIMIT 3
 							]) {
 			resultList.add(new News(cnItem));
+		}
+		return resultList;
+	}
+
+	public List<News> getHomeNews() {
+		Community_Settings__c cs = Community_Settings__c.getOrgDefaults();
+		Integer LIMIT_HOME_NEWS = cs.News_Max_Sticky__c == NULL || cs.News_Max_Sticky__c < 0 ? 5 : Integer.valueOf(cs.News_Max_Sticky__c); 
+
+		List<News> resultList = new List<News>();
+		if (!SObjectType.Community_News__c.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.Community_News__c);
+		for (Community_News__c cnItem : [
+						SELECT Id, Title__c, Teaser__c, Image_Path__c, Entry_Date__c
+						FROM Community_News__c
+						WHERE Make_Entry_Sticky__c = true AND (Expiration_Date__c > :Datetime.now() OR Expiration_Date__c = NULL)
+						AND Status__c != 'Pending' AND Entry_Date__c <= :Datetime.now()
+						ORDER BY Entry_Date__c ASC NULLS LAST
+						LIMIT :LIMIT_HOME_NEWS
+							]) {
+			resultList.add(new News(cnItem, cnItem.Entry_Date__c));
+		}
+		return resultList;
+	}
+
+	public List<Events> getHomeEvents() {
+		List<Events> resultList = new List<Events>();
+		Set<String> eventsIdsFromTags = new Set<String>();
+		Set<String> eventsIdsFromSubscription = new Set<String>();
+		Set<String> myGroups = new Set<String>();
+		Id userId = UserInfo.getUserId();
+		Schema.DescribeSObjectResult eventsDescribe = Community_Events__c.sObjectType.getDescribe();
+		String eventsPref = eventsDescribe.getKeyPrefix();
+
+		for (CollaborationGroupMember cgmItem : [SELECT CollaborationGroupId FROM CollaborationGroupMember
+												WHERE CollaborationGroup.NetworkId = :Network.getNetworkId() 
+												AND MemberId = :userId AND CollaborationGroup.IsArchived = false]) {
+				myGroups.add(cgmItem.CollaborationGroupId);
+		}
+		
+		if (!SObjectType.Community_Event_Tag__c.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.Community_Event_Tag__c);
+		for(Community_Event_Tag__c cet : [SELECT Id, Name, Community_Event__c, Community_Group_Control__c, Event_Name__c
+										FROM Community_Event_Tag__c 
+										WHERE Community_Group_Control__r.Chatter_Group_ID__c IN :myGroups
+										AND Community_Event__r.Start__c >= :Datetime.now()
+										AND Community_Event__r.End__c > :Datetime.now()
+										ORDER BY Community_Event__r.Start__c ASC NULLS LAST]){
+			eventsIdsFromTags.add(cet.Community_Event__c);
+		}
+
+		for(EntitySubscription es : [SELECT SubscriberId, ParentId, IsDeleted, Id, CreatedDate, CreatedById
+									FROM EntitySubscription WHERE SubscriberId =:Userinfo.getUserId() AND IsDeleted = false
+									LIMIT 1000]){
+			if(String.valueOf(es.ParentId).substring(0,3) == eventsPref){
+				eventsIdsFromSubscription.add(es.ParentId);
+			}
+		}
+		if (!SObjectType.Community_Events__c.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.Community_Events__c);
+		for(Community_Events__c eventsItem : [SELECT Id, Name__c, Teaser__c, Start__c, OwnerId, CreatedById
+											FROM Community_Events__c
+											WHERE End__c > :Datetime.now()
+											AND Start__c >= :Datetime.now()
+											AND (Id IN :eventsIdsFromTags OR Id IN :eventsIdsFromSubscription OR
+												OwnerId =: userId OR CreatedById =: userId)
+											ORDER BY Start__c ASC NULLS LAST
+											LIMIT 3
+											]){
+			resultList.add(new Events(eventsItem));
 		}
 		return resultList;
 	}
@@ -52,7 +118,7 @@ public with sharing class CommunityHomeComponentController {
 		List<Community_News__c> cnList = [
 			SELECT Id, Title__c, Teaser__c, Image_Path__c, Entry_Date__c
 			FROM Community_News__c
-			WHERE Entry_Date__c <= :Datetime.now() AND Expiration_Date__c > :Datetime.now()
+			WHERE Entry_Date__c <= :Datetime.now() AND (Expiration_Date__c > :Datetime.now() OR Expiration_Date__c = NULL)
 			AND Make_Entry_Sticky__c = true AND Status__c != 'Pending'
 			ORDER BY Make_Entry_Sticky__c, Entry_Date__c DESC LIMIT 2
 				];
@@ -115,6 +181,14 @@ public with sharing class CommunityHomeComponentController {
 			teaser = incn.Teaser__c;
 		}
 
+		public News(Community_News__c incn, Datetime indate) {
+			id = incn.Id;
+			title = incn.Title__c;
+			imageUrl = incn.Image_Path__c;
+			teaser = incn.Teaser__c;
+			entryDate = indate.format('MM/dd/yyyy');
+		}
+
 		public News(Community_News__c incn, Community_Tag__c intag) {
 			id = incn.Id;
 			title = incn.Title__c;
@@ -132,6 +206,26 @@ public with sharing class CommunityHomeComponentController {
 		public String getImagePath() {
 			return CommunityUtils.checkUrl(imageUrl);
 		}
+	}
+
+	public class Events {
+		public String id { get;set; }
+		public String title { get;set; }
+		public String teaser { get;set; }
+		public String entryDate { get;set; }
+		public String month {get; set;}
+		public String day {get; set;}
+		
+
+		public Events(Community_Events__c ince) {
+			id = ince.Id;
+			title = ince.Name__c;
+			teaser = ince.Teaser__c;
+			entryDate = ince.Start__c.format('MM/dd/yyyy @ hh:mm a');
+			month = ince.Start__c.format('MMM');
+			day = ince.Start__c.format('dd');
+		}
+
 	}
 	/* !-- Wrapper -- */
 }
