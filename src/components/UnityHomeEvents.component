@@ -1,0 +1,47 @@
+<!--  
+ * Unity - Communities
+ * 
+ * Community is critical to the student experience--but building community is 
+ * just plain hard. Built on Communities and designed specifically for higher ed, 
+ * Unity is a powerful networking tool to help you generate engagement and 
+ * connect your campus.
+ * 
+ * Copyright (C) 2015 Motivis Learning Systems Inc.
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * To contact Motivis Learning Systems Inc.
+ * 25 Pelham Road
+ * Salem, NH 03790
+ * unity@motivislearning.com
+-->
+
+<apex:component controller="CommunityHomeComponentController">
+<div class="block">
+	<h2>{!$Label.LBL_Upcoming_Events}</h2>
+	<ul class="event-list">
+		<apex:repeat value="{!HomeEvents}" var="he">
+			<li>
+	            <span class="calendar-date"><span class="month">{!he.month}</span><span class="day">{!he.day}</span></span>
+	            <a href="{!$Page.CommunityEventDetail}?id={!he.id}" class="it-eventsTitleLink1">{!he.title}</a>
+	            <time>{!he.entryDate}</time>
+       		</li>
+		</apex:repeat>
+	</ul>
+	<apex:outputPanel styleClass="text-center" rendered="{!HomeEvents.size == 0}" layout="block">{!$Label.LBL_No_Events}</apex:outputPanel>	
+	<apex:outputPanel styleClass="text-center" rendered="{!HomeEvents.size > 0}" layout="block">
+		<a href="{!$Page.CommunityEventsList}" class="btn-outline-gray it-viewAllEvents">{!$Label.LBL_View_All}</a>
+	</apex:outputPanel>	
+</div>
+</apex:component>
