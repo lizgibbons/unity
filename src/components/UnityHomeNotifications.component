@@ -1,0 +1,87 @@
+<!--  
+ * Unity - Communities
+ * 
+ * Community is critical to the student experience--but building community is 
+ * just plain hard. Built on Communities and designed specifically for higher ed, 
+ * Unity is a powerful networking tool to help you generate engagement and 
+ * connect your campus.
+ * 
+ * Copyright (C) 2015 Motivis Learning Systems Inc.
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * To contact Motivis Learning Systems Inc.
+ * 25 Pelham Road
+ * Salem, NH 03790
+ * unity@motivislearning.com
+-->
+
+<apex:component controller="CommunityHomeNotificationsController">
+	
+	<script src="{!$Resource.assets}/plugins/scrollbar/src/perfect-scrollbar.js"></script>
+
+	<div id="notif-panel" class="feedMenuHolder"></div>
+
+	<script id="nPanel" type="text/template">
+		<% _.each(rc, function(n){ %>
+			<li class="feedMenuItem">
+				<a href="{!$Page.CommunityProfilePage}?id=<%- n.MemberId%>" class="avatar it-navatar6"><img src="<%- n.Image %>"/></a>
+				<p>
+					<strong><%- n.Name%></strong> <%
+						if(n.StrongMessage != null){
+							var message = n.Message.split(n.StrongMessage);
+							print(message[0])%><strong><%- n.StrongMessage %></strong><%print(message[1])
+						}else{
+							print(n.Message);
+						}%>
+					<small><%- n.DateString%>&nbsp;&nbsp;|&nbsp;&nbsp;<%- n.Type%></small>
+				</p>
+				<a class="remove it-removeNotification6" role="button" onclick="deleteNotification(this);"><i class="lrm lrm-remove"></i></a>
+			</li>
+		<% }); %>
+		<li class="blockBtnWrapper">
+            <a href="#" class="block-btn-full it-showAllNotifications">{!$Label.LBL_Show_All}</a>
+        </li>
+	</script>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			loadNotifications();
+		});
+
+		var sizeData = 0;
+		var limitSize = 20;
+		var notifications;
+
+		function loadNotifications(){
+			Visualforce.remoting.Manager.invokeAction(
+				'{!$RemoteAction.CommunityHomeNotificationsController.notifications}',
+				function(result, event){
+					if(result.split('EMPTY').length > 1){
+						$('#notif-panel').html(result.substring(5, result.length));
+					}else{
+						_.templateSettings.variable = 'rc';
+						var template = _.template($('#nPanel').html());
+						notifications = jsonObj(result);
+						var notificationsCopy = notifications.slice(0,limitSize);
+						$('#notif-panel').prepend(template(notificationsCopy));
+						$('a.alerts span.number').text(notificationsCopy.length);
+					}
+				}
+			);
+		}
+
+	</script>
+
+</apex:component>
