@@ -1,0 +1,187 @@
+<!--  
+ * Unity - Communities
+ * 
+ * Community is critical to the student experience--but building community is 
+ * just plain hard. Built on Communities and designed specifically for higher ed, 
+ * Unity is a powerful networking tool to help you generate engagement and 
+ * connect your campus.
+ * 
+ * Copyright (C) 2015 Motivis Learning Systems Inc.
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * To contact Motivis Learning Systems Inc.
+ * 25 Pelham Road
+ * Salem, NH 03790
+ * unity@motivislearning.com
+-->
+
+<apex:component controller="CommunityMenuController" access="global">
+<!-- For Background Image -->
+
+<apex:outputPanel rendered="{!Registration == 'true'}">
+	<script type="text/javascript">
+		(function() {
+			console.log('Registration = true');
+			window.location.href = '{!$Page.CommunityRegTerms}';
+			jQuery('body').hide();
+		})();
+	</script>
+</apex:outputPanel>
+
+<header id="masthead">
+	<!-- Navbar -->
+	<div id="navbarID" class="inner">
+		<div class="left">
+            <a href="{!$Page.UnityHome}" class="logo it-navMastheadHome"><img src="{!$Resource.assets2}/images/unity-logo-main.png" /></a>
+        </div>
+		<div class="right">
+			<a href="#" class="menuBtn it-navMastheadMobileMenu">
+                <span class="top">Menu</span>
+                <span class="middle"></span>
+                <span class="bottom"></span>
+            </a>
+			
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<!--<apex:outputPanel layout="block" rendered="{!!isRegTermsPage}">-->
+			<ul>
+				<li class="mobileOnly">
+	                <ul>
+	                    <li><a href="#" class="emails it-navMastheadViewEmails">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Messages}</span><apex:outputPanel StyleClass="number" rendered="{!MessageUnreadCount > 0}">{!MessageUnreadCount}</apex:outputPanel></span></a></li>
+	                    <li><a href="#" class="alerts it-navMastheadViewAlerts">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Notifications}</span><span class="number"></span></span></a></li>
+	                    <li><a href="#" class="search it-navMastheadOpenSearch">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Search}</span></span></a></li>
+	               	</ul>
+            	</li>
+               	 <!-- Search Block -->
+				<li class="searchBox">
+					<input id="menusearch" type="search" placeholder="{!$Label.LBL_Search_Question}"  class="it-navSearchField" value="{!JSENCODE($CurrentPage.parameters.s)}"/>
+	                <button class="searchBtn" type="submit" onclick="menuSearch();">
+	                    <span class="icon"><span class="helper">{!$Label.LBL_Search}</span></span>
+	                </button>
+					<script>
+						jQuery(document).on('keyup', '#menusearch', function(event) {
+							event.preventDefault();
+							if (event.keyCode == 13) {
+								menuSearch();
+							}
+						});
+						function menuSearch() {
+							if (jQuery('#menusearch').val().length > 1) {
+								window.open("{!IF(CONTAINS($CurrentPage.URL,'CommunityNews'),$Page.CommunityNews,IF(CONTAINS($CurrentPage.URL,'CommunityEvent'), $Page.CommunityEventsList, $Page.CommunitySearch))}?s=" + encodeURIComponent(jQuery('#menusearch').val()), '_self');
+							}
+							return false;
+						}
+					</script>
+				</li>
+					<!-- End Search Block -->
+				<li class="home"><a href="{!$Page.UnityHome}" class="it-navMastheadHome {!IF(activePage == 1, 'active', '')}">{!$Label.LBL_Home}</a></li>
+				<li class="groups"><a href="{!$Page.CommunityGroups}?f=all_groups" class="it-navMastheadGroups {!IF(activePage == 2, 'active', '')}">{!$Label.LBL_Groups}</a></li>
+	            <li class="events"><a href="{!$Page.CommunityEventsList}" class="it-navMastheadEvents {!IF(activePage == 3, 'active', '')}">{!$Label.LBL_Events}</a></li>
+	            <li class="discover"><a href="{!$Page.CommunityDiscover}" class="it-navMastheadDiscover {!IF(activePage == 4, 'active', '')}">{!$Label.LBL_Discover}</a></li>
+	            <li class="resources"><a href="{!$Page.CommunityResources}" class="it-navMastheadResources {!IF(activePage == 5, 'active', '')}">{!$Label.LBL_Resources}</a></li>
+				<!-- Links -->
+				<li class="links hasChildren" style="{!IF(LinkItems.size > 0,'','display:none')}">
+					<a href="javascript:void(0);" class="it-navMastheadLinks">
+						{!$Label.LBL_Links}
+					</a>
+					<ul class="subMenu">
+						<apex:repeat value="{!LinkItems}" var="link">
+							<li><a href="{!link.Link}" target="_blank">{!link.Name}</a></li>
+						</apex:repeat>
+					</ul>
+				</li>
+				<!-- End Links -->
+				<!--Recent Messages-->
+				<li class="icon hasChildren">
+	                <a href="#" title="{!$Label.LBL_Messages}" class="emails it-navMastheadViewEmails">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Messages}</span><apex:outputPanel StyleClass="number" rendered="{!MessageUnreadCount > 0}">{!MessageUnreadCount}</apex:outputPanel></span></a>
+	                <ul class="subMenu feedMenu">
+	                    <li class="feedMenuHeader">
+	                        <h4>{!$Label.LBL_Recent_Messages}</h4>
+	                        <a href="#" class="it-messageSettings">{!$Label.LBL_Settings}</a>
+	                    </li>
+	                    <!-- Messages block -->
+	                    <div class="feedMenuHolder" id="conversations">
+	                    	<apex:repeat value="{!unityConversations}" var="conv">
+		                    	<li class="{!IF(conv.IsRead, 'feedMenuItem', 'feedMenuItem unread')}">
+				                    <a href="{!$Page.CommunityProfilePage}?id={!conv.LatestMessage.Sender.MemberId}" class="avatar it-navatar1">
+										<img src="{!conv.LatestMessage.Sender.MemberPhotoUrl}" alt="{!conv.LatestMessage.Sender.MemberName}" />
+									</a>
+									<a href="{!$Page.CommunityFeed_MyMessages}?c={!conv.ConversationId}">
+										<p>
+											<strong>{!conv.LatestMessage.Sender.MemberName} {!conv.LatestMessage.Sender.MemberRole}</strong>
+											<span class="message-snippet">{!conv.LatestMessage.MessageBody.Text}</span>
+											<small>{!conv.LatestMessage.SentDateFormatted}</small>
+										</p>
+									</a>	
+									<a class="remove it-removeNotification1" role="button" onclick="deleteNotification(this);"><i class="lrm lrm-remove"></i></a>
+								</li>
+							</apex:repeat>	
+	                    </div>
+	                    <!-- END Messages block -->
+	                    <li class="blockBtnWrapper">
+	                        <a href="{!$Page.CommunityFeed_MyMessages}" class="block-btn-full it-showAllMessages">{!$Label.LBL_Show_All}</a>
+	                    </li>
+	                </ul>
+	            </li>
+	            <!--END Recent Messages-->
+	            <li class="icon hasChildren">
+	                <a href="#" title="{!$Label.LBL_Notifications}" class="alerts it-navMastheadViewAlerts">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Notifications}</span><span class="number"></span></span></a>
+	                <ul class="subMenu feedMenu">
+	                    <li class="feedMenuHeader">
+	                        <h4>{!$Label.LBL_Notifications}</h4>
+	                        <a href="#" class="it-notificationSettings">{!$Label.LBL_Settings}</a>
+	                    </li>
+	                    <c:UnityHomeNotifications />
+	                </ul>
+	            </li>
+				<li class="icon">
+					<a href="#" class="search it-navMastheadOpenSearch">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Search}</span></span></a>
+				</li>
+				<li class="profileNav hasChildren"><a href="{!$Page.CommunityProfilePage}?id={!currentUser.Id}" class="view it-navMastheadViewSubNav"><span class="avatar" style="background-image: url({!currentUser.SmallPhotoUrl});">My Account</span></a>
+                    <div class="dropdown">
+                        <ul class="userInfo">
+                            <li>
+                                <h4><a href="{!$Page.CommunityProfilePage}?id={!currentUser.Id}" class="it-userProfile">{!currentUser.Name}</a></h4>
+                                <h5>{!currentUserRole}</h5>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li><a href="{!$Page.CommunityProfilePage}?id={!currentUser.Id}" class="it-navMastheadPersonalInfo">{!$Label.LBL_My_Profile}</a></li>
+                            <li><a href="#" class="it-navMastheadAccountSettings">{!$Label.LBL_Account_Settings}</a></li>
+                           <apex:outputPanel layout="none" rendered="{!!ISBLANK(HelpLink)}">
+                            	<li><a href="{!HelpLink}" target="_blank" class="it-navMastheadHelp">{!$Label.LBL_Help}</a></li>
+                            </apex:outputPanel>	
+                        </ul>
+                        <ul>
+                        	<apex:outputPanel layout="none" rendered="{!!ISBLANK(BackCRMlink)}">
+                            	<li><a href="{!BackCRMlink}" class="it-navMastheadLRM">{!$Label.LBL_Back_to_CRM}</a></li>
+                            </apex:outputPanel>	
+                        </ul>
+                        <ul>
+                            <li><a href="{!$Site.Prefix}/secur/logout.jsp" class="it-navMastheadSignOut">{!$Label.LBL_Sign_Out}</a></li>
+                        </ul>
+                    </div>
+                </li>
+			</ul>
+			<!--</apex:outputPanel>--><!--/navbar-collapse-->
+		</div>
+	</div>
+	<!-- End Navbar -->
+</header>
+	<script>
+		function deleteNotification(elem){
+			$(elem).parent('.feedMenuItem').slideUp();
+		}
+	</script>
+</apex:component>

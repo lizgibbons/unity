@@ -308,7 +308,7 @@ private class CommunityTest2 {
 			params2.put('parentId', parentId);
 
 			CommunityFeedController cfc = new CommunityFeedController();
-			CommunityFeedController.ChatterActionItem cai = new CommunityFeedController.ChatterActionItem('test', 'test1', 'test2');
+			CommunityFeedController.ChatterActionItem cai = new CommunityFeedController.ChatterActionItem('test', 'test1', 'test2', 'test3', 'test4');
 			List<CommunityFeedController.ChatterActionItem> lCai = cfc.getAvailableActions();
 			String layoutText = CommunityFeedController.actionLayout('FeedItem.TextPost');
 			params2.put('jsontext', layoutText);

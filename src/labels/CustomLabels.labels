@@ -386,6 +386,13 @@
         <shortDescription>ERR NotGroupManager</shortDescription>
         <value>You do not have the permission to view this page.</value>
     </labels>
+	<labels>
+        <fullName>ERR_Only_One_Help_Link</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>ERR Only One Help Link</shortDescription>
+        <value>Only one active resource can be tagged as a Help Link.</value>
+    </labels>
     <labels>
         <fullName>ERR_Please_Enter_Value</fullName>
         <language>en_US</language>
@@ -483,6 +490,13 @@
         <protected>true</protected>
         <shortDescription>LBL About this group</shortDescription>
         <value>About this group</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Account_Settings</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Account Settings</shortDescription>
+        <value>Account Settings</value>
     </labels>
     <labels>
         <fullName>LBL_Add</fullName>
@@ -723,6 +737,13 @@
         <value>Current Events</value>
     </labels>
     <labels>
+        <fullName>LBL_Current_News</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Current News</shortDescription>
+        <value>Current News</value>
+    </labels>
+    <labels>
         <fullName>LBL_Current_News_Title</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -798,6 +819,13 @@
         <protected>true</protected>
         <shortDescription>Label Weekly Digest</shortDescription>
         <value>Weekly Digest</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Discover</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Discover</shortDescription>
+        <value>Discover</value>
     </labels>
     <labels>
         <fullName>LBL_Done</fullName>
@@ -1213,6 +1241,13 @@
         <value>Say something about this link...</value>
     </labels>
     <labels>
+        <fullName>LBL_Links</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Links</shortDescription>
+        <value>Links</value>
+    </labels>
+    <labels>
         <fullName>LBL_Load_More</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -1401,6 +1436,13 @@
         <shortDescription>Label My News</shortDescription>
         <value>My News</value>
     </labels>
+	<labels>
+        <fullName>LBL_My_Profile</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL My Profile</shortDescription>
+        <value>My Profile</value>
+    </labels>
     <labels>
         <fullName>LBL_Name</fullName>
         <language>en_US</language>
@@ -1456,6 +1498,13 @@
         <protected>true</protected>
         <shortDescription>LBL NoUsersFound</shortDescription>
         <value>No Users have been found.</value>
+    </labels>
+    <labels>
+        <fullName>LBL_No_Events</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL No Events</shortDescription>
+        <value>You have no upcoming events</value>
     </labels>
     <labels>
         <fullName>LBL_No_Upcoming_Events_Group</fullName>
@@ -1682,6 +1731,13 @@
         <value>Read More News</value>
     </labels>
     <labels>
+        <fullName>LBL_Recent_Messages</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Recent Messages</shortDescription>
+        <value>Recent Messages</value>
+    </labels>
+    <labels>
         <fullName>LBL_RecommendedGroups</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -1787,6 +1843,13 @@
         <value>You changes has been successfully saved.</value>
     </labels>
     <labels>
+        <fullName>LBL_Search</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Search</shortDescription>
+        <value>Search</value>
+    </labels>
+    <labels>
         <fullName>LBL_SearchAllMessages</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -1821,6 +1884,13 @@
         <value>Search words with regular expressions...</value>
     </labels>
     <labels>
+        <fullName>LBL_Search_Question</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Search Question</shortDescription>
+        <value>What can we help you find ...</value>
+    </labels>
+    <labels>
         <fullName>LBL_Select_Image</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -1840,6 +1910,13 @@
         <protected>true</protected>
         <shortDescription>Select Tags field label</shortDescription>
         <value>Select Tags</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Settings</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Settings</shortDescription>
+        <value>Settings</value>
     </labels>
     <labels>
         <fullName>LBL_Share</fullName>
@@ -1924,6 +2001,13 @@
         <protected>true</protected>
         <shortDescription>LBL Show All</shortDescription>
         <value>Show All</value>
+    </labels>
+	<labels>
+        <fullName>LBL_Sign_Out</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Sign Out</shortDescription>
+        <value>Sign Out</value>
     </labels>
     <labels>
         <fullName>LBL_Sure_To_Delete_Topic</fullName>
@@ -2079,6 +2163,13 @@
         <protected>true</protected>
         <shortDescription>Label Verify New Password</shortDescription>
         <value>Verify New Password</value>
+    </labels>
+    <labels>
+        <fullName>LBL_View_All</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL View All</shortDescription>
+        <value>View All</value>
     </labels>
     <labels>
         <fullName>LBL_View_Results</fullName>
