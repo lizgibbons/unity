@@ -612,6 +612,7 @@
         <members>LBL_Username</members>
         <members>LBL_VerifyNewPassword</members>
         <members>LBL_View_All</members>
+        <members>LBL_View_Previous_Comments</members>
         <members>LBL_When</members>
         <members>LBL_of</members>
 		<members>LBL_View_Results</members>
