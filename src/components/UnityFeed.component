@@ -306,7 +306,7 @@
 										<img src="{!currentUserPhoto}" alt=""/>
 									</a>
 									<div>
-										<textarea id="a<%- p2.id %>" class="it-commentBox1" onclick="checkmi(this);" onFocus="checkmi(this);" onkeyup="checkbtn(this,'#b<%- p2.id %>');"></textarea>
+										<textarea id="a<%- p2.id %>" class="it-commentBox1" onclick="checkmi(this);" onFocus="checkmi(this);" onkeyup="checkbtn(this,'#b<%- p2.id %>');" placeholder="{!$Label.LBL_Write_A_Comment}"></textarea>
 									</div>
 									<a class="btn-fill-custom post-btn avatar pull-right disabled" style="width: auto;" role="button" id="b<%- p2.id %>" onclick="postComment($('#a<%- p2.id %>').val(),'<%- p2.id %>', '<%-p2.topicsUser.length%>');">{!$Label.LBL_Comment}</a>
 								</span>
