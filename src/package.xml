@@ -614,6 +614,7 @@
         <members>LBL_View_All</members>
         <members>LBL_View_Previous_Comments</members>
         <members>LBL_When</members>
+        <members>LBL_Write_A_Comment</members>
         <members>LBL_of</members>
 		<members>LBL_View_Results</members>
 		<members>LBL_Change_Vote</members>

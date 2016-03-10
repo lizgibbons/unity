@@ -2249,6 +2249,13 @@
         <value>When:</value>
     </labels>
     <labels>
+        <fullName>LBL_Write_A_Comment</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Write A Comment</shortDescription>
+        <value>Write a Comment . . .</value>
+    </labels>
+    <labels>
         <fullName>LBL_of</fullName>
         <language>en_US</language>
         <protected>true</protected>
