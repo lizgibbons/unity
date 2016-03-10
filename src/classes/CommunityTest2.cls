@@ -369,10 +369,7 @@ private class CommunityTest2 {
 			String resultGetTopics = CommunityFeedController.getTopics('test');
 			System.assertEquals(true, resultGetTopics.length() > 0);
 
-			String createEvent = 'Create_Event,Community_Events__c,Name:true,Start:true,End:true,Teaser:false,Website:false,Description:false,Street Address:false';
-			String createNews = 'News,Community_News__c,Name:true,Teaser:false';
-			Community_Template_Settings__c cts = new Community_Template_Settings__c(); 
-			String layoutEvent = CommunityFeedController.actionLayoutSForce(JSON.serialize(cts.Enable_Unity2_0_Template__c ? createNews : createEvent));
+			String layoutEvent = CommunityFeedController.actionLayoutSForce(JSON.serialize('Create_Event,Community_Events__c,Name__c:true,Start__c:true,End__c:true,Teaser__c:false,Website__c:false,Description__c:false,Street_Address__c:false'));
 			params2.put('jsontext', layoutEvent);
 			CommunityFeedController.postActions(params2);
 
