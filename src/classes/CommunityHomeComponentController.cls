@@ -56,7 +56,7 @@ public with sharing class CommunityHomeComponentController {
 						FROM Community_News__c
 						WHERE Make_Entry_Sticky__c = true AND (Expiration_Date__c > :Datetime.now() OR Expiration_Date__c = NULL)
 						AND Status__c != 'Pending' AND Entry_Date__c <= :Datetime.now()
-						ORDER BY Entry_Date__c ASC NULLS LAST
+						ORDER BY Entry_Date__c DESC NULLS LAST
 						LIMIT :LIMIT_HOME_NEWS
 							]) {
 			resultList.add(new News(cnItem, cnItem.Entry_Date__c));
