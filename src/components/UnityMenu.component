@@ -148,16 +148,16 @@
 				<li class="icon">
 					<a href="#" class="search it-navMastheadOpenSearch">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Search}</span></span></a>
 				</li>
-				<li class="profileNav hasChildren"><a href="{!$Page.CommunityProfilePage}?id={!currentUser.Id}" class="view it-navMastheadViewSubNav"><span class="avatar" style="background-image: url({!currentUser.SmallPhotoUrl});">My Account</span></a>
+				<li class="profileNav hasChildren"><a href="{!$Page.CommunityProfilePage}?id={!JSENCODE(currentUser.Id)}" class="view it-navMastheadViewSubNav"><span class="avatar" style="background-image: url({!JSENCODE(currentUser.SmallPhotoUrl)});">My Account</span></a>
                     <div class="dropdown">
                         <ul class="userInfo">
                             <li>
-                                <h4><a href="{!$Page.CommunityProfilePage}?id={!currentUser.Id}" class="it-userProfile">{!currentUser.Name}</a></h4>
+                                <h4><a href="{!$Page.CommunityProfilePage}?id={!JSENCODE(currentUser.Id)}" class="it-userProfile">{!JSENCODE(currentUser.Name)}</a></h4>
                                 <h5>{!currentUserRole}</h5>
                             </li>
                         </ul>
                         <ul>
-                            <li><a href="{!$Page.CommunityProfilePage}?id={!currentUser.Id}" class="it-navMastheadPersonalInfo">{!$Label.LBL_My_Profile}</a></li>
+                            <li><a href="{!$Page.CommunityProfilePage}?id={!JSENCODE(currentUser.Id)}" class="it-navMastheadPersonalInfo">{!$Label.LBL_My_Profile}</a></li>
                             <li><a href="#" class="it-navMastheadAccountSettings">{!$Label.LBL_Account_Settings}</a></li>
                            <apex:outputPanel layout="none" rendered="{!!ISBLANK(HelpLink)}">
                             	<li><a href="{!HelpLink}" target="_blank" class="it-navMastheadHelp">{!$Label.LBL_Help}</a></li>
