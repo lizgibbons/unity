@@ -49,6 +49,7 @@
 	<apex:stylesheet value="{!$Resource.assets}/plugins/datetimepicker/jquery.datetimepicker.css" />
 	<script type="text/javascript" src="{!$Resource.assets}/plugins/datetimepicker/jquery.datetimepicker.js"></script>
 	<!-- script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.13.1/jquery.validate.min.js"></script-->
+	
 	<article id="mainFeed">
 		<apex:outputPanel rendered="{!fromEmail}">
 		<div class="preloader__container">
@@ -301,15 +302,13 @@
 							<div class="card-comments" id="c<%- p2.id %>" name="<%- p2.id %>">
 						<% } %>
 							<div id="d<%- p2.id %>" class="comment-box">
-								<span id="s<%- p2.id %>">
 									<a class="avatar it-avatar2" href="javascript:void(0);">
 										<img src="{!currentUserPhoto}" alt=""/>
 									</a>
 									<div>
-										<textarea id="a<%- p2.id %>" class="it-commentBox1" onclick="checkmi(this);" onFocus="checkmi(this);" onkeyup="checkbtn(this,'#b<%- p2.id %>');" placeholder="{!$Label.LBL_Write_A_Comment}"></textarea>
+									<textarea id="a<%- p2.id %>" class="it-commentBox1" onclick="checkmi(this); focusComm(this, '#b<%- p2.id %>');" onkeyup="checkbtn(this,'#b<%- p2.id %>');" placeholder="{!$Label.LBL_Write_A_Comment}"></textarea>
+									<a class="btn-fill-custom right-btn disabled it-submitCommentBtn1" role="button" id="b<%- p2.id %>" onclick="postComment($('#a<%- p2.id %>').val(),'<%- p2.id %>', '<%-p2.topicsUser.length%>'); return false;">{!$Label.LBL_Comment}</a>
 									</div>
-									<a class="btn-fill-custom post-btn avatar pull-right disabled" style="width: auto;" role="button" id="b<%- p2.id %>" onclick="postComment($('#a<%- p2.id %>').val(),'<%- p2.id %>', '<%-p2.topicsUser.length%>');">{!$Label.LBL_Comment}</a>
-								</span>
 							</div>
 						</div>
 				</div>
@@ -898,7 +897,8 @@
 					return 1;
 				}
 				function postComment(text, feedid, size) {
-					if($(('#b'+feedid)).hasClass('disabled')) return false;
+					if(($('#b'+feedid)).hasClass('disabled')) return false;
+					$('#b'+feedid).hide();
 					disableBtn('b'+feedid);
 					$('#a'+feedid).mentionsInput('val', function(text) {
 						hideFeedError();
@@ -912,7 +912,7 @@
 									var template = _.template($('#ttp21').html() + $('#ttp2').html());
 									var tt = jsonObj(result);
 									$('#d'+tt.feedId).before(template(tt));
-									$('#a'+tt.feedId).val('');
+									$('#a'+tt.feedId).val('').css("height","");
 								}
 								else {
 									showFeedError(event.message);
@@ -927,6 +927,7 @@
 					$('#a'+inid).focus();
 					checkmi($('#a'+inid)[0]);
 				}
+				
 				function disableBtn(inid,inm) {
 					$('#'+inid).addClass('disabled');
 				}
@@ -1035,6 +1036,14 @@
 						$(btnid).removeClass('disabled');
 					}
 				}
+
+				function focusComm(element, btnid){
+					$('.comment-box a[role="button"]').hide();
+					$('.comment-box textarea').css("height","");		
+					$(btnid).show();
+					$(element).css("height","72px");
+				}
+
 				var chataction = {loading:false};
 				function setActiveli(element) {
 					var previousText = $('#post-area').val();
