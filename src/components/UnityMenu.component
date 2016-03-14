@@ -27,7 +27,7 @@
  * unity@motivislearning.com
 -->
 
-<apex:component controller="CommunityMenuController" access="global">
+<apex:component controller="CommunityMenuController" access="global" allowDml="true">
 <!-- For Background Image -->
 
 <apex:outputPanel rendered="{!Registration == 'true'}">
@@ -124,7 +124,7 @@
 											<small>{!conv.LatestMessage.SentDateFormatted}</small>
 										</p>
 									</a>	
-									<a class="remove it-removeNotification1" role="button" onclick="deleteNotification(this);"><i class="lrm lrm-remove"></i></a>
+									<a class="read it-removeNotification1" role="button" onclick="readNotification(this,'{!conv.ConversationId}');"></a>
 								</li>
 							</apex:repeat>	
 	                    </div>
@@ -175,13 +175,21 @@
                 </li>
 			</ul>
 			<!--</apex:outputPanel>--><!--/navbar-collapse-->
+			<apex:outputPanel id="form"/>
+			<apex:form >
+				<apex:actionFunction action="{!readConversation}" name="readConversation" rerender="form">
+			        <apex:param name="conversationId" assignTo="{!conversationId}" value="" />
+			        <apex:param name="read" assignTo="{!read}" value="" />
+			    </apex:actionFunction>
+		    </apex:form>
 		</div>
 	</div>
 	<!-- End Navbar -->
 </header>
 	<script>
-		function deleteNotification(elem){
-			$(elem).parent('.feedMenuItem').slideUp();
+		function readNotification(elem, id){
+			var read = $(elem).parent('.feedMenuItem').hasClass('unread') ? true : false;
+			readConversation(id,read);
 		}
 	</script>
 </apex:component>
