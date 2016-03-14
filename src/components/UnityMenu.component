@@ -58,7 +58,7 @@
 			<ul>
 				<li class="mobileOnly">
 	                <ul>
-	                    <li><a href="#" class="emails it-navMastheadViewEmails">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Messages}</span><apex:outputPanel StyleClass="number" rendered="{!MessageUnreadCount > 0}">{!MessageUnreadCount}</apex:outputPanel></span></a></li>
+	                    <li><a href="#" class="emails it-navMastheadViewEmails">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Messages}</span><span class="number" style="display: none">{!MessageUnreadCount}</span></span></a></li>
 	                    <li><a href="#" class="alerts it-navMastheadViewAlerts">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Notifications}</span><span class="number"></span></span></a></li>
 	                    <li><a href="#" class="search it-navMastheadOpenSearch">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Search}</span></span></a></li>
 	               	</ul>
@@ -104,7 +104,7 @@
 				<!-- End Links -->
 				<!--Recent Messages-->
 				<li class="icon hasChildren">
-	                <a href="#" title="{!$Label.LBL_Messages}" class="emails it-navMastheadViewEmails">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Messages}</span><apex:outputPanel StyleClass="number" rendered="{!MessageUnreadCount > 0}">{!MessageUnreadCount}</apex:outputPanel></span></a>
+	                <a href="#" title="{!$Label.LBL_Messages}" class="emails it-navMastheadViewEmails">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Messages}</span><span class="number" style="display:none">{!MessageUnreadCount}</span></span></a>
 	                <ul class="subMenu feedMenu">
 	                    <li class="feedMenuHeader">
 	                        <h4>{!$Label.LBL_Recent_Messages}</h4>
@@ -187,9 +187,16 @@
 	<!-- End Navbar -->
 </header>
 	<script>
+		$(document).ready(function() {
+			var countEmail = parseInt($('.emails .number').first().text(), 10); 
+			if(countEmail > 0) $('.emails .number').show();
+		});
 		function readNotification(elem, id){
 			var read = $(elem).parent('.feedMenuItem').hasClass('unread') ? true : false;
 			readConversation(id,read);
+			var countEmail = parseInt($('.emails .number').first().text(), 10);
+			if(!read && (countEmail+1) > 0) $('.emails .number').show();
+			if(read && (countEmail-1) <= 0) $('.emails .number').hide();
 		}
 	</script>
 </apex:component>
