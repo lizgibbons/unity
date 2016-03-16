@@ -1291,7 +1291,7 @@
 				function addPollChoiceInputElement (t) {
 					var t_el = $(t);
 					var totalChoices = t_el.parent().find('input[name*="choice"]');
-					var mkp = '<section><label class="label input">Choice {0}</label><label class="input"><input id="choice{0}" name="choice{0}" type="text"  /></label></section>';
+					var mkp = '<section><label class="label input">Choice {0}</label><label class="input"><input id="choice{0}" name="choice{0}" type="text" required="required" class="form-control" data-field-for-post aria-required="true"/></label></section>';
 					var nextChoice = (totalChoices.length+1);
 					$(mkp.replace(/\{0}/g, nextChoice)).insertBefore(t_el);
 					var lastitemcopy = chataction.layout.items[chataction.layout.items.length-1];
