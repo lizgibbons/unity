@@ -1707,11 +1707,11 @@ global with sharing class CommunityFeedController {
 	}
 	
 	private static List<List<String>> CHATTER_ACTIONS = new List<List<String>> {
-		new List<String> { label.LBL_Post, 'FeedItem.TextPost', 'fa-comment', 'TextPost', '', ''},
-		new List<String> { unity20_Template_Use ? label.LBL_Upload_File : label.LBL_File, 'FeedItem.ContentPost', 'fa-file-o', 'ContentPost', unity20_Template_Use ? 'upload-btn' : '', unity20_Template_Use ? 'post-upload-content-holder' : ''},
-		new List<String> { label.LBL_Link, 'FeedItem.LinkPost', 'fa-link', 'LinkPost', unity20_Template_Use ? 'link-btn' : '', unity20_Template_Use ? 'post-link-content-holder' : ''},
-		new List<String> { Label.LBL_Poll, 'FeedItem.PollPost', 'fa-bar-chart', 'PollPost', unity20_Template_Use ? 'poll-btn' : '', unity20_Template_Use ? 'post-poll-content-holder' : ''},
-		new List<String> { unity20_Template_Use ? 'News' : 'Create Event', unity20_Template_Use ? 'Create_News' : 'Create_Event', 'fa-calendar', unity20_Template_Use ? 'Create_News' : 'Create_Event', unity20_Template_Use ? 'news-btn' : '', unity20_Template_Use ? 'post-news-content-holder' : ''}
+		new List<String> { label.LBL_Post, 'FeedItem.TextPost', 'fa-comment', 'TextPost', '', '', ''},
+		new List<String> { unity20_Template_Use ? label.LBL_Upload_File : label.LBL_File, 'FeedItem.ContentPost', 'fa-file-o', 'ContentPost', unity20_Template_Use ? 'upload-btn' : '', unity20_Template_Use ? 'post-upload-content-holder' : '', unity20_Template_Use ? 'lrm-upload' : ''},
+		new List<String> { label.LBL_Link, 'FeedItem.LinkPost', 'fa-link', 'LinkPost', unity20_Template_Use ? 'link-btn' : '', unity20_Template_Use ? 'post-link-content-holder' : '', unity20_Template_Use ? 'lrm-link-feed' : ''},
+		new List<String> { Label.LBL_Poll, 'FeedItem.PollPost', 'fa-bar-chart', 'PollPost', unity20_Template_Use ? 'poll-btn' : '', unity20_Template_Use ? 'post-poll-content-holder' : '', unity20_Template_Use ? 'lrm-poll-feed' : ''},
+		new List<String> { unity20_Template_Use ? 'News' : 'Create Event', unity20_Template_Use ? 'Create_News' : 'Create_Event', 'fa-calendar', unity20_Template_Use ? 'Create_News' : 'Create_Event', unity20_Template_Use ? 'news-btn' : '', unity20_Template_Use ? 'post-news-content-holder' : '',unity20_Template_Use ? 'lrm-news-feed' : ''}
 	};
 
 	
@@ -1887,7 +1887,7 @@ global with sharing class CommunityFeedController {
 					|| (caa[3] == (unity20_Template_Use ? 'Create_News' : 'Create_Event') && hideEventBtn != true && CommunityUtils.checkCRUDforObject(CommunityUtils.getPackagePrefix()+(unity20_Template_Use ? 'Community_News__c' : 'Community_Events__c')).get('isCreateable') && CommunityUtils.checkAPIEnable())
 				)
 			) {
-					resultList.add(new ChatterActionItem(caa[0],caa[1],caa[2], caa[4], caa[5]));
+					resultList.add(new ChatterActionItem(caa[0],caa[1],caa[2], caa[4], caa[5], caa[6]));
 			}
 		}
 		}
@@ -1900,13 +1900,15 @@ global with sharing class CommunityFeedController {
 		public String icon { get; set; }
 		public String actionClass { get; set; }
 		public String holderClass { get; set; }
+		public String iconClass { get; set; }
 
-		public ChatterActionItem(String l, String n, String i, String c, String h) {
+		public ChatterActionItem(String l, String n, String i, String c, String h, String ic) {
 			label = l;
 			name = n;
 			icon = i;
 			actionClass = c;
 			holderClass = h;
+			iconClass = ic;
 		}
 	}
 

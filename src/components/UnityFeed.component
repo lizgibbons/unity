@@ -71,13 +71,13 @@
 				<div class="hide">
 					<input type="file" id="fileUploader" name="fileUploader" />
 					<div class="post-upload-content-holder">
-						<div class="post-upload-content">
+						<div class="post-upload-content" id="postUpload">
 						</div>
 					</div>
 				</div>
 				<div class="post-options" id="palist">
 				   <apex:repeat value="{!AvailableActions}" var="aa">
-				   		<button data-content-target="{!aa.holderClass}" class="{!aa.actionClass}" style="{!IF(aa.name == 'FeedItem.TextPost', 'display: none', '')}" title="{!aa.label}" id="{!aa.name}" onclick="setActiveli(this);"><i class="lrm lrm-upload"></i> <span>{!aa.label}</span></button>
+				   		<button data-content-target="{!aa.holderClass}" class="{!aa.actionClass}" style="{!IF(aa.name == 'FeedItem.TextPost', 'display: none', '')}" title="{!aa.label}" id="{!aa.name}" onclick="setActiveli(this);"><i class="lrm {!aa.iconClass}"></i> <span>{!aa.label}</span></button>
 				   </apex:repeat>
 				</div>
 			</div>
@@ -162,6 +162,7 @@
 			                    <% } %>
 			                </div>
 						</h3>
+						<% if((p2.capabilities.mute != null && {!isMuteShow}) || (p2.showFlag && chekFlagOnPage(p2.parentType)) || p2.isDeleteRestricted){ %>
 						<div class="dropmenu">
 			                <a title="More Options" alt="More Options" role="button" class="it=moreOptions2" onclick="dropUpMenu(this);"><i class="lrm lrm-more"></i></a>
 			                <ul>
@@ -181,6 +182,7 @@
 			                    <% } %>
 			                </ul>
 			            </div>
+			            <% } %>
 					</div>	
 					<div class="card-content">
 						<p>	<% var p2p = parseFeedBody(p2.body,p2.topicsUser);
@@ -189,8 +191,8 @@
 					</div>
 					<% if (p2.showLink) { %>
 						<div class="card-attachment">
-				            <h2><a href="<%- p2.linkHref %>" class="it-linkTitle"><%- p2.linkName %></a></h2>
-				            <small><a href="<%- p2.linkHref %>" class="it-linkURL"><% print(wrapnl(p2.linkHref)); %></a></small>
+				            <h2><a href="<%- p2.linkHref %>" target="_blank" class="it-linkTitle"><%- p2.linkName %></a></h2>
+				            <small><a href="<%- p2.linkHref %>" target="_blank" class="it-linkURL"><% print(wrapnl(p2.linkHref)); %></a></small>
 				        </div>
 					<% } %>
 					<% if (p2.showContent) { %>
@@ -200,7 +202,7 @@
 						            <img src="<%- p2.capabilities.content.downloadUrl %>">
 						        </div>
 						        <div class="card-content card-attachment">
-						            <a href="<%- p2.capabilities.content.downloadUrl %>" class="file-path it-filePathExample"><i class="lrm lrm-img"></i><%- p2.capabilities.content.title %></a href="#">
+						            <a href="{!$Page.CommunityGroupFiles}?f=<%- p2.capabilities.content.id %>&fi=<%- p2.id %>" target="_self" class="file-path it-filePathExample"><i class="lrm lrm-img"></i><%- p2.capabilities.content.title %></a href="#">
 						            <a href="<%- p2.capabilities.content.downloadUrl %>" class="download-btn context-btn it-filePathDownload"><i class="lrm lrm-upload"></i> {!$Label.BTN_Download}</a>
 						        </div>
 						    <% }else{ %>
@@ -290,8 +292,8 @@
 												<% var p2p = parseFeedBody(c2.body,c2.topicsUser);
 												print(wrapnl(p2p)); %>
 											</p>
-											<p>
-												<time><%- c2.dateStr %></time> &#8226; <a class="normal-weight" href="#" class="it-commentLike1">{!$Label.LBL_Feed_Like}</a> &nbsp;<%- c2.countLikes %>
+											<p id="ul<%- c2.id %>">
+												<time><%- c2.dateStr %></time> &#8226; <a class="normal-weight fa-thumbs-up" href="javascript:void(0);" class="it-commentLike1" onclick="inlAct('<%- c2.id %>','fa-thumbs-up','<%- c2.likeId %>');" >{!$Label.LBL_Feed_Like}</a> &nbsp;<span name="countLikes"><%- c2.countLikes %></span>
 											</p>
 									</div>
 								</div>
@@ -321,7 +323,7 @@
 						<img src="<%- rc.user.SmallPhotoUrl %>" alt=""/>
 					</a>
 					<textarea id="post-area" name="message" class="validate-textarea" onFocus="checkmi(this);"  onclick="checkmi(this);" placeholder="<%- rc.unPlaceholder %>" data-field-for-post></textarea>
-
+					<div id="post-area-heightmatch"></div>
 					<% if(rc.name != "FeedItem.TextPost"){%>
 						<div class="post-extra-content">
 							<div class="<%- rc.divClass %>">
@@ -404,11 +406,6 @@
         			$(el).prev('ul').slideToggle();
    				};
    				
-				
-		 		function inputFileOnchange(elm) {
-						if (elm.files.length>0) elm.parentNode.nextSibling.value = elm.files[0].name;
-						else elm.parentNode.nextSibling.value = '';
-					}
 				var chekFlagOnPage = function(type){
 					if(!(_.contains(['News','Events','Manager','Resources'], type)) ) {
 						listPages = ['CommunityNewsDetail', 'CommunityEventDetail', 'CommunityGroupManager', 'communityresourcedetail'];
@@ -448,8 +445,11 @@
 
 					$(window).scroll(function() {
 						if($(window).scrollTop() == $(document).height() - $(window).height()) {
+							if($('#shmbtn').attr('onclick')){
 							$('#shmbtn').click();
+								$('#shmbtn').removeAttr('onclick');
 							$('.loader').show();
+						}
 						}
 					});
 
@@ -468,7 +468,9 @@
 								var template = _.template($('#ttp1').html() + $('#ttp2').html() + $('#ttp3').html());
 								var tt = jsonObj(result);
 								$('#cfcmp').append(template(tt));
+								if(tt.nextPageToken){
 								$('#shmbtn').attr('onclick','loadFeeds(\'' + tt.nextPageToken + '\');return false;');
+								}
 								$('.loader').hide();
 							}
 							else {
@@ -585,7 +587,7 @@
 							onSuccess : function(result, source) {
 								if (result[0].getBoolean("success")) {
 								if($("#post-area").val()) {
-										$('[name = "message"]').mentionsInput('val', function(text) {
+										$("#post-area").mentionsInput('val', function(text) {
 											chataction.layout.items[messageItemIndex].value = text;
 											insertAttIntoFeed(result[0].id, JSON.stringify(chataction.layout));
 										});
@@ -599,7 +601,7 @@
 								}
 							},
 							onFailure : function(error, source) {
-								showFeedError(result[0].errors.message);
+								showFeedError(error);
 							}
 					});
 					// end sending
@@ -624,7 +626,7 @@
 								sendFile = true;
 								var inputfile = $("#fileUploader")[0].files[0];
 								if(inputfile != undefined) {
-									fType = inputfile.type;
+									fType = inputfile.type.length ? inputfile.type : 'application/octet-stream';
 									fName = inputfile.name;
 									if(inputfile.size>26214400) {
 										showFeedError('{!JSINHTMLENCODE($Label.LBL_File_Upload_Size_Limit)}');  // change - need label
@@ -751,7 +753,9 @@
 								refreshFeed();
 								bodyObjects = [];
 								editMessageText = '';
-								$('#pos-area').val('');
+								$('#post-area').val('');
+								$('#fileUploader').val('');
+								$('#fileUploader').change();
 								setActiveli();
 								if (typeof(switchToMemberMode) == 'function') switchToMemberMode();
 							}
@@ -1044,8 +1048,26 @@
 					$(element).css("height","72px");
 				}
 
+				$('#fileUploader').bind('changeUpload',function(){
+					fileChanged = true;
+					setActiveli($('.upload-btn')[0]);
+				});
+
+				$('.post-box').on('click', '.post-upload-content .remove', function(){
+					fileChanged = false;
+					setActiveli();
+				});
+
 				var chataction = {loading:false};
-				function setActiveli(element) {
+				var fileChanged = false;
+				function setActiveli(element, bool) {
+					if(element){
+						if(element.id.indexOf('ContentPost') != -1){
+							if(!fileChanged) return false;
+						}
+					}
+
+
 					var previousText = $('#post-area').val();
 					if(previousText.length){
 						 $('#post-area').mentionsInput('getMentions', function(text) {
@@ -1053,7 +1075,6 @@
 						});
 						editMessageText = previousText;
 					}
-								
 					if(!element) element = $("#palist button").get(0); 
 					if($(element).attr('class').indexOf('active') != -1) element = $("#palist button").get(0); 
 					if (!chataction.loading) {
@@ -1139,7 +1160,7 @@
 				function addPollChoiceInputElement (t) {
 					var t_el = $(t);
 					var totalChoices = t_el.parent().find('input[name*="choice"]');
-					var mkp = '<label>Choice {0}</label><input id="choice{0}" name="choice{0}" type="text"/>';
+					var mkp = '<label>Choice {0}</label><input id="choice{0}" name="choice{0}" type="text" required="required" class="form-control" data-field-for-post aria-required="true"/>';
 					var nextChoice = (totalChoices.length+1);
 					$(mkp.replace(/\{0}/g, nextChoice)).insertBefore(t_el);
 					var lastitemcopy = chataction.layout.items[chataction.layout.items.length-1];
