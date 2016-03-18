@@ -76,7 +76,10 @@
 						notifications = jsonObj(result);
 						var notificationsCopy = notifications.slice(0,limitSize);
 						$('#notif-panel').prepend(template(notificationsCopy));
+						if(notificationsCopy.length){
 						$('a.alerts span.number').text(notificationsCopy.length);
+							$('a.alerts span.number').show();
+						}
 					}
 				}
 			);

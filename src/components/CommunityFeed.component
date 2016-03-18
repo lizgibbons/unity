@@ -781,6 +781,7 @@
 								 		showFeedError('{!JSINHTMLENCODE($Label.LBL_File_Upload_Size_Limit)}');  // change - need label
 								 		return null;
 									}
+									var loadImg = false;
 									// my code
 									if(fType.indexOf("image/")>-1) {
 										var options = {
@@ -795,13 +796,16 @@
 											}
 											loadImage( inputfile,
 												function (img) {
+													if(img.type != 'error'){ 
 													var binary = img.toDataURL(fType).substring(img.toDataURL(fType).indexOf("base64,")+"base64,".length);
 													uploadAttachment(binary,fName,fType);
+														loadImg = true;
+													}
 												}, options
 											);
 										});
 									}
-									else {
+									if(!loadImg){
 										// end my code
 										var reader = new FileReader();
 										reader.onloadend = function(){

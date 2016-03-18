@@ -103,7 +103,7 @@
 				</li>
 				<!-- End Links -->
 				<!--Recent Messages-->
-				<li class="icon hasChildren">
+				<li class="icon hasChildren" id="recentMessages" style="display: none;">
 	                <a href="#" title="{!$Label.LBL_Messages}" class="emails it-navMastheadViewEmails">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Messages}</span><span class="number" style="display:none">{!MessageUnreadCount}</span></span></a>
 	                <ul class="subMenu feedMenu">
 	                    <li class="feedMenuHeader">
@@ -112,7 +112,7 @@
 	                    </li>
 	                    <!-- Messages block -->
 	                    <div class="feedMenuHolder" id="conversations">
-	                    	<apex:repeat value="{!unityConversations}" var="conv">
+	                    	<apex:repeat value="{!unityConversations}" var="conv" rendered="{!showPrivateMessages}">
 		                    	<li class="{!IF(conv.IsRead, 'feedMenuItem', 'feedMenuItem unread')}">
 				                    <a href="{!$Page.CommunityProfilePage}?id={!conv.LatestMessage.Sender.MemberId}" class="avatar it-navatar1">
 										<img src="{!conv.LatestMessage.Sender.MemberPhotoUrl}" alt="{!conv.LatestMessage.Sender.MemberName}" />
@@ -188,8 +188,12 @@
 </header>
 	<script>
 		$(document).ready(function() {
-			var countEmail = parseInt($('.emails .number').first().text(), 10); 
-			if(countEmail > 0) $('.emails .number').show();
+			if({!showPrivateMessages}) {
+				$('#recentMessages').show();
+				var countEmail = parseInt($('.emails .number').first().text(), 10); 
+				if(countEmail > 0) $('.emails .number').show();
+			}
+			
 		});
 		function readNotification(elem, id){
 			var read = $(elem).parent('.feedMenuItem').hasClass('unread') ? true : false;
