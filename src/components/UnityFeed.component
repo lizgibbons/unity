@@ -145,7 +145,7 @@
 				<% } %>
 					<div class="card-header">
 						<a class="avatar it-avatar1" href="{!$Page.CommunityProfilePage}?id=<%- p2.actor.id %>">
-							<img src="<%- p2.actor.photo.smallPhotoUrl %>" alt=""/>
+							<img src="<%- printPhotoUrl(p2.actor.photo.smallPhotoUrl) %>" alt=""/>
 						</a>
 						<h3><a class="it-userName1" href="{!$Page.CommunityProfilePage}?id=<%- p2.actor.id %>"><%- p2.actor.displayName %></a>
 							<span class="post-type"> posted a <strong>
@@ -202,12 +202,12 @@
 						            <img src="<%- p2.capabilities.content.downloadUrl %>">
 						        </div>
 						        <div class="card-content card-attachment">
-						            <a href="{!$Page.CommunityGroupFiles}?f=<%- p2.capabilities.content.id %>&fi=<%- p2.id %>" target="_self" class="file-path it-filePathExample"><i class="lrm lrm-img"></i><%- p2.capabilities.content.title %></a href="#">
+						            <a href="{!$Page.CommunityGroupFiles}?f=<%- p2.capabilities.content.id %>&fi=<%- p2.id %>" target="_self" class="file-path it-filePathExample"><i class="lrm lrm-img"></i><%- p2.capabilities.content.title %> (<% print(roundSize(p2.capabilities.content.fileSize)) %>)</a>
 						            <a href="<%- p2.capabilities.content.downloadUrl %>" class="download-btn context-btn it-filePathDownload"><i class="lrm lrm-upload"></i> {!$Label.BTN_Download}</a>
 						        </div>
 						    <% }else{ %>
 						    	<div class="card-content card-attachment">
-						            <a href="<%- p2.capabilities.content.downloadUrl %>" class="file-path it-filePathExample"><i class="lrm lrm-img"></i><%- p2.capabilities.content.title %></a href="#">
+						            <a href="{!$Page.CommunityGroupFiles}?f=<%- p2.capabilities.content.id %>&fi=<%- p2.id %>" target="_self" class="file-path it-filePathExample"><i class="lrm lrm-img"></i><%- p2.capabilities.content.title %> (<% print(roundSize(p2.capabilities.content.fileSize)) %>)</a>
 						            <a href="<%- p2.capabilities.content.downloadUrl %>" class="download-btn context-btn it-filePathDownload"><i class="lrm lrm-upload"></i> {!$Label.BTN_Download}</a>
 						        </div>
 						    <% } %>         
@@ -284,7 +284,7 @@
 			<script id="ttp2" type="text/template">
 								<div class="comment" id="m<%- c2.id %>">
 									<a class="avatar it-avatar4" href="{!$Page.CommunityProfilePage}?id=<%- c2.user.id %>">
-										<img src="<%- c2.user.photo.smallPhotoUrl %>" alt=""/>
+										<img src="<%- printPhotoUrl(c2.user.photo.smallPhotoUrl) %>" alt=""/>
 									</a>
 									<div class="comment-holder">
 										<h4 class="media-heading">
@@ -320,7 +320,7 @@
 			<script id="atp" type="text/template">
 				<form name="postform">
 					<a class="avatar" href="{!$Page.CommunityProfilePage}?id=<%- rc.user.Id %>">
-						<img src="<%- rc.user.SmallPhotoUrl %>" alt=""/>
+						<img src="<%- printPhotoUrl(rc.user.SmallPhotoUrl) %>" alt=""/>
 					</a>
 					<textarea id="post-area" name="message" class="validate-textarea" onFocus="checkmi(this);"  onclick="checkmi(this);" placeholder="<%- rc.unPlaceholder %>" data-field-for-post></textarea>
 					<div id="post-area-heightmatch"></div>
@@ -632,6 +632,7 @@
 										showFeedError('{!JSINHTMLENCODE($Label.LBL_File_Upload_Size_Limit)}');  // change - need label
 								 		return null;
 									}
+									var loadImg = false;
 									// my code
 									if(fType.indexOf("image/")>-1) {
 										var options = {
@@ -646,13 +647,16 @@
 											}
 											loadImage( inputfile,
 												function (img) {
+													if(img.type != 'error'){ 
 													var binary = img.toDataURL(fType).substring(img.toDataURL(fType).indexOf("base64,")+"base64,".length);
 													uploadAttachment(binary,fName,fType);
+														loadImg = true;
+													}
 												}, options
 											);
 										});
 									}
-									else {
+									if(!loadImg){
 										// end my code
 										var reader = new FileReader();
 										reader.onloadend = function(){
@@ -1066,8 +1070,7 @@
 							if(!fileChanged) return false;
 						}
 					}
-
-
+					editMessageText = '';
 					var previousText = $('#post-area').val();
 					if(previousText.length){
 						 $('#post-area').mentionsInput('getMentions', function(text) {
@@ -1075,7 +1078,10 @@
 						});
 						editMessageText = previousText;
 					}
-					if(!element) element = $("#palist button").get(0); 
+					if(!element){
+						element = $("#palist button").get(0);
+						$("#palist button").removeClass('active');
+					} 
 					if($(element).attr('class').indexOf('active') != -1) element = $("#palist button").get(0); 
 					if (!chataction.loading) {
 						hideFeedError();
@@ -1119,11 +1125,14 @@
 									initValidator();
 									if($('.hide .post-upload-content.fileAdded').length && chataction.layout.name == 'FeedItem.ContentPost'){
 										$('.post-extra-content').html($('.hide .post-upload-content.fileAdded').clone());
+										togglePostButton();
 									}
 									//previous text
 									if(editMessageText.length){
 										checkmi($('#postarea [name="message"]'));
-										$('[name="postform"] .post-btn').removeClass('disabled');
+										togglePostButton();
+										$('#post-area-heightmatch').text($('#post-area').val());
+										$('#post-area').height($('#post-area-heightmatch').height());
 									}
 								
 									//datetime
@@ -1179,6 +1188,7 @@
 					if (nextChoice == 11) {
 						t_el.remove();
 					}
+					togglePostButton();
 				}
 				
 				function vote(t) {
@@ -1534,6 +1544,28 @@
 			}
 			
 			return outString;
+		}
+
+		function roundSize(fileSize){
+			var outString = "";
+			var sizeName = ['b','kb','mb','gb'];
+			var index = 0;
+			var resSize = fileSize;
+			while(Math.floor(resSize / 1024) > 0){
+				index++;
+				if(index == 4) return resSize.toString()+sizeName[index];
+				resSize = Math.round(fileSize / 1024);
+			}
+			outString = resSize.toString()+sizeName[index];
+			return outString;
+
+		}
+		function printPhotoUrl(photoUrl){
+			var url = photoUrl.split('/');
+			if(url[url.length-2].length == 3){
+				return '{!$Resource.assets2}/images/home/default-male.jpg';
+			}
+			return photoUrl;
 		}
 		$(document).ready(function() {
 			if($("form[name='postform']")[0]) {

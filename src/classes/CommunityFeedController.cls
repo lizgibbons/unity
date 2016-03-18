@@ -57,7 +57,7 @@ global with sharing class CommunityFeedController {
 	public Boolean muteShowTooltip { get; set; }
     public Boolean isMuteShow { 
         get{
-            if(ApexPages.currentPage().getUrl().containsIgnoreCase('CommunityFeed_MyFeed')){
+            if(ApexPages.currentPage().getUrl().containsIgnoreCase('CommunityFeed_MyFeed') || ApexPages.currentPage().getUrl().containsIgnoreCase('UnityHome')){
                 muteShowTooltip = feedType == '1' ? true : false;
                 return feedType == '1' || feedType == '4';
             }
