@@ -562,6 +562,8 @@
         <members>LBL_RegProfilePicture_Title</members>
         <members>LBL_RegTerms_Title</members>
         <members>LBL_Related_Tags</members>
+        <members>LBL_Remove_Flag</members>
+        <members>LBL_Remove_Flags</members>
         <members>LBL_Remove_From_Favorites</members>
         <members>LBL_RequestToJoin</members>
         <members>LBL_Requested</members>

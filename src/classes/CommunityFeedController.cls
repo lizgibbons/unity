@@ -45,6 +45,7 @@ global with sharing class CommunityFeedController {
 			return cts.Enable_Unity2_0_Template__c; 
 		}
 	}
+	public static Boolean isModerateNetworkFeeds { get{ return CommunityUtils.isModerateChatterAndModerateNetworkFeeds();} }
 	public Boolean grID { get; set; }
 	public Boolean hideEventBtn { get { return hideEventBtn == true; } set; }
 	public String parentId { get { return parentId == NULL ? UserInfo.getUserId() : parentId; } set; }
@@ -115,7 +116,8 @@ global with sharing class CommunityFeedController {
 
 	public String currentUserPhoto {
 		get {
-            return ConnectApi.UserProfiles.getPhoto(Network.getNetworkId(),'me').smallPhotoUrl;
+			String imgPhoto =  ConnectApi.UserProfiles.getPhoto(Network.getNetworkId(),'me').smallPhotoUrl;
+			return unity20_Template_Use ? CommunityUtils.checkUrlForImage(imgPhoto) : imgPhoto;
             //return ConnectApi.UserProfiles.getPhoto(Network.getNetworkId(),'me').smallPhotoUrl;
 		}
 	}
@@ -413,7 +415,6 @@ global with sharing class CommunityFeedController {
 			}
 			
 		}
-		
 		for(FeedElement fe : currentFeedPage.elements){
 			if(feedIdParentId.containsKey(fe.Id)){
 				fe.parentId = feedIdParentId.get(fe.Id);
@@ -1170,11 +1171,12 @@ global with sharing class CommunityFeedController {
 		else if (inCname == 'fa-flag') {
 			String resultOid = '';
 			if (String.isNotBlank(inOid)) {
+				String usId = (unity20_Template_Use && isModerateNetworkFeeds) ? null : UserInfo.getUserId();
 				if (inPid.startsWith('0D5')) {
-					ConnectApi.CommunityModeration.removeFlagFromFeedElement(Network.getNetworkId(), inPid, UserInfo.getUserId());
+					ConnectApi.CommunityModeration.removeFlagFromFeedElement(Network.getNetworkId(), inPid, usId);
 				}
 				else {
-					ConnectApi.CommunityModeration.removeFlagFromComment(Network.getNetworkId(), inPid, UserInfo.getUserId());
+					ConnectApi.CommunityModeration.removeFlagFromComment(Network.getNetworkId(), inPid, usId);
 				}
 			}
 			else {
@@ -1386,10 +1388,7 @@ global with sharing class CommunityFeedController {
 	private static Boolean bool ;
 	public static Boolean checkBool(){
 		if(bool == null){
-			Profile prof = [SELECT PermissionsModerateChatter, PermissionsModerateNetworkFeeds FROM Profile WHERE Id = :UserInfo.getProfileId() Limit 1];
-			Boolean moderateChatter = prof.PermissionsModerateChatter;
-			Boolean moderateFeeds = prof.PermissionsModerateNetworkFeeds;
-			bool = moderateChatter || moderateFeeds;
+			bool = CommunityUtils.isModerateChatterAndModerateNetworkFeeds();
 		}
 		return bool;
 	}
@@ -1423,6 +1422,7 @@ global with sharing class CommunityFeedController {
 		public Boolean showContent { get { return capabilities.content != NULL; } }
 		public Boolean showFlag { get { return capabilities.moderation != NULL; } }
 		public Boolean flagged { get { return (showFlag && capabilities.moderation != NULL && capabilities.moderation.moderationFlags != NULL) ? capabilities.moderation.moderationFlags.flaggedByMe : false; } }
+		public Integer flagCount { get { return (showFlag && capabilities.moderation != NULL && capabilities.moderation.moderationFlags != NULL) ? capabilities.moderation.moderationFlags.flagCount : 0; } }
 		public String flagStatus { get { return flagged ? 'true' : ''; } }
 		public String flagStyle { get { return flagged ? ' active' : ''; } }
 
@@ -1508,6 +1508,7 @@ global with sharing class CommunityFeedController {
 
 	public class ModerationFlags {
 		public Boolean flaggedByMe { get; set; }
+		public Integer flagCount { get; set; }
 	}
 
 	public class ChatterLikes {

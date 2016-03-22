@@ -100,24 +100,7 @@
 		            <div class="ispinner-blade"></div>
 		        </div>
 		    </div>
-					<!-- modal section for edit post-->	
-			<div class="modal fade" tabindex="-1" role="dialog" id="editPanel" data-backdrop="static">
-				<div class="modal-dialog">
-					<div class="modal-content">
-			    		<div class="modal-header">
-				        	<button type="button" class="close" onclick="closeEditDialog();return false;" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				        	<h4 class="modal-title">{!$Label.BTN_Edit}</h4>
-				      	</div>
-				     	<div id="modalDialog" class="modal-body">
-						    <form name="editform">
-								<div class="sky-form bordered margin-bottom-5">
-									<textarea name="message" id="message" class="form-control share" onclick="checkmi(this);"></textarea>
-								</div>
-							</form>
-				      	</div>
-				    </div><!-- /.modal-content -->
-				</div><!-- /.modal-dialog -->
-			</div><!-- /.modal -->
+					<!-- section for edit post-->	
 			<script id="ttp1" type="text/template">
 				<% if(viewFromEmail && rc.elements == null) {%>
 					<p><a class="font-weight-bold" href="<%- rc %>">{!$Label.LBL_All_Updates}</a> ) {!$Label.LBL_This_Update}</p>
@@ -162,23 +145,47 @@
 			                    <% } %>
 			                </div>
 						</h3>
-						<% if((p2.capabilities.mute != null && {!isMuteShow}) || (p2.showFlag && chekFlagOnPage(p2.parentType)) || p2.isDeleteRestricted){ %>
+						<% if((p2.capabilities.mute != null && {!isMuteShow}) || (p2.showFlag && chekFlagOnPage(p2.parentType)) || p2.isDeleteRestricted || p2.capabilities.edit.isEditRestricted){ %>
+						<% if({!isModerateNetworkFeeds} || p2.flagStatus == 'true'){
+						 	if(p2.flagCount > 0 || p2.flagStatus == 'true') { %>
+						 		<div class="flag" id="f<%- p2.id %>">
+							<% }else { %>
+								<div class="flag" id="f<%- p2.id %>" style="display:none">
+							<% } %>	
+						<% }else{ %> 
+						<div class="flag" id="f<%- p2.id %>" style="display:none">
+						<% } %>
+							<a role="button" title="Flag" alt="Flag" class="card-btn flag-btn it-flagBtn1 active">Flag</a>
+			            </div>
 						<div class="dropmenu">
 			                <a title="More Options" alt="More Options" role="button" class="it=moreOptions2" onclick="dropUpMenu(this);"><i class="lrm lrm-more"></i></a>
-			                <ul>
+			                <ul id="drop<%- p2.id %>">
+			                	<% if (!p2.showContent && !p2.capabilities.poll && !p2.capabilities.edit.isEditRestricted){ %>
+									<li><a role="button" class="editPost it-editPost2" onclick="dropDownMenu(this);editPost('<%- p2.id %>');"><i class="lrm lrm-edit outline-icon"></i><i class="lrm lrm-edit solid-icon"></i>{!$Label.BTN_Edit}</a></li>
+								<% } %>
 			                	<% if(p2.capabilities.mute != null && {!isMuteShow}){ %>
 									<% if({!muteShowTooltip}){%>	
-			                    		<li><a role="button" class="it-mutePost1" onclick="muteFeed('<%- p2.id %>', '<%- p2.capabilities.mute.isMutedByMe %>'); dropDownMenu(this);"><i class="lrm lrm-mute outline-icon"></i><i class="lrm lrm-mute-solid solid-icon"></i>{!$Label.LBL_MuteFeed}</a></li>
+			                    		<li><a role="button" class="it-mutePost1" onclick="dropDownMenu(this); muteFeed('<%- p2.id %>', '<%- p2.capabilities.mute.isMutedByMe %>');"><i class="lrm lrm-mute outline-icon"></i><i class="lrm lrm-mute-solid solid-icon"></i>{!$Label.LBL_MuteFeed}</a></li>
 			                    	<% } %>
 									<% if({!!muteShowTooltip}){%>
-										<li><a role="button" class="it-mutePost1" onclick="muteFeed('<%- p2.id %>', '<%- p2.capabilities.mute.isMutedByMe %>'); dropDownMenu(this);"><i class="lrm lrm-mute outline-icon"></i><i class="lrm lrm-mute-solid solid-icon"></i>{!$Label.LBL_Unmute_Feed}</a></li>
+										<li><a role="button" class="it-mutePost1" onclick=" dropDownMenu(this); muteFeed('<%- p2.id %>', '<%- p2.capabilities.mute.isMutedByMe %>');"><i class="lrm lrm-mute outline-icon"></i><i class="lrm lrm-mute-solid solid-icon"></i>{!$Label.LBL_Unmute_Feed}</a></li>
 									<% } %>
 								<% } %>
 								<% if ( (p2.showFlag) && chekFlagOnPage(p2.parentType) ) { %>
-			                    	<li><a role="button" class="it-flagPost1" onclick="inlAct('<%- p2.id %>','fa-flag','<%- p2.flagStatus %>'); dropDownMenu(this);"><i class="lrm lrm-flag outline-icon"></i><i class="lrm lrm-flag-solid solid-icon"></i>{!$Label.LBL_Flag}</a></li>
+			                    	<% if({!!isModerateNetworkFeeds}) { %>
+			                    		<li><a role="button" class="it-flagPost1" onclick="dropDownMenu(this); inlAct('<%- p2.id %>','fa-flag','<%- p2.flagStatus %>');"><i class="lrm lrm-flag outline-icon"></i><i class="lrm lrm-flag-solid solid-icon"></i><% if(p2.flagStatus){ %> {!$Label.LBL_Remove_Flag}
+			                    			<% } else {%> {!$Label.LBL_Flag} <%}%></a></li>
+			                    	<% } else{ %>
+			                    		<% if(!p2.flagStatus){ %>
+			                    			<li><a role="button" class="it-flagPost1" onclick="dropDownMenu(this); inlAct('<%- p2.id %>','fa-flag','');"><i class="lrm lrm-flag outline-icon"></i><i class="lrm lrm-flag-solid solid-icon"></i> {!$Label.LBL_Flag}</a></li>
+			                    		<% } %>
+			                    		<% if (p2.flagCount > 0){ %>
+			                    			<li><a role="button" class="it-flagPost1" onclick="dropDownMenu(this); inlAct('<%- p2.id %>','fa-flag','true');"><i class="lrm lrm-flag outline-icon"></i><i class="lrm lrm-flag-solid solid-icon"></i> {!$Label.LBL_Remove_Flags}</a></li>
+			                   			 <% } %>	
+			                    	<% } %>	
 			                    <% } %>
 			                    <% if (p2.isDeleteRestricted) { %>
-			                    	<li><a role="button" class="it-deletePost1" onclick="inlAct('<%- p2.id %>','fa-times',''); dropDownMenu(this);"><i class="lrm lrm-remove outline-icon"></i><i class="lrm lrm-remove solid-icon"></i>{!$Label.LBL_Delete}</a></li>
+			                    	<li><a role="button" class="it-deletePost1" onclick=" dropDownMenu(this); inlAct('<%- p2.id %>','fa-times','');"><i class="lrm lrm-remove outline-icon"></i><i class="lrm lrm-remove solid-icon"></i>{!$Label.LBL_Delete}</a></li>
 			                    <% } %>
 			                </ul>
 			            </div>
@@ -188,6 +195,9 @@
 						<p>	<% var p2p = parseFeedBody(p2.body,p2.topicsUser);
 								print(wrapnl(p2p)); %>
 						</p>
+						<% if (!p2.showContent && !p2.capabilities.poll && !p2.capabilities.edit.isEditRestricted){ %>
+							<div id="editPanel<%- p2.id %>" style="display: none;"></div>
+						<% } %>
 					</div>
 					<% if (p2.showLink) { %>
 						<div class="card-attachment">
@@ -207,7 +217,17 @@
 						        </div>
 						    <% }else{ %>
 						    	<div class="card-content card-attachment">
-						            <a href="{!$Page.CommunityGroupFiles}?f=<%- p2.capabilities.content.id %>&fi=<%- p2.id %>" target="_self" class="file-path it-filePathExample"><i class="lrm lrm-img"></i><%- p2.capabilities.content.title %> (<% print(roundSize(p2.capabilities.content.fileSize)) %>)</a>
+						            <a href="{!$Page.CommunityGroupFiles}?f=<%- p2.capabilities.content.id %>&fi=<%- p2.id %>" target="_self" class="file-path it-filePathExample">
+						            <% if(p2.capabilities.content.fileExtension){
+						            	if(p2.capabilities.content.fileExtension == 'pdf'){ %><i class="lrm lrm-pdf"></i>
+						            	<% 	}else if(['ppt', 'pptx'].indexOf(p2.capabilities.content.fileExtension) != -1){ %><i class="lrm lrm-ppt"></i>
+						            	<% 	}else if(['doc', 'docx'].indexOf(p2.capabilities.content.fileExtension) != -1){ %><i class="lrm lrm-doc"></i>
+						            	<% 	}else if(['xls', 'xlsx'].indexOf(p2.capabilities.content.fileExtension) != -1){ %><i class="lrm lrm-xls"></i>
+						            	<% 	}else if(['avi', 'wmv', 'mkv', 'mov','3gp', 'flv', 'swf', 'vob', 'ifo', 'mp4'].indexOf(p2.capabilities.content.fileExtension) != -1){ %><i class="lrm lrm-video"></i>
+						            	<% 	}else if(['ac3', 'aud', 'flac', 'midi', 'mp3', 'voc', 'wav', 'wma'].indexOf(p2.capabilities.content.fileExtension) != -1){ %><i class="lrm lrm-audio"></i>
+						            	<% 	}else{ %><i class="lrm lrm-genericfile"></i><% } %>
+						            <% } %>
+						            <%- p2.capabilities.content.title %> (<% print(roundSize(p2.capabilities.content.fileSize)) %>)</a>
 						            <a href="<%- p2.capabilities.content.downloadUrl %>" class="download-btn context-btn it-filePathDownload"><i class="lrm lrm-upload"></i> {!$Label.BTN_Download}</a>
 						        </div>
 						    <% } %>         
@@ -287,13 +307,19 @@
 										<img src="<%- printPhotoUrl(c2.user.photo.smallPhotoUrl) %>" alt=""/>
 									</a>
 									<div class="comment-holder">
-										<h4 class="media-heading">
 											<p><strong><a href="{!$Page.CommunityProfilePage}?id=<%- c2.user.id %>" class="it-userCommentAvatar1"><%- c2.user.displayName %></a></strong>
 												<% var p2p = parseFeedBody(c2.body,c2.topicsUser);
 												print(wrapnl(p2p)); %>
 											</p>
-											<p id="ul<%- c2.id %>">
-												<time><%- c2.dateStr %></time> &#8226; <a class="normal-weight fa-thumbs-up" href="javascript:void(0);" class="it-commentLike1" onclick="inlAct('<%- c2.id %>','fa-thumbs-up','<%- c2.likeId %>');" >{!$Label.LBL_Feed_Like}</a> &nbsp;<span name="countLikes"><%- c2.countLikes %></span>
+											<div id="editPanel<%- c2.id %>" style="display: none;"></div>
+											<p id="ul<%- c2.id %>"><time><%- c2.dateStr %></time>
+												<% if(!c2.capabilities.edit.isEditRestricted){ %> 
+												| <a href="javascript:void(0);" class="normal-weight editComment it-commentLike2" onclick="editComment('<%- c2.id %>');">{!$Label.BTN_Edit}</a>
+												<% } %>
+												<% if (c2.isDeleteRestricted) { %>
+												| <a href="javascript:void(0);" class="normal-weight it-commentLike2" onclick="inlAct('<%- c2.id %>','fa-times','');">{!$Label.LBL_Delete}</a>
+												<% } %> 
+												| <a class="normal-weight fa-thumbs-up" href="javascript:void(0);" class="it-commentLike1" onclick="inlAct('<%- c2.id %>','fa-thumbs-up','<%- c2.likeId %>');" >{!$Label.LBL_Feed_Like}</a> &nbsp;<span name="countLikes"><%- c2.countLikes %></span>
 											</p>
 									</div>
 								</div>
@@ -353,40 +379,31 @@
 			</script>
 
 			<script id="etp" type="text/template">
-				<div id="postarea">
 				<form name="editform" class="edit-form" novalidate="novalidate">
-					<div class="sky-form bordered margin-bottom-5">
-						<div class="sky-div-margin">
                     	<% if(rc.elements){ 
                     		_.each(rc.elements, function(editel){%>
-							</div>
 								<textarea id="message" name="message" class="form-control tagged_text share validate-textarea" onFocus="checkmi(this);"  onclick="checkmi(this);"><%print(wrapnl(parseFeedBodyEdit(editel.body))); 
 										parseBody(editel.body,editel.topicsUser);
 									%>
 								</textarea>
+							<div class="blockBtnWrapper" id="editBtnBlock">
+			                	<a id="svbtn<%- editel.id %>" role="button" class="block-btn-half btn-fill-custom" onclick="initTextareaBTN(this);updateAction($('#editPanel<%- editel.id %> #message').val(),'<%- editel.id %>');return false;">{!$Label.BTN_Save}</a>
+			                	<a id="cnsbtn<%- editel.id %>" role="button" class="block-btn-half btn-fill-light" onclick="closeEditDialog('<%- editel.id %>');return false;">{!$Label.BTN_Cancel}</a>
+			                </div>
 							<%}); 
                     	}else{
                     		_.each(rc.items, function(editel){%>
-							</div>
 								<textarea id="message" name="message" class="form-control tagged_text share validate-textarea" onFocus="checkmi(this);"  onclick="checkmi(this);"><%print(wrapnl(parseFeedBodyEdit(editel.body))); 
 										parseBody(editel.body,editel.topicsUser);
 									%>
 								</textarea>
+							<div class="blockBtnWrapper" id="editBtnBlock">
+			                	<a id="svbtn<%- editel.id %>" role="button" class="block-btn-half btn-fill-custom" onclick="initTextareaBTN(this);updateAction($('#editPanel<%- editel.id %> #message').val(),'<%- editel.id %>');return false;">{!$Label.BTN_Save}</a>
+			                	<a id="cnsbtn<%- editel.id %>" role="button" class="block-btn-half btn-fill-light" onclick="closeEditDialog('<%- editel.id %>');return false;">{!$Label.BTN_Cancel}</a>
+			                </div>
 							<%}); 
                     	}%>
-	                </div>
-	                <div class="text-right">
-	                	<button id="svbtn" class="btn-u margin-right-5" type="button" onclick="initTextareaBTN(this);updateAction($('#editPanel #message').val());return false;">
-	                		<i class="fa fa-spinner fa-pulse" style="display:none;"></i>
-							<span>{!$Label.BTN_Save}</span>
-						</button>
-				    	<button id="cnlbtn" class="btn-u btn-u-default margin-right-5" type="button" onclick="closeEditDialog();return false;">
-				    		<span>{!$Label.BTN_Cancel}</span>
-						</button>
-						
-					</div>
                 </form>
-                </div>
             </script>
 
 			<script>
@@ -403,7 +420,7 @@
    				};
 
    				function dropDownMenu(el){
-        			$(el).prev('ul').slideToggle();
+   					$(el).parent().parent().slideToggle();
    				};
    				
 				var chekFlagOnPage = function(type){
@@ -602,6 +619,7 @@
 							},
 							onFailure : function(error, source) {
 								showFeedError(error);
+								$(".post-box").css('pointer-events', '').css('opacity', '');
 							}
 					});
 					// end sending
@@ -610,6 +628,7 @@
 				function postAction(text) {
 					if($('#mesbtn').hasClass('disabled')) return false;
 					if( checkTopicsCount(text) == -1 ) return ;
+					$(".post-box").css('pointer-events', 'none').css('opacity', '0.8');
 					hideFeedError();
 					disableBtn('mesbtn');
 					var messageItemIndex = -1;
@@ -685,39 +704,41 @@
 							else {
 								sendPostAction(JSON.stringify(chataction.layout), fBaseStr, fType, fName);
 							}
+							$(".post-box").css('pointer-events', '').css('opacity', '');
 						}
 					}
 					else {
 						$("form[name='postform']").data('validator').showErrors(); 
+						$(".post-box").css('pointer-events', '').css('opacity', ''); 
 					}
 				}
 
-				function updateAction(text) {
+				function updateAction(text, objId) {
 					if( checkTopicsCount(text) == -1 ) return ;
 					hideFeedError();
-					disableBtn('svbtn');
+					$("#editPanel"+objId).css('pointer-events', 'none').css('opacity', '0.8');
 					var messageItemIndex = -1;
 
 					if(idForEditPost){
-						if($("form[name='editform']").data('validator').checkForm()) {
+						if($("#editPanel"+objId+" form").data('validator').checkForm()) {
 							_.each(chatactionForEdit.layout.items, function(item) {
 								messageItemIndex = chatactionForEdit.layout.items.indexOf(item);
-								item.value = $("#modalDialog [name='message']").val();
+								item.value = $("#editPanel"+objId+" [name='message']").val();
 							});
-							if($("#modalDialog [name='message']").val()) {
-								$('#modalDialog [name="message"]').mentionsInput('val', function(text) {
+							if($("#editPanel"+objId+" [name='message']").val()) {
+								$('#editPanel'+objId+' [name="message"]').mentionsInput('val', function(text) {
 									chatactionForEdit.layout.items[messageItemIndex].value = text;
 									updateFeedPostAction(JSON.stringify(chatactionForEdit.layout));
 								});
 							}
 						}
 						else {
-							$("form[name='editform']").data('validator').showErrors(); 
+							$("#editPanel"+objId+" form").data('validator').showErrors(); 
 							enableBtn('svbtn');
 						}
 					}
 					if(idForEditComment){
-						$('#modalDialog [name="message"]').mentionsInput('val', function(text) {
+						$('#editPanel'+objId+' [name="message"]').mentionsInput('val', function(text) {
 							hideFeedError();
 							var params = {
 								'inText' 	 : text, 
@@ -728,17 +749,15 @@
 								params,
 								function(result, event) {
 									if (event.result) {
-										enableBtn('svbtn');
 										refreshFeed();
 										setActiveli();
-										closeEditDialog();
-										$('#modalDialog [name="message"]').val('');
+										//closeEditDialog();
+										$('#editPanel [name="message"]').val('');
 										if (typeof(switchToMemberMode) == 'function') switchToMemberMode();
 									}
 									else {
 										showFeedError(event.message);
 									}
-									enableBtn('svbtn');
 								}
 							);
 						});
@@ -760,6 +779,7 @@
 								$('#post-area').val('');
 								$('#fileUploader').val('');
 								$('#fileUploader').change();
+								$(".post-box").css('pointer-events', '').css('opacity', '');
 								setActiveli();
 								if (typeof(switchToMemberMode) == 'function') switchToMemberMode();
 							}
@@ -785,17 +805,15 @@
 						params,
 						function(result, event) {
 							if (event.result) {
-								enableBtn('svbtn');
 								refreshFeed();
 								setActiveli();
-								closeEditDialog();
-								$('#modalDialog [name="message"]').val('');
+								//closeEditDialog();
+								$('#editPanel [name="message"]').val('');
 								if (typeof(switchToMemberMode) == 'function') switchToMemberMode();
 							} 
 							else {
 								showFeedError(event.message);
 							}
-							enableBtn('svbtn');
 						}
 					);					
 				}
@@ -963,6 +981,9 @@
 									if (tt.cname=='fa-thumbs-up') {
 									var dti = parseInt($('#ul'+tt.pid+' [name="countLikes"]').first().text());
 									$('#ul'+tt.pid+' [name="countLikes"]').first().text(tt.oid==''?(dti-1):(dti+1));
+									}
+									if(tt.cname == 'fa-flag'){
+										refreshFeed();	
 									}
 								}
 						}
@@ -1230,7 +1251,9 @@
 				}
 
 				function editPost(objId){
-					$('#editPanel').modal('toggle');
+					if($("[id^='editPanel'].active").length){
+						closeEditDialog($("[id^='editPanel'].active").attr('id').split('editPanel')[1]);
+					}
 					idForEditPost = objId;
 					var params = {'parentId' : '{!JSENCODE(parentId)}', 
 								'feedType' 	 : '{!feedType}',
@@ -1244,11 +1267,16 @@
 								_.templateSettings.variable = 'rc';
 								var template = _.template($('#etp').html());
 								var tt = jsonObj(result);
-								$('#modalDialog').empty();
-								$('#modalDialog').prepend(template(tt));
+								$('#editPanel'+objId).empty();
+								$('#editPanel'+objId).prepend(template(tt));
+								$('#editPanel'+objId).addClass('active');
+								$('#editPanel'+objId+' #message').height($('#m'+objId+' .card-content p').height());
+								$('#editPanel'+objId+' #editBtnBlock').css('position','relative').css('top','-3px');
+								$('#editPanel'+objId).show();
+								$('#m'+objId+' .card-content p').hide();
 								//$('.preloader__container').hide();
-								initValidator(true);
-								checkmi($('#editPanel textarea'));
+								initValidator(objId);
+								checkmi($('#editPanel'+objId+' textarea'));
 							}else{
 								showFeedError(event.message);
 							}
@@ -1257,7 +1285,9 @@
 				}
 
 				function editComment(objId){
-					$('#editPanel').modal('toggle');
+					if($("[id^='editPanel'].active").length){
+						closeEditDialog($("[id^='editPanel'].active").attr('id').split('editPanel')[1]);
+					}
 					idForEditComment = objId;
 					var params = {
 						'commentId'	 	: objId
@@ -1270,11 +1300,16 @@
 								_.templateSettings.variable = 'rc';
 								var template = _.template($('#etp').html());
 								var tt = jsonObj(result);
-								$('#modalDialog').empty();
-								$('#modalDialog').prepend(template(tt));
+								$('#editPanel'+objId).empty();
+								$('#editPanel'+objId).prepend(template(tt));
+								$('#editPanel'+objId).addClass('active');
+								$('#editPanel'+objId+' #message').height($('#m'+objId+' .comment-holder p').height());
+								$('#editPanel'+objId+' #editBtnBlock').css('position','relative').css('top','-3px');
+								$('#editPanel'+objId).show();
+								$('#m'+objId+' .comment-holder p').hide();
 								//$('.preloader__container').hide();
-								initValidator(true);
-								checkmi($('#editPanel textarea'));
+								initValidator(objId);
+								checkmi($('#editPanel'+objId+' textarea'));
 							}else{
 								showFeedError(event.message);
 							}
@@ -1282,9 +1317,13 @@
 					);
 				}
 
-				function closeEditDialog(){
-					$('#editPanel').modal('toggle');
-					$('#modalDialog [name="message"]').val('');
+				function closeEditDialog(objId){
+					$('#editPanel'+objId).hide();
+					$('#editPanel'+objId).empty();
+					$('#editPanel'+objId).removeClass('active');
+					$('#m'+objId+' .card-content p').show();
+					$('#m'+objId+' .comment-holder p').show();
+					$('#editPanel'+objId+' [name="message"]').val('');
 					idForEditPost = '';
 					idForEditComment = '';
 					bodyObjects = [];
@@ -1404,7 +1443,7 @@
 								if(item.fieldName == 'message') {
 									messageItemIndex = chataction.layout.items.indexOf(item);
 								}
-								var currentItem = editFlag ? $("#modalDialog [name='message']") : $("[name='" + item.fieldName + "']");
+								var currentItem = editFlag ? $("#editPanel"+editFlag+" [name='message']") : $("[name='" + item.fieldName + "']");
 								if(currentItem && item.ftype != 'inputfile') {
 									if(currentItem.rules()) {
 										currentItem.rules('remove');
@@ -1560,6 +1599,7 @@
 			return outString;
 
 		}
+		
 		function printPhotoUrl(photoUrl){
 			var url = photoUrl.split('/');
 			if(url[url.length-2].length == 3){
@@ -1568,7 +1608,7 @@
 			return photoUrl;
 		}
 		$(document).ready(function() {
-			if($("form[name='postform']")[0]) {
+			if($("form[name='postform']")[0]) {<apex:includeScript value="{!$Resource.CommunityResources}/js/underscore/underscore-min.js"/>
 				initValidator();
 				setActiveli();
 			}

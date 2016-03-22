@@ -89,6 +89,7 @@ public with sharing class CommunityMenuController {
 	}
 	
 	public static Boolean getShowPrivateMessages(){
+		if(Network.getNetworkId() == NULL) return true;
 		return [SELECT OptionsPrivateMessagesEnabled, Id FROM Network WHERE Id =: Network.getNetworkId() LIMIT 1].OptionsPrivateMessagesEnabled;
 	}
 	
