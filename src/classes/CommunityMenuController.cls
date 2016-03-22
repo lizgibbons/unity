@@ -31,9 +31,12 @@ public with sharing class CommunityMenuController {
 
 	
 	public String currentUserRole { get{ return CommunityFeedController.getUserRoles(new List<String>{UserInfo.getUserId()}).get(UserInfo.getUserId());} }
+	public String conversationId { get; set; }
+	public Boolean read { get; set; }
 
 	public List<ChatterConversation> getUnityConversations(){
 		UnityMessage umn = new UnityMessage();
+		umn.Conversations.sort();
 		return umn.Conversations;
 	}
 
@@ -86,6 +89,7 @@ public with sharing class CommunityMenuController {
 	}
 	
 	public static Boolean getShowPrivateMessages(){
+		if(Network.getNetworkId() == NULL) return true;
 		return [SELECT OptionsPrivateMessagesEnabled, Id FROM Network WHERE Id =: Network.getNetworkId() LIMIT 1].OptionsPrivateMessagesEnabled;
 	}
 	
@@ -179,6 +183,12 @@ public with sharing class CommunityMenuController {
 		return CommunityUtils.getUser();
 	}
 	
+	public void readConversation(){
+		try{
+			ConnectApi.ChatterConversationSummary ccs = ConnectApi.ChatterMessages.markConversationRead(Network.getNetworkId(), conversationId, read);
+		}catch(Exception ex){}
+	}
+
 	// -- Wrapper class --
 	public class LinkItem {
 		public String Name {get; set;}
@@ -212,7 +222,7 @@ public with sharing class CommunityMenuController {
 		}
 	}
 
-	public class ChatterConversation {
+	public class ChatterConversation implements Comparable{
 		public String ConversationId { get; set; }
 		public Boolean IsRead { get; set; }
 		public ChatterMessage LatestMessage { get; set; }
@@ -221,6 +231,12 @@ public with sharing class CommunityMenuController {
 			this.ConversationId = summary.Id;
 			this.IsRead = summary.Read;
 			this.LatestMessage = new ChatterMessage(summary.LatestMessage);
+		}
+		public Integer compareTo(Object compareTo) {
+	    	ChatterConversation compareToEmp = (ChatterConversation)compareTo;
+	        if (this.IsRead == compareToEmp.IsRead) return 0;
+	        if (this.IsRead == true && compareToEmp.IsRead == false) return 1;
+	        return -1;   
 		}
 	}	
 	public class ChatterMessage {

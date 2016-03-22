@@ -27,7 +27,7 @@
  * unity@motivislearning.com
 -->
 
-<apex:component controller="CommunityMenuController" access="global">
+<apex:component controller="CommunityMenuController" access="global" allowDml="true">
 <!-- For Background Image -->
 
 <apex:outputPanel rendered="{!Registration == 'true'}">
@@ -124,7 +124,7 @@
 											<small>{!conv.LatestMessage.SentDateFormatted}</small>
 										</p>
 									</a>	
-									<a class="remove it-removeNotification1" role="button" onclick="deleteNotification(this);"><i class="lrm lrm-remove"></i></a>
+									<a class="read it-removeNotification1" role="button" onclick="readNotification(this,'{!JSENCODE(conv.ConversationId)}');"></a>
 								</li>
 							</apex:repeat>	
 	                    </div>
@@ -136,7 +136,7 @@
 	            </li>
 	            <!--END Recent Messages-->
 	            <li class="icon hasChildren">
-	                <a href="#" title="{!$Label.LBL_Notifications}" class="alerts it-navMastheadViewAlerts">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Notifications}</span><span class="number"></span></span></a>
+	                <a href="#" title="{!$Label.LBL_Notifications}" class="alerts it-navMastheadViewAlerts">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Notifications}</span><span class="number" style="display:none"></span></span></a>
 	                <ul class="subMenu feedMenu">
 	                    <li class="feedMenuHeader">
 	                        <h4>{!$Label.LBL_Notifications}</h4>
@@ -175,6 +175,13 @@
                 </li>
 			</ul>
 			<!--</apex:outputPanel>--><!--/navbar-collapse-->
+			<apex:outputPanel id="form"/>
+			<apex:form >
+				<apex:actionFunction action="{!readConversation}" name="readConversation" rerender="form">
+			        <apex:param name="conversationId" assignTo="{!conversationId}" value="" />
+			        <apex:param name="read" assignTo="{!read}" value="" />
+			    </apex:actionFunction>
+		    </apex:form>
 		</div>
 	</div>
 	<!-- End Navbar -->
@@ -186,7 +193,33 @@
 				var countEmail = parseInt($('.emails .number').first().text(), 10); 
 				if(countEmail > 0) $('.emails .number').show();
 			}
-			
+			checkPhotoUrl();
 		});
+		function readNotification(elem, id){
+			var read = $(elem).parent('.feedMenuItem').hasClass('unread') ? true : false;
+			readConversation(id,read);
+			var countEmail = parseInt($('.emails .number').first().text(), 10);
+			if(!read && (countEmail+1) > 0) $('.emails .number').show();
+			if(read && (countEmail-1) <= 0) $('.emails .number').hide();
+       	}
+       	function checkPhotoUrl(){
+       		//check for current user photo
+       		var image = $('.profileNav span.avatar'); 
+       		var styleAttr = image.attr('style'); 
+       		var styleUrl = styleAttr.substring(styleAttr.indexOf('(')+1, styleAttr.indexOf(')'))
+       		var url = styleUrl.split('/');
+       		if(url[url.length-2].length == 3){
+				image.attr('style', 'background-image: url({!$Resource.assets2}/images/home/default-male.jpg)');
+			}
+			
+       		//check for conversation users photos
+			var images = $('#conversations img');
+			for(var i = 0; i < images.length; i++){
+				var url = images[i].src.split('/');
+				if(url[url.length-2].length == 3){
+					images[i].src = '{!$Resource.assets2}/images/home/default-male.jpg';
+				}
+			}
+		}
 	</script>
 </apex:component>

@@ -1836,6 +1836,20 @@
         <value>Related Tags</value>
     </labels>
     <labels>
+        <fullName>LBL_Remove_Flag</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Remove Flag</shortDescription>
+        <value>Remove Flag</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Remove_Flags</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Remove Flags</shortDescription>
+        <value>Remove Flags</value>
+    </labels>
+    <labels>
         <fullName>LBL_Remove_From_Favorites</fullName>
         <language>en_US</language>
         <protected>true</protected>
