@@ -82,7 +82,7 @@
         <referenceTo>Community_Tag__c</referenceTo>
         <relationshipLabel>Users Tagged</relationshipLabel>
         <relationshipName>Community_Users_Tagged</relationshipName>
-        <relationshipOrder>1</relationshipOrder>
+        <relationshipOrder>0</relationshipOrder>
         <reparentableMasterDetail>false</reparentableMasterDetail>
         <trackTrending>false</trackTrending>
         <type>MasterDetail</type>
