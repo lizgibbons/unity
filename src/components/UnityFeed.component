@@ -751,7 +751,6 @@
 									if (event.result) {
 										refreshFeed();
 										setActiveli();
-										//closeEditDialog();
 										$('#editPanel [name="message"]').val('');
 										if (typeof(switchToMemberMode) == 'function') switchToMemberMode();
 									}
@@ -807,7 +806,6 @@
 							if (event.result) {
 								refreshFeed();
 								setActiveli();
-								//closeEditDialog();
 								$('#editPanel [name="message"]').val('');
 								if (typeof(switchToMemberMode) == 'function') switchToMemberMode();
 							} 
@@ -1274,7 +1272,6 @@
 								$('#editPanel'+objId+' #editBtnBlock').css('position','relative').css('top','-3px');
 								$('#editPanel'+objId).show();
 								$('#m'+objId+' .card-content p').hide();
-								//$('.preloader__container').hide();
 								initValidator(objId);
 								checkmi($('#editPanel'+objId+' textarea'));
 							}else{
@@ -1307,7 +1304,6 @@
 								$('#editPanel'+objId+' #editBtnBlock').css('position','relative').css('top','-3px');
 								$('#editPanel'+objId).show();
 								$('#m'+objId+' .comment-holder p').hide();
-								//$('.preloader__container').hide();
 								initValidator(objId);
 								checkmi($('#editPanel'+objId+' textarea'));
 							}else{
@@ -1339,6 +1335,7 @@
 					if(viewFromEmail){
 						$('#cfcmp').empty();
 						loadFeedFromEmail('');
+						closeEditDialog();
 					}else if(top){
 						$('#cfcmp').empty();
 						loadFeedsForTopic(null);
@@ -1346,6 +1343,7 @@
 							$('#palist').hide();
 							$('#postarea').hide();
 						}
+						closeEditDialog();
 					}else{
 					Visualforce.remoting.Manager.invokeAction(
 						'{!$RemoteAction.CommunityFeedController.feeds}',
@@ -1359,6 +1357,7 @@
 								var tt = jsonObj(result);
 								$('#cfcmp').empty();
 								$('#cfcmp').prepend(template(tt));
+								closeEditDialog();
 							}
 							else {
 								showFeedError(event.message);
