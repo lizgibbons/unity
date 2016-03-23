@@ -574,11 +574,6 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>true</editable>
-        <field>Community_Profile_Tag__c.Contact__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
         <editable>false</editable>
         <field>Community_Profile_Tag__c.Profile_Tag_SF_ID__c</field>
         <readable>true</readable>
