@@ -124,7 +124,7 @@
         <displayedFields>
             <field>Status__c</field>
             <isFieldManaged>false</isFieldManaged>
-            <isRequired>false</isRequired>
+            <isRequired>true</isRequired>
         </displayedFields>
         <displayedFields>
             <field>Description__c</field>
