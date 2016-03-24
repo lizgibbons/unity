@@ -489,6 +489,9 @@
 								$('#shmbtn').attr('onclick','loadFeeds(\'' + tt.nextPageToken + '\');return false;');
 								}
 								$('.loader').hide();
+								if({!fromEmail}){
+									$('.preloader__container').hide();
+								}
 							}
 							else {
 								showFeedError(event.message);
@@ -649,6 +652,7 @@
 									fName = inputfile.name;
 									if(inputfile.size>26214400) {
 										showFeedError('{!JSINHTMLENCODE($Label.LBL_File_Upload_Size_Limit)}');  // change - need label
+								 		$(".post-box").css('pointer-events', '').css('opacity', '');
 								 		return null;
 									}
 									// my code
