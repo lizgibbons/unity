@@ -231,7 +231,11 @@
 						            <a href="<%- p2.capabilities.content.downloadUrl %>" class="download-btn context-btn it-filePathDownload"><i class="lrm lrm-upload"></i> {!$Label.BTN_Download}</a>
 						        </div>
 						    <% } %>         
-						<% } %>    
+						<% } else { %>
+							<p>
+								<i class="fa fa-file-o"></i> The file is no longer available.
+							</p>
+						<% } %>       
 					<% } %>
 
 					<% if (p2.capabilities.poll && p2.capabilities.poll.choices) { %>
