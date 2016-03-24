@@ -69,7 +69,7 @@
 					</form>
 				</div>
 				<div class="hide">
-					<input type="file" id="fileUploader" name="fileUploader" />
+					<input type="file" id="fileUploader" name="fileUploader"/>
 					<div class="post-upload-content-holder">
 						<div class="post-upload-content" id="postUpload">
 						</div>
@@ -198,6 +198,11 @@
 						<% if (!p2.showContent && !p2.capabilities.poll && !p2.capabilities.edit.isEditRestricted){ %>
 							<div id="editPanel<%- p2.id %>" style="display: none;"></div>
 						<% } %>
+						<% if(p2.showContent && !p2.capabilities.content.fileExtension){ %>
+							<p>
+								<i class="fa fa-file-o"></i> The file is no longer available.
+							</p>
+						<% } %>
 					</div>
 					<% if (p2.showLink) { %>
 						<div class="card-attachment">
@@ -215,7 +220,7 @@
 						            <a href="{!$Page.CommunityGroupFiles}?f=<%- p2.capabilities.content.id %>&fi=<%- p2.id %>" target="_self" class="file-path it-filePathExample"><i class="lrm lrm-img"></i><span class="file-name"><%- p2.capabilities.content.title %> (<% print(fileSizeIEC(p2.capabilities.content.fileSize)) %>)</span></a>
 						            <a href="<%- p2.capabilities.content.downloadUrl %>" class="download-btn context-btn it-filePathDownload"><i class="lrm lrm-upload"></i> {!$Label.BTN_Download}</a>
 						        </div>
-						    <% }else{ %>
+						    <% }else{%>
 						    	<div class="card-content card-attachment">
 						            <a href="{!$Page.CommunityGroupFiles}?f=<%- p2.capabilities.content.id %>&fi=<%- p2.id %>" target="_self" class="file-path it-filePathExample">
 						            <% if(p2.capabilities.content.fileExtension){
@@ -330,13 +335,13 @@
 							<div class="card-comments" id="c<%- p2.id %>" name="<%- p2.id %>">
 						<% } %>
 							<div id="d<%- p2.id %>" class="comment-box">
-									<a class="avatar it-avatar2" href="javascript:void(0);">
-										<img src="{!currentUserPhoto}" alt=""/>
-									</a>
-									<div>
+								<a class="avatar it-avatar2" href="javascript:void(0);">
+									<img src="{!currentUserPhoto}" alt=""/>
+								</a>
+								<div>
 									<textarea id="a<%- p2.id %>" class="it-commentBox1" onclick="checkmi(this); focusComm(this, '#b<%- p2.id %>');" onkeyup="checkbtn(this,'#b<%- p2.id %>');" placeholder="{!$Label.LBL_Write_A_Comment}"></textarea>
 									<a class="btn-fill-custom right-btn disabled it-submitCommentBtn1" role="button" id="b<%- p2.id %>" onclick="postComment($('#a<%- p2.id %>').val(),'<%- p2.id %>', '<%-p2.topicsUser.length%>'); return false;">{!$Label.LBL_Comment}</a>
-									</div>
+								</div>
 							</div>
 						</div>
 				</div>
@@ -380,29 +385,29 @@
 
 			<script id="etp" type="text/template">
 				<form name="editform" class="edit-form" novalidate="novalidate">
-                    	<% if(rc.elements){ 
-                    		_.each(rc.elements, function(editel){%>
+					<% if(rc.elements){ 
+                    	_.each(rc.elements, function(editel){%>
 							<textarea id="message" name="message" class="form-control tagged_text share validate-textarea" onFocus="checkmi(this);" onkeyup="toggleEditButton(this,'<%- editel.id %>');" onclick="checkmi(this);"><%print(wrapnl(parseFeedBodyEdit(editel.body))); 
-										parseBody(editel.body,editel.topicsUser);
-									%>
-								</textarea>
+									parseBody(editel.body,editel.topicsUser);
+								%>
+							</textarea>
 							<div class="blockBtnWrapper" id="editBtnBlock">
 			                	<a id="svbtn<%- editel.id %>" role="button" class="block-btn-half btn-fill-custom" onclick="initTextareaBTN(this);updateAction($('#editPanel<%- editel.id %> #message').val(),'<%- editel.id %>');return false;">{!$Label.BTN_Save}</a>
 			                	<a id="cnsbtn<%- editel.id %>" role="button" class="block-btn-half btn-fill-light" onclick="closeEditDialog('<%- editel.id %>');return false;">{!$Label.BTN_Cancel}</a>
 			                </div>
-							<%}); 
-                    	}else{
-                    		_.each(rc.items, function(editel){%>
+						<%}); 
+                    }else{
+                    	_.each(rc.items, function(editel){%>
 							<textarea id="message" name="message" class="form-control tagged_text share validate-textarea" onFocus="checkmi(this);"  onkeyup="toggleEditButton(this,'<%- editel.id %>');" onclick="checkmi(this);"><%print(wrapnl(parseFeedBodyEdit(editel.body))); 
-										parseBody(editel.body,editel.topicsUser);
-									%>
-								</textarea>
+									parseBody(editel.body,editel.topicsUser);
+								%>
+							</textarea>
 							<div class="blockBtnWrapper" id="editBtnBlock">
 			                	<a id="svbtn<%- editel.id %>" role="button" class="btn-fill-custom block-btn-half" onclick="initTextareaBTN(this);updateAction($('#editPanel<%- editel.id %> #message').val(),'<%- editel.id %>');return false;">{!$Label.BTN_Save}</a>
 			                	<a id="cnsbtn<%- editel.id %>" role="button" class="btn-fill-light block-btn-half" onclick="closeEditDialog('<%- editel.id %>');return false;">{!$Label.BTN_Cancel}</a>
 			                </div>
-							<%}); 
-                    	}%>
+						<%}); 
+                    }%>
                 </form>
             </script>
 
@@ -463,13 +468,12 @@
 					$(window).scroll(function() {
 						if($(window).scrollTop() == $(document).height() - $(window).height()) {
 							if($('#shmbtn').attr('onclick')){
-							$('#shmbtn').click();
+								$('#shmbtn').click();
 								$('#shmbtn').removeAttr('onclick');
-							$('.loader').show();
-						}
+								$('.loader').show();
+							}
 						}
 					});
-
 				});
 
 				function loadFeeds(inpt) {
@@ -486,7 +490,7 @@
 								var tt = jsonObj(result);
 								$('#cfcmp').append(template(tt));
 								if(tt.nextPageToken){
-								$('#shmbtn').attr('onclick','loadFeeds(\'' + tt.nextPageToken + '\');return false;');
+									$('#shmbtn').attr('onclick','loadFeeds(\'' + tt.nextPageToken + '\');return false;');
 								}
 								$('.loader').hide();
 								if({!fromEmail}){
@@ -670,8 +674,8 @@
 											loadImage( inputfile,
 												function (img) {
 													if(img.type != 'error'){ 
-													var binary = img.toDataURL(fType).substring(img.toDataURL(fType).indexOf("base64,")+"base64,".length);
-													uploadAttachment(binary,fName,fType);
+														var binary = img.toDataURL(fType).substring(img.toDataURL(fType).indexOf("base64,")+"base64,".length);
+														uploadAttachment(binary,fName,fType);
 													}else{
 														var reader = new FileReader();
 														reader.onloadend = function(){
@@ -700,10 +704,10 @@
 												binary += String.fromCharCode(bytes[i]);
 											}
 											uploadAttachment(new sforce.Base64Binary(binary).toString(),fName,fType);
-									};
-									reader.readAsArrayBuffer(inputfile);
+										};
+										reader.readAsArrayBuffer(inputfile);
+									}
 								}
-							}
 							}
 							item.value = $("[name='" + item.fieldName + "']").val();
 						});
@@ -721,7 +725,7 @@
 						}
 					}
 					else {
-						$("form[name='postform']").data('validator').showErrors(); 
+						$("form[name='postform']").data('validator').showErrors();
 						$(".post-box").css('pointer-events', '').css('opacity', ''); 
 					}
 				}
@@ -731,7 +735,6 @@
 					hideFeedError();
 					$("#editPanel"+objId).css('pointer-events', 'none').css('opacity', '0.8');
 					var messageItemIndex = -1;
-
 					if(idForEditPost){
 						if($("#editPanel"+objId+" form").data('validator').checkForm()) {
 							_.each(chatactionForEdit.layout.items, function(item) {
@@ -833,7 +836,7 @@
 								if (typeof(switchToMemberMode) == 'function') switchToMemberMode();
 							} 
 							else {
-								showFeedError(event.message);
+								showFeedError(event.message); 
 								$("[id^='editPanel']").css('pointer-events', '').css('opacity', '');
 							}
 						}
@@ -1008,14 +1011,14 @@
 									var nocl = 'inlAct(\''+tt.pid+'\',\''+tt.cname+'\',\''+tt.oid+'\');';
 									$('#ul'+tt.pid+' [name="'+tt.cname+'"]').removeClass('fa-spinner fa-pulse').addClass(tt.cname+tt.stl).attr('onclick',nocl);
 									if (tt.cname=='fa-thumbs-up') {
-									var dti = parseInt($('#ul'+tt.pid+' [name="countLikes"]').first().text());
-									$('#ul'+tt.pid+' [name="countLikes"]').first().text(tt.oid==''?(dti-1):(dti+1));
+										var dti = parseInt($('#ul'+tt.pid+' [name="countLikes"]').first().text());
+										$('#ul'+tt.pid+' [name="countLikes"]').first().text(tt.oid==''?(dti-1):(dti+1));
 									}
 									if(tt.cname == 'fa-flag'){
 										refreshFeed();	
 									}
 								}
-						}
+							}
 							else {
 								showFeedError(event.message);
 							}
@@ -1123,7 +1126,7 @@
 					editMessageText = '';
 					var previousText = $('#post-area').val();
 					if(previousText.length){
-						 $('#post-area').mentionsInput('getMentions', function(text) {
+						$('#post-area').mentionsInput('getMentions', function(text) {
 							bodyObjects = text;
 						});
 						editMessageText = previousText;
@@ -1376,9 +1379,9 @@
 							$('#postarea').hide();
 						}
 					}else{
-								$('#cfcmp').empty();
+						$('#cfcmp').empty();
 						loadFeeds(null);
-				}
+					}
 				}
 				function changeVote(voteId){
 					_.templateSettings.variable = 'rc';
