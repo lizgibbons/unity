@@ -202,7 +202,7 @@
 					<% if (p2.showLink) { %>
 						<div class="card-attachment">
 				            <h2><a href="<%- p2.linkHref %>" target="_blank" class="it-linkTitle"><%- p2.linkName %></a></h2>
-				            <small><a href="<%- p2.linkHref %>" target="_blank" class="it-linkURL"><% print(wrapnl(p2.linkHref)); %></a></small>
+				            <small class="limit-1-line"><a href="<%- p2.linkHref %>" target="_blank" class="it-linkURL"><% print(wrapnl(p2.linkHref)); %></a></small>
 				        </div>
 					<% } %>
 					<% if (p2.showContent) { %>
@@ -212,7 +212,7 @@
 						            <img src="<%- p2.capabilities.content.downloadUrl %>">
 						        </div>
 						        <div class="card-content card-attachment">
-						            <a href="{!$Page.CommunityGroupFiles}?f=<%- p2.capabilities.content.id %>&fi=<%- p2.id %>" target="_self" class="file-path it-filePathExample"><i class="lrm lrm-img"></i><%- p2.capabilities.content.title %> (<% print(roundSize(p2.capabilities.content.fileSize)) %>)</a>
+						            <a href="{!$Page.CommunityGroupFiles}?f=<%- p2.capabilities.content.id %>&fi=<%- p2.id %>" target="_self" class="file-path it-filePathExample"><i class="lrm lrm-img"></i><span class="file-name"><%- p2.capabilities.content.title %> (<% print(fileSizeIEC(p2.capabilities.content.fileSize)) %>)</span></a>
 						            <a href="<%- p2.capabilities.content.downloadUrl %>" class="download-btn context-btn it-filePathDownload"><i class="lrm lrm-upload"></i> {!$Label.BTN_Download}</a>
 						        </div>
 						    <% }else{ %>
@@ -227,7 +227,7 @@
 						            	<% 	}else if(['ac3', 'aud', 'flac', 'midi', 'mp3', 'voc', 'wav', 'wma'].indexOf(p2.capabilities.content.fileExtension) != -1){ %><i class="lrm lrm-audio"></i>
 						            	<% 	}else{ %><i class="lrm lrm-genericfile"></i><% } %>
 						            <% } %>
-						            <%- p2.capabilities.content.title %> (<% print(roundSize(p2.capabilities.content.fileSize)) %>)</a>
+						            <span class="file-name"><%- p2.capabilities.content.title %> (<% print(fileSizeIEC(p2.capabilities.content.fileSize)) %>)</span></a>
 						            <a href="<%- p2.capabilities.content.downloadUrl %>" class="download-btn context-btn it-filePathDownload"><i class="lrm lrm-upload"></i> {!$Label.BTN_Download}</a>
 						        </div>
 						    <% } %>         
@@ -382,7 +382,7 @@
 				<form name="editform" class="edit-form" novalidate="novalidate">
                     	<% if(rc.elements){ 
                     		_.each(rc.elements, function(editel){%>
-								<textarea id="message" name="message" class="form-control tagged_text share validate-textarea" onFocus="checkmi(this);"  onclick="checkmi(this);"><%print(wrapnl(parseFeedBodyEdit(editel.body))); 
+							<textarea id="message" name="message" class="form-control tagged_text share validate-textarea" onFocus="checkmi(this);" onkeyup="toggleEditButton(this,'<%- editel.id %>');" onclick="checkmi(this);"><%print(wrapnl(parseFeedBodyEdit(editel.body))); 
 										parseBody(editel.body,editel.topicsUser);
 									%>
 								</textarea>
@@ -393,13 +393,13 @@
 							<%}); 
                     	}else{
                     		_.each(rc.items, function(editel){%>
-								<textarea id="message" name="message" class="form-control tagged_text share validate-textarea" onFocus="checkmi(this);"  onclick="checkmi(this);"><%print(wrapnl(parseFeedBodyEdit(editel.body))); 
+							<textarea id="message" name="message" class="form-control tagged_text share validate-textarea" onFocus="checkmi(this);"  onkeyup="toggleEditButton(this,'<%- editel.id %>');" onclick="checkmi(this);"><%print(wrapnl(parseFeedBodyEdit(editel.body))); 
 										parseBody(editel.body,editel.topicsUser);
 									%>
 								</textarea>
 							<div class="blockBtnWrapper" id="editBtnBlock">
-			                	<a id="svbtn<%- editel.id %>" role="button" class="block-btn-half btn-fill-custom" onclick="initTextareaBTN(this);updateAction($('#editPanel<%- editel.id %> #message').val(),'<%- editel.id %>');return false;">{!$Label.BTN_Save}</a>
-			                	<a id="cnsbtn<%- editel.id %>" role="button" class="block-btn-half btn-fill-light" onclick="closeEditDialog('<%- editel.id %>');return false;">{!$Label.BTN_Cancel}</a>
+			                	<a id="svbtn<%- editel.id %>" role="button" class="btn-fill-custom block-btn-half" onclick="initTextareaBTN(this);updateAction($('#editPanel<%- editel.id %> #message').val(),'<%- editel.id %>');return false;">{!$Label.BTN_Save}</a>
+			                	<a id="cnsbtn<%- editel.id %>" role="button" class="btn-fill-light block-btn-half" onclick="closeEditDialog('<%- editel.id %>');return false;">{!$Label.BTN_Cancel}</a>
 			                </div>
 							<%}); 
                     	}%>
@@ -651,7 +651,6 @@
 										showFeedError('{!JSINHTMLENCODE($Label.LBL_File_Upload_Size_Limit)}');  // change - need label
 								 		return null;
 									}
-									var loadImg = false;
 									// my code
 									if(fType.indexOf("image/")>-1) {
 										var options = {
@@ -669,13 +668,23 @@
 													if(img.type != 'error'){ 
 													var binary = img.toDataURL(fType).substring(img.toDataURL(fType).indexOf("base64,")+"base64,".length);
 													uploadAttachment(binary,fName,fType);
-														loadImg = true;
+													}else{
+														var reader = new FileReader();
+														reader.onloadend = function(){
+															var binary = "";
+															var bytes = new Uint8Array(reader.result);
+															var length = bytes.byteLength;
+															for (var i = 0; i < length; i++)
+															{
+																binary += String.fromCharCode(bytes[i]);
+															}
+															uploadAttachment(new sforce.Base64Binary(binary).toString(),fName,fType);
+														};
 													}
 												}, options
 											);
 										});
-									}
-									if(!loadImg){
+									}else{
 										// end my code
 										var reader = new FileReader();
 										reader.onloadend = function(){
@@ -734,7 +743,7 @@
 						}
 						else {
 							$("#editPanel"+objId+" form").data('validator').showErrors(); 
-							enableBtn('svbtn');
+							$("#editPanel"+objId).css('pointer-events', '').css('opacity', '');
 						}
 					}
 					if(idForEditComment){
@@ -742,20 +751,26 @@
 							hideFeedError();
 							var params = {
 								'inText' 	 : text, 
-								'commId'	 : idForEditComment
+								'commId'	 : idForEditComment,
+								'feedId'	 : $('#editPanel'+objId).parent().parent().parent().attr('name')
 							};
 							Visualforce.remoting.Manager.invokeAction(
 								'{!$RemoteAction.CommunityFeedController.updateComment}',
 								params,
 								function(result, event) {
 									if (event.result) {
-										refreshFeed();
+										_.templateSettings.variable = 'rc';
+										var template = _.template($('#ttp21').html() + $('#ttp2').html());
+										var tt = jsonObj(result);
+										$('#m'+tt.items[0].id).replaceWith(template(tt));		
+										closeEditDialog(tt.items[0].id);
 										setActiveli();
 										$('#editPanel [name="message"]').val('');
 										if (typeof(switchToMemberMode) == 'function') switchToMemberMode();
 									}
 									else {
-										showFeedError(event.message);
+										showFeedError('{!JSENCODE($Label.ERR_Comment_Too_Large)}'); 
+										$("#editPanel"+objId).css('pointer-events', '').css('opacity', '');
 									}
 								}
 							);
@@ -804,13 +819,18 @@
 						params,
 						function(result, event) {
 							if (event.result) {
-								refreshFeed();
+								_.templateSettings.variable = 'rc';
+								var template = _.template($('#ttp1').html() + $('#ttp2').html() + $('#ttp3').html());
+								var tt = jsonObj(result);
+								$('#m'+tt.elements[0].id).replaceWith(template(tt));		
+								closeEditDialog(tt.elements[0].id);
 								setActiveli();
 								$('#editPanel [name="message"]').val('');
 								if (typeof(switchToMemberMode) == 'function') switchToMemberMode();
 							} 
 							else {
 								showFeedError(event.message);
+								$("[id^='editPanel']").css('pointer-events', '').css('opacity', '');
 							}
 						}
 					);					
@@ -958,6 +978,13 @@
 				function enableBtn(inid) {
 					$('#'+inid).removeClass('disabled');
 				}
+				function toggleEditButton(el, elId) {
+				    if ($(el).filter(function() { return $(this).val(); }).length > 0) {
+				        $('#svbtn'+elId).css('pointer-events', '').css('opacity', '');
+				    } else {
+				        $('#svbtn'+elId).css('pointer-events', 'none').css('opacity', '0.8');
+				    }
+				};
 				function inlAct(inpid,ins,ini) {
 					$('#ul'+inpid+' .'+ins).removeClass(ins).removeClass('active').addClass('fa-spinner fa-pulse').attr('name',ins);
 					hideFeedError();
@@ -1268,7 +1295,8 @@
 								$('#editPanel'+objId).empty();
 								$('#editPanel'+objId).prepend(template(tt));
 								$('#editPanel'+objId).addClass('active');
-								$('#editPanel'+objId+' #message').height($('#m'+objId+' .card-content p').height());
+								$('#editPanel'+objId+' #message').height($('#m'+objId+' .comment-holder p').height() < 50 ? 50 : $('#m'+objId+' .comment-holder p').height());
+								$('#editPanel'+objId+' #message').css('margin-bottom', '0');
 								$('#editPanel'+objId+' #editBtnBlock').css('position','relative').css('top','-3px');
 								$('#editPanel'+objId).show();
 								$('#m'+objId+' .card-content p').hide();
@@ -1300,8 +1328,9 @@
 								$('#editPanel'+objId).empty();
 								$('#editPanel'+objId).prepend(template(tt));
 								$('#editPanel'+objId).addClass('active');
-								$('#editPanel'+objId+' #message').height($('#m'+objId+' .comment-holder p').height());
-								$('#editPanel'+objId+' #editBtnBlock').css('position','relative').css('top','-3px');
+								$('#editPanel'+objId+' #message').height($('#m'+objId+' .comment-holder p').height() < 47 ? 47 : $('#m'+objId+' .comment-holder p').height());
+								$('#editPanel'+objId+' #message').css('margin-bottom', '0');
+								$('#editPanel'+objId+' #editBtnBlock').css('position','relative').css('top','-2px');
 								$('#editPanel'+objId).show();
 								$('#m'+objId+' .comment-holder p').hide();
 								initValidator(objId);
@@ -1335,7 +1364,6 @@
 					if(viewFromEmail){
 						$('#cfcmp').empty();
 						loadFeedFromEmail('');
-						closeEditDialog();
 					}else if(top){
 						$('#cfcmp').empty();
 						loadFeedsForTopic(null);
@@ -1343,27 +1371,9 @@
 							$('#palist').hide();
 							$('#postarea').hide();
 						}
-						closeEditDialog();
 					}else{
-					Visualforce.remoting.Manager.invokeAction(
-						'{!$RemoteAction.CommunityFeedController.feeds}',
-						'{!JSENCODE(parentId)}',
-						'{!feedType}',
-						'',
-						function(result, event) {
-							if (event.result) {
-								_.templateSettings.variable = 'rc';
-								var template = _.template($('#ttp1').html() + $('#ttp2').html() + $('#ttp3').html());
-								var tt = jsonObj(result);
 								$('#cfcmp').empty();
-								$('#cfcmp').prepend(template(tt));
-								closeEditDialog();
-							}
-							else {
-								showFeedError(event.message);
-							}
-						}
-					);
+						loadFeeds(null);
 				}
 				}
 				function changeVote(voteId){
@@ -1584,21 +1594,6 @@
 			return outString;
 		}
 
-		function roundSize(fileSize){
-			var outString = "";
-			var sizeName = ['b','kb','mb','gb'];
-			var index = 0;
-			var resSize = fileSize;
-			while(Math.floor(resSize / 1024) > 0){
-				index++;
-				if(index == 4) return resSize.toString()+sizeName[index];
-				resSize = Math.round(fileSize / 1024);
-			}
-			outString = resSize.toString()+sizeName[index];
-			return outString;
-
-		}
-		
 		function printPhotoUrl(photoUrl){
 			var url = photoUrl.split('/');
 			if(url[url.length-2].length == 3){

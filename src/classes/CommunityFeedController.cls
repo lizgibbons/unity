@@ -795,8 +795,14 @@ global with sharing class CommunityFeedController {
 		fei.body = Test.isRunningTest() ? werewolfText('test') : werewolfText(layout.items[0].value);
 		try{
 			ConnectApi.FeedElement feedEl = ConnectApi.ChatterFeeds.updateFeedElement(Network.getNetworkId(), feedId, fei);
-		}catch(Exception ex){
-			throw new UnityFeedException(ex.getMessage());
+			String newFeed = json.serialize(feedEl);
+			FeedElementPage fepResult = new FeedElementPage();
+			fepResult.elements = new List<FeedElement> { (FeedElement)JSON.deserialize(newFeed,FeedElement.class) };
+			fepResult = initialRoles(fepResult);
+			fepResult = initialTopics(fepResult);
+			return json.serialize(fepResult);
+		}catch(ConnectApi.ConnectApiException ex){
+			throw new UnityFeedException(Label.ERR_Post_Too_Large);
 		}	
 		
 		return json.serialize('Success');
@@ -804,18 +810,26 @@ global with sharing class CommunityFeedController {
 
 	@RemoteAction
 	global static String updateComment(Map<String, String> params) {
+		
 		String inCommentText = params.get('inText');
 		String inCommId = params.get('commId');
+		String inFeedId = params.get('feedId');
 
 		ConnectApi.CommentInput ci = new ConnectApi.CommentInput();
-		ci.body = werewolfText(inCommentText);
 		
+		ci.body = werewolfText(inCommentText);
 		try{
 			ConnectApi.Comment editedComment = ConnectApi.ChatterFeeds.updateComment(Network.getNetworkId(), inCommId, ci);
-		}catch(Exception ex){
-			throw new UnityFeedException(ex.getMessage());
+			String newComment = json.serialize(editedComment);
+			Page2 commentPage = new Page2();
+			commentPage.feedId = inFeedId;
+			commentPage.items = new List<FeedElementComment> { (FeedElementComment)JSON.deserialize(newComment,FeedElementComment.class) };
+			commentPage = initialRoles(commentPage);
+			commentPage = initialTopicsForComment(commentPage);
+			return json.serialize(commentPage);
+		}catch(ConnectApi.ConnectApiException ex){
+			throw new UnityFeedException(Label.ERR_Comment_Too_Large);
 		}	
-		
 		return json.serialize('Success');
 	}
 
