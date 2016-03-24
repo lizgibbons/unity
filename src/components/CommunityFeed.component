@@ -615,6 +615,9 @@
 								$('#cfcmp').append(template(tt));
 								enableBtn('shmbtn');
 								$('#shmbtn').css('display',tt.showMore?'block':'none').attr('onclick','loadFeeds(\'' + tt.nextPageToken + '\');return false;');
+								if({!fromEmail}){
+									$('.preloader__container').hide();
+								}	
 							}
 							else {
 								showFeedError(event.message);
