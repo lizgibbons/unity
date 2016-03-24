@@ -5,6 +5,8 @@
         <members>CommunityAboutGroupComponentController</members>
         <members>CommunityAccess</members>
         <members>CommunityAccessException</members>
+        <members>CommunityBatch</members>
+        <members>CommunityBatchHelper</members>
         <members>CommunityEventController</members>
         <members>CommunityFeedController</members>
         <members>CommunityFeedNavigationController</members>
@@ -221,6 +223,7 @@
         <members>Community_Profile_Tag__c.Active__c</members>
         <members>Community_Profile_Tag__c.Community_Tag__c</members>
         <members>Community_Profile_Tag__c.Contact__c</members>
+        <members>Community_Profile_Tag__c.Related_Contact__c</members>
         <members>Community_Profile_Tag__c.Profile_Tag_SF_ID__c</members>
         <members>Community_Profile_Tag__c.Theme__c</members>
         <members>Community_Profile__c.Advisor__c</members>

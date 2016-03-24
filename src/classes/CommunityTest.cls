@@ -297,6 +297,21 @@ private class CommunityTest {
 			cppc.getLastTimePasswordChange();
 			ApexPages.currentPage().getParameters().put('cid', '');
 			cppc = new CommunityProfilePageController();
+			
+			// Start migrate batch logic
+			List<Community_Profile_Tag__c> tags = [
+				SELECT Id, Related_Contact__c
+				FROM Community_Profile_Tag__c
+				WHERE Contact__c != null
+			];
+			for (Community_Profile_Tag__c tag : tags) {
+				tag.Related_Contact__c = null;
+			}
+			update tags;
+			Test.startTest();
+			CommunityBatchHelper.startMigrateProfileTagContactField();
+			Test.stopTest();
+			// End migrate batch logic
 		}
 	}
 

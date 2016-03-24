@@ -116,6 +116,19 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>Related_Contact__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <description>Allows tags to be associated to this Contact record.</description>
+        <externalId>false</externalId>
+        <label>Contact</label>
+        <referenceTo>Contact</referenceTo>
+        <relationshipLabel>Community Profile Tags (Related Contact)</relationshipLabel>
+        <relationshipName>Community_Profile_Tags</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
         <fullName>Theme__c</fullName>
         <description>Represents the Name of the Theme that the Tag is related to.</description>
         <externalId>false</externalId>
