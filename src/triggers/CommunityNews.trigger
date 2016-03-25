@@ -34,7 +34,7 @@ trigger CommunityNews on Community_News__c (before insert, before update) {
 	Map<String,Community_News__c> slotMap = new Map<String,Community_News__c>();
 
 	for (Community_News__c cnItem : Trigger.new) {
-		
+
 		if (String.isNotBlank(cnItem.Feature_on_Home_Page_Slot__c)
 			&& (Trigger.isInsert || cnItem.Feature_on_Home_Page_Slot__c != Trigger.oldMap.get(cnItem.Id).Feature_on_Home_Page_Slot__c)
 				) {
