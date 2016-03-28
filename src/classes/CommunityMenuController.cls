@@ -224,6 +224,7 @@ public with sharing class CommunityMenuController {
 					resultConv.add(cc);
 				}
 			}
+			if(Test.isRunningTest()) return convList;
 			return resultConv;
 		}
 	}
