@@ -40,8 +40,6 @@ private class CommunityTest2 {
 				'addRoleToContact'
 			}
 		);
-		Community_News__c cnews = new Community_News__c(Title__c='t',Status__c = 'Approwed',Teaser__c='t',Entry_Date__c=Datetime.now(),Expiration_Date__c=Datetime.now().addDays(2),Alert__c = true);
-		insert cnews;
 		
 		System.runAs(df.communityUser) {
 			CollaborationGroup cg = new CollaborationGroup(Name = 'testGroup', CollaborationType = 'Public');
@@ -50,6 +48,9 @@ private class CommunityTest2 {
 			insert cgc;
 			Community_Group_Manager__c cgm = new Community_Group_Manager__c(Group_Control__c = cgc.Id, Group_Manager_User__c = df.communityUser.Id);
 			insert cgm;
+
+			Community_News__c cnews = new Community_News__c(Title__c='t',Status__c = 'Approwed',Teaser__c='t',Entry_Date__c=Datetime.now(),Expiration_Date__c=Datetime.now().addDays(2),Alert__c = true);
+			insert cnews;
 
 			CommunityFeedNavigationController.getHasTwitterFeed();
 			CommunityFeedNavigationController.getTwitterHandle();
@@ -482,7 +483,10 @@ private class CommunityTest2 {
 			System.assertEquals(String.valueOf('testN'),String.valueOf(li.Name));
 
 		}
+	}
 
+	static testMethod void test_CommunityMenuController2() {
+		Test.setCurrentPage(Page.CommunityHome);
 		Account acc = new Account(Name='testAccount');
 		insert acc;
 		List<Contact> cons = new List<Contact> {
