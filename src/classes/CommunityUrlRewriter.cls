@@ -50,14 +50,19 @@ global without sharing class CommunityUrlRewriter implements Site.UrlRewriter {
 			 redirect = isUnity2Template ? Page.UnityHome : Page.CommunityHome;
 		}
 		if(url.contains(COMMUNITY_HEADER_REWRITING_PAGE)){
-			Id objId = (Id)myFriendlyUrl.getParameters().get('id');
-			if(objId == NULL){
+			String idStr = myFriendlyUrl.getParameters().get('id');
+			if(idStr == NULL){
                 redirect = isUnity2Template ? Page.UnityHome : Page.CommunityHome;
-            }else if(objId.getSObjectType().getDescribe().getName().contains('ContentDocument')){
+            }else if(idStr instanceof Id){
+			Id objId = (Id)myFriendlyUrl.getParameters().get('id');
+            	if(objId.getSObjectType().getDescribe().getName().contains('ContentDocument')){
 				redirect = Page.CommunityGroupFiles;
 				redirect.getParameters().put('f',objId);
 			}else{
-				redirect = isUnity2Template ? Page.CommunityFeed_MyFeed : Page.CommunityFeed_MyFeed;
+					redirect = isUnity2Template ? Page.UnityHome : Page.CommunityHome;
+				}
+			}else{
+				redirect = isUnity2Template ? Page.UnityHome : Page.CommunityHome;
 			}
 		}
 		if (myFriendlyUrl.getParameters().containsKey('nr')) {
