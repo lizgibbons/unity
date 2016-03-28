@@ -50,14 +50,19 @@ global without sharing class CommunityUrlRewriter implements Site.UrlRewriter {
 			 redirect = isUnity2Template ? Page.UnityHome : Page.CommunityHome;
 		}
 		if(url.contains(COMMUNITY_HEADER_REWRITING_PAGE)){
-			Id objId = (Id)myFriendlyUrl.getParameters().get('id');
-			if(objId == NULL){
+			String idStr = myFriendlyUrl.getParameters().get('id');
+			if(idStr == NULL){
                 redirect = isUnity2Template ? Page.UnityHome : Page.CommunityHome;
-            }else if(objId.getSObjectType().getDescribe().getName().contains('ContentDocument')){
+            }else if(idStr instanceof Id){
+			Id objId = (Id)myFriendlyUrl.getParameters().get('id');
+            	if(objId.getSObjectType().getDescribe().getName().contains('ContentDocument')){
 				redirect = Page.CommunityGroupFiles;
 				redirect.getParameters().put('f',objId);
 			}else{
-				redirect = isUnity2Template ? Page.UnityHome : Page.CommunityFeed_MyFeed;
+					redirect = isUnity2Template ? Page.UnityHome : Page.CommunityHome;
+				}
+			}else{
+				redirect = isUnity2Template ? Page.UnityHome : Page.CommunityHome;
 			}
 		}
 		if (myFriendlyUrl.getParameters().containsKey('nr')) {
@@ -74,7 +79,7 @@ global without sharing class CommunityUrlRewriter implements Site.UrlRewriter {
 			}
 		}
 		else if (url.contains(STANDARD_CHATTER_PAGE)) {
-			redirect = isUnity2Template ? Page.UnityHome : Page.CommunityFeed_MyFeed;
+			redirect = isUnity2Template ? Page.CommunityFeed_MyFeed : Page.CommunityFeed_MyFeed;
 			if(messageType == CHATTER_POST_NOTIFICATION || messageType == CHATTER_COMMENT_NOTIFICATION || messageType == CHATTER_LIKE_NOTIFICATION){
 				if(myFriendlyUrl.getParameters().get('fid') != NULL){
 					redirect.getParameters().put('oid',myFriendlyUrl.getParameters().get('id'));
@@ -121,7 +126,7 @@ global without sharing class CommunityUrlRewriter implements Site.UrlRewriter {
 				redirect.getparameters().put('id',myFriendlyUrl.getParameters().get('u'));
 				redirect.getparameters().put('f','2');
 			}else{
-			redirect = isUnity2Template ? Page.UnityHome : Page.CommunityFeed_MyFeed;
+			redirect = isUnity2Template ? Page.CommunityFeed_MyFeed : Page.CommunityFeed_MyFeed;
 				redirect.getParameters().put('oid',myFriendlyUrl.getParameters().get('id'));
 			}
 			redirect.getParameters().put('fid',myFriendlyUrl.getParameters().get('fid'));
@@ -133,7 +138,7 @@ global without sharing class CommunityUrlRewriter implements Site.UrlRewriter {
 				String parentId = [SELECT Id, ParentId FROM FeedItem WHERE Id = :feedItemId LIMIT 1].ParentId;
 				String currentId = myFriendlyUrl.getParameters().get('s1uid');
 				if (parentId.substring(0, currentId.length()) == currentId) {
-					redirect = isUnity2Template ? Page.UnityHome : Page.CommunityFeed_MyFeed;
+					redirect = isUnity2Template ? Page.CommunityFeed_MyFeed : Page.CommunityFeed_MyFeed;
 					if(myFriendlyUrl.getParameters().get('id') == NULL){
 						redirect.getparameters().put('oid',myFriendlyUrl.getParameters().get('u'));
 					}else{
