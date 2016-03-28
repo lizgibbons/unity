@@ -82,7 +82,7 @@
         <referenceTo>Community_Tag__c</referenceTo>
         <relationshipLabel>Users Tagged</relationshipLabel>
         <relationshipName>Community_Users_Tagged</relationshipName>
-        <relationshipOrder>1</relationshipOrder>
+        <relationshipOrder>0</relationshipOrder>
         <reparentableMasterDetail>false</reparentableMasterDetail>
         <trackTrending>false</trackTrending>
         <type>MasterDetail</type>
@@ -96,7 +96,7 @@
         <referenceTo>Contact</referenceTo>
         <relationshipLabel>Profile Tags</relationshipLabel>
         <relationshipName>Contact_Profile_Tags</relationshipName>
-        <relationshipOrder>0</relationshipOrder>
+        <relationshipOrder>1</relationshipOrder>
         <reparentableMasterDetail>false</reparentableMasterDetail>
         <trackTrending>false</trackTrending>
         <type>MasterDetail</type>
@@ -114,6 +114,19 @@
         <trackTrending>false</trackTrending>
         <type>Text</type>
         <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Related_Contact__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <description>Allows tags to be associated to this Contact record.</description>
+        <externalId>false</externalId>
+        <label>Contact</label>
+        <referenceTo>Contact</referenceTo>
+        <relationshipLabel>Community Profile Tags (Related Contact)</relationshipLabel>
+        <relationshipName>Community_Profile_Tags</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
     </fields>
     <fields>
         <fullName>Theme__c</fullName>
