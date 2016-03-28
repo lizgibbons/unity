@@ -411,6 +411,7 @@ private class CommunityTest4 {
 		String TopicsIUse = Label.LBL_TopicsIUse;
 		String Read = Label.LBL_Read;
 		String UnRead = Label.LBL_UnRead;
+		
 		System.assert(true);
 	}
 
