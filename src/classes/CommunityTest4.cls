@@ -409,6 +409,8 @@ private class CommunityTest4 {
 		String ShueToDelete = Label.LBL_Sure_To_Delete_Topic;
 		String TalkingAbout = Label.LBL_Talking_About;
 		String TopicsIUse = Label.LBL_TopicsIUse;
+		String Read = Label.LBL_Read;
+		String UnRead = Label.LBL_UnRead;
 		System.assert(true);
 	}
 
