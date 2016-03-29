@@ -9,7 +9,7 @@
         <layoutColumns>
             <layoutItems>
                 <behavior>Required</behavior>
-                <field>Contact__c</field>
+                <field>Related_Contact__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
@@ -66,7 +66,7 @@
         <style>CustomLinks</style>
     </layoutSections>
     <miniLayout>
-        <fields>Contact__c</fields>
+        <fields>Related_Contact__c</fields>
         <fields>Community_Tag__c</fields>
         <fields>Theme__c</fields>
         <fields>Active__c</fields>
