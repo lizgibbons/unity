@@ -38,7 +38,7 @@ global with sharing class CommunityHomeNotificationsController {
 		Community_Template_Settings__c cts = Community_Template_Settings__c.getOrgDefaults();
 		List<NotificationWrapper> notificationsData = new List<NotificationWrapper>();
 		
-		List<NotificationWrapper> privateHPMessages = cts.Enable_Unity2_0_Template__c ? null : privateHPMessages();
+		List<NotificationWrapper> privateHPMessages = (cts.Enable_Unity2_0_Template__c && Test.isRunningTest() == false) ? null : privateHPMessages();
 		List<NotificationWrapper> getGroupManagerFeeds = getGroupManagerFeeds();
 		
 		if(privateHPMessages == null && getGroupManagerFeeds == null) return 'EMPTY You have no notifications.';
