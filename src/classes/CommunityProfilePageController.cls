@@ -391,7 +391,7 @@ global with sharing class CommunityProfilePageController {
 					'CommunityProfilePageController.cls [toogle]',
 					new List<Schema.DescribeFieldResult> {
 						Community_Profile_Tag__c.Contact__c.getDescribe(),
-						Community_Profile_Tag__c.Related_Contact__c.getDescribe(),
+						//Community_Profile_Tag__c.Related_Contact__c.getDescribe(), //UN-492
 						Community_Profile_Tag__c.Community_Tag__c.getDescribe(),
 						Community_Profile_Tag__c.Active__c.getDescribe()
 					}
