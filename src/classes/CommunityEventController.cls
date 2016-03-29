@@ -313,11 +313,6 @@ public with sharing class CommunityEventController {
 			}
 		}
 		String groupId = CommunityUtils.validateId(ApexPages.currentPage().getParameters().get('gr'));
-		if(String.isBlank(groupId)) {
-			if (!SObjectType.Community_Event_Tag__c.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.Community_Event_Tag__c);
-			List<Community_Event_Tag__c> cet = [SELECT Community_Group_Control__r.Chatter_Group_ID__c FROM Community_Event_Tag__c WHERE Community_Event__c = :event.Id AND Community_Group_Control__c != NULL];
-			groupId = cet.isEmpty() ? NULL : cet[0].Community_Group_Control__r.Chatter_Group_ID__c;
-		}
 		connectedGroupStr = '';
 		if(String.isNotBlank(groupId)) {
 			if (!SObjectType.Community_Group_Control__c.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.Community_Group_Control__c);
@@ -388,7 +383,7 @@ public with sharing class CommunityEventController {
 			else {
 				// create group
 				if (!SObjectType.Community_Group_Control__c.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.Community_Group_Control__c);
-				String queryConnectedGroupStr = String.escapeSingleQuotes(connectedGroupStr);
+				String queryConnectedGroupStr = connectedGroupStr; 
 				List<Community_Group_Control__c> communityGroupControll = [
 						SELECT Id, Chatter_Group_ID__c
 						FROM Community_Group_Control__c
