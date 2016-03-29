@@ -615,6 +615,9 @@
 								$('#cfcmp').append(template(tt));
 								enableBtn('shmbtn');
 								$('#shmbtn').css('display',tt.showMore?'block':'none').attr('onclick','loadFeeds(\'' + tt.nextPageToken + '\');return false;');
+								if({!fromEmail}){
+									$('.preloader__container').hide();
+								}	
 							}
 							else {
 								showFeedError(event.message);
@@ -795,13 +798,26 @@
 											}
 											loadImage( inputfile,
 												function (img) {
+													if(img.type != 'error'){ 
 													var binary = img.toDataURL(fType).substring(img.toDataURL(fType).indexOf("base64,")+"base64,".length);
 													uploadAttachment(binary,fName,fType);
+													}else{
+														var reader = new FileReader();
+														reader.onloadend = function(){
+															var binary = "";
+															var bytes = new Uint8Array(reader.result);
+															var length = bytes.byteLength;
+															for (var i = 0; i < length; i++)
+															{
+																binary += String.fromCharCode(bytes[i]);
+															}
+															uploadAttachment(new sforce.Base64Binary(binary).toString(),fName,fType);
+														};
+													}
 												}, options
 											);
 										});
-									}
-									else {
+									}else{
 										// end my code
 										var reader = new FileReader();
 										reader.onloadend = function(){
@@ -874,15 +890,17 @@
 								params,
 								function(result, event) {
 									if (event.result) {
-										enableBtn('svbtn');
-										refreshFeed();
+										_.templateSettings.variable = 'rc';
+										var template = _.template($('#ttp21').html() + $('#ttp2').html());
+										var tt = jsonObj(result);
+										$('#m'+tt.items[0].id).replaceWith(template(tt));		
+										closeEditDialog(tt.items[0].id);
 										setActiveli();
-										closeEditDialog();
 										$('#modalDialog #message').val('');
 										if (typeof(switchToMemberMode) == 'function') switchToMemberMode();
 									}
 									else {
-										showFeedError(event.message);
+										showFeedError('{!JSENCODE($Label.ERR_Comment_Too_Large)}');
 									}
 									enableBtn('svbtn');
 								}
@@ -931,10 +949,12 @@
 						params,
 						function(result, event) {
 							if (event.result) {
-								enableBtn('svbtn');
-								refreshFeed();
-								setActiveli();
+								_.templateSettings.variable = 'rc';
+								var template = _.template($('#ttp1').html() + $('#ttp2').html() + $('#ttp3').html());
+								var tt = jsonObj(result);
+								$('#m'+tt.elements[0].id).replaceWith(template(tt));		
 								closeEditDialog();
+								setActiveli();
 								$('#modalDialog #message').val('');
 								if (typeof(switchToMemberMode) == 'function') switchToMemberMode();
 							} 
@@ -1291,7 +1311,7 @@
 				function addPollChoiceInputElement (t) {
 					var t_el = $(t);
 					var totalChoices = t_el.parent().find('input[name*="choice"]');
-					var mkp = '<section><label class="label input">Choice {0}</label><label class="input"><input id="choice{0}" name="choice{0}" type="text"  /></label></section>';
+					var mkp = '<section><label class="label input">Choice {0}</label><label class="input"><input id="choice{0}" name="choice{0}" type="text" required="required" class="form-control" data-field-for-post aria-required="true"/></label></section>';
 					var nextChoice = (totalChoices.length+1);
 					$(mkp.replace(/\{0}/g, nextChoice)).insertBefore(t_el);
 					var lastitemcopy = chataction.layout.items[chataction.layout.items.length-1];

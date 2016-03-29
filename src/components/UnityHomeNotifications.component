@@ -36,7 +36,7 @@
 	<script id="nPanel" type="text/template">
 		<% _.each(rc, function(n){ %>
 			<li class="feedMenuItem">
-				<a href="{!$Page.CommunityProfilePage}?id=<%- n.MemberId%>" class="avatar it-navatar6"><img src="<%- n.Image %>"/></a>
+				<a href="{!$Page.CommunityProfilePage}?id=<%- n.MemberId%>" class="avatar it-navatar6"><img src="<%- printPhotoUrl(n.Image) %>"/></a>
 				<p>
 					<strong><%- n.Name%></strong> <%
 						if(n.StrongMessage != null){
@@ -76,10 +76,21 @@
 						notifications = jsonObj(result);
 						var notificationsCopy = notifications.slice(0,limitSize);
 						$('#notif-panel').prepend(template(notificationsCopy));
+						if(notificationsCopy.length){
 						$('a.alerts span.number').text(notificationsCopy.length);
+							$('a.alerts span.number').show();
+						}
 					}
 				}
 			);
+		}
+
+		function printPhotoUrl(photoUrl){
+			var url = photoUrl.split('/');
+			if(url[url.length-2].length == 3){
+				return '{!$Resource.assets2}/images/home/default-male.jpg';
+			}
+			return photoUrl;
 		}
 
 	</script>
