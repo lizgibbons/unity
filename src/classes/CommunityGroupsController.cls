@@ -214,7 +214,7 @@ public with sharing class CommunityGroupsController {
 			if (String.isNotBlank(currentContactId)) {
 				String queryContactId = CommunityUtils.validateId(currentContactId);
 				if (!SObjectType.Community_Profile_Tag__c.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.Community_Profile_Tag__c);
-				for (Community_Profile_Tag__c cpt : [SELECT Community_Tag__c FROM Community_Profile_Tag__c WHERE Active__c = true AND Contact__c = :queryContactId]) {
+				for (Community_Profile_Tag__c cpt : [SELECT Community_Tag__c FROM Community_Profile_Tag__c WHERE Active__c = true AND (Contact__c = :queryContactId OR Related_Contact__c = :queryContactId)]) {
 					userTags.add(cpt.Community_Tag__c);
 				}
 			}

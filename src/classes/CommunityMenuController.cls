@@ -88,6 +88,11 @@ public with sharing class CommunityMenuController {
 		return result;
 	}
 	
+	public static Boolean getShowPrivateMessages(){
+		if(Network.getNetworkId() == NULL) return true;
+		return [SELECT OptionsPrivateMessagesEnabled, Id FROM Network WHERE Id =: Network.getNetworkId() LIMIT 1].OptionsPrivateMessagesEnabled;
+	}
+	
 	public static Boolean getShowHideMenu() {
 		Community_Template_Settings__c cts = Community_Template_Settings__c.getOrgDefaults();
 		return !((String.isBlank(cts.Header_Logo_ImageID__c)) && getIsRegTermsPage());
