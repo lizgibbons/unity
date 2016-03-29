@@ -191,7 +191,7 @@ global with sharing class CommunityProfilePageController {
 		Set<Id> activeTags = new Set<Id>();
 		if (!SObjectType.Community_Profile_Tag__c.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.Community_Profile_Tag__c);
 		String queryContactId = CommunityUtils.validateId(contactId);
-		for (Community_Profile_Tag__c cptItem : [SELECT Community_Tag__c FROM Community_Profile_Tag__c WHERE Contact__c =:queryContactId AND Active__c = true]) {
+		for (Community_Profile_Tag__c cptItem : [SELECT Community_Tag__c FROM Community_Profile_Tag__c WHERE (Contact__c = :queryContactId OR Related_Contact__c = :queryContactId) AND Active__c = true]) {
 			activeTags.add(cptItem.Community_Tag__c);
 		}
 		Map<Id,InterestSection> isMap = new Map<Id,InterestSection>();
@@ -368,7 +368,7 @@ global with sharing class CommunityProfilePageController {
 			String queryCcId = CommunityUtils.validateId(ccId);
 			String queryInId = CommunityUtils.validateId(inid);
 			if (!SObjectType.Community_Profile_Tag__c.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.Community_Profile_Tag__c);
-			List<Community_Profile_Tag__c> cptList3 = [SELECT Id, Active__c FROM Community_Profile_Tag__c WHERE Contact__c = :queryCcId AND Community_Tag__c = :queryInId LIMIT 1];
+			List<Community_Profile_Tag__c> cptList3 = [SELECT Id, Active__c FROM Community_Profile_Tag__c WHERE (Contact__c = :queryCcId OR Related_Contact__c = :queryCcId) AND Community_Tag__c = :queryInId LIMIT 1];
 			if (cptList3.size() > 0) {
 				cptList3[0].Active__c = sel;
 				//update cptList3;
@@ -381,9 +381,9 @@ global with sharing class CommunityProfilePageController {
 				);
 			}
 			else {
-				//insert new Community_Profile_Tag__c (Contact__c = ccId, Community_Tag__c = inid, Active__c = true);
 				Community_Profile_Tag__c cpt = new Community_Profile_Tag__c();
 				cpt.Contact__c = ccId;
+				cpt.Related_Contact__c = ccId;
 				cpt.Community_Tag__c = inid;
 				cpt.Active__c = true;
 				CommunityAccess.InsertWithoutSharing(
@@ -391,6 +391,7 @@ global with sharing class CommunityProfilePageController {
 					'CommunityProfilePageController.cls [toogle]',
 					new List<Schema.DescribeFieldResult> {
 						Community_Profile_Tag__c.Contact__c.getDescribe(),
+						//Community_Profile_Tag__c.Related_Contact__c.getDescribe(), //UN-492
 						Community_Profile_Tag__c.Community_Tag__c.getDescribe(),
 						Community_Profile_Tag__c.Active__c.getDescribe()
 					}
