@@ -61,13 +61,14 @@ trigger CommunityResource on Community_Resource__c (after undelete, before inser
 	}
 
 	if (duplicated) {
+		Community_Template_Settings__c cts = Community_Template_Settings__c.getOrgDefaults();
 		for (Community_Resource__c crItem2 : Trigger.new) {
 			if (crItem2.Help_Link__c == true) {
 				if (!Trigger.isUpdate || crItem2.Help_Link__c != Trigger.oldMap.get(crItem2.Id).Help_Link__c) {
-					crItem2.Help_Link__c.addError(Label.LBL_ERR_Help_Link);
+					crItem2.Help_Link__c.addError(cts.Enable_Unity2_0_Template__c ? Label.ERR_Only_One_Help_Link : Label.LBL_ERR_Help_Link);
 				}
 				else if (Trigger.isUpdate && crItem2.Status__c != Trigger.oldMap.get(crItem2.Id).Status__c) {
-					crItem2.Status__c.addError(Label.LBL_ERR_Help_Link);
+					crItem2.Status__c.addError(cts.Enable_Unity2_0_Template__c ? Label.ERR_Only_One_Help_Link : Label.LBL_ERR_Help_Link);
 				}
 			}
 		}
