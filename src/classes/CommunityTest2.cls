@@ -40,7 +40,7 @@ private class CommunityTest2 {
 				'addRoleToContact'
 			}
 		);
-
+		
 		System.runAs(df.communityUser) {
 			CollaborationGroup cg = new CollaborationGroup(Name = 'testGroup', CollaborationType = 'Public');
 			insert cg;
@@ -48,6 +48,9 @@ private class CommunityTest2 {
 			insert cgc;
 			Community_Group_Manager__c cgm = new Community_Group_Manager__c(Group_Control__c = cgc.Id, Group_Manager_User__c = df.communityUser.Id);
 			insert cgm;
+
+			Community_News__c cnews = new Community_News__c(Title__c='t',Status__c = 'Approwed',Teaser__c='t',Entry_Date__c=Datetime.now(),Expiration_Date__c=Datetime.now().addDays(2),Alert__c = true);
+			insert cnews;
 
 			CommunityFeedNavigationController.getHasTwitterFeed();
 			CommunityFeedNavigationController.getTwitterHandle();
@@ -103,6 +106,10 @@ private class CommunityTest2 {
 			PageReference ref = new PageReference('/apex/CommunityFeedNavigation'); 
 			Test.setCurrentPage(ref);*/
 			cfnc.currentUser = false;
+
+			cfnc = new CommunityFeedNavigationController();
+			List<CommunityFeedNavigationController.AlertWrapper> alerts = cfnc.getHomeAlerts();
+			System.assert(alerts.size() > 0);
 
 		}
 	}
@@ -308,7 +315,7 @@ private class CommunityTest2 {
 			params2.put('parentId', parentId);
 
 			CommunityFeedController cfc = new CommunityFeedController();
-			CommunityFeedController.ChatterActionItem cai = new CommunityFeedController.ChatterActionItem('test', 'test1', 'test2', 'test3', 'test4');
+			CommunityFeedController.ChatterActionItem cai = new CommunityFeedController.ChatterActionItem('test', 'test1', 'test2', 'test3', 'test4', 'test5');
 			List<CommunityFeedController.ChatterActionItem> lCai = cfc.getAvailableActions();
 			String layoutText = CommunityFeedController.actionLayout('FeedItem.TextPost');
 			params2.put('jsontext', layoutText);
@@ -369,7 +376,7 @@ private class CommunityTest2 {
 			String resultGetTopics = CommunityFeedController.getTopics('test');
 			System.assertEquals(true, resultGetTopics.length() > 0);
 
-			String layoutEvent = CommunityFeedController.actionLayoutSForce(JSON.serialize('Create_Event,Community_Events__c,Name:true,Start:true,End:true,Teaser:false,Website:false,Description:false,Street Address:false'));
+			String layoutEvent = CommunityFeedController.actionLayoutSForce(JSON.serialize('Create_Event,Community_Events__c,Name__c:true,Start__c:true,End__c:true,Teaser__c:false,Website__c:false,Description__c:false,Street_Address__c:false'));
 			params2.put('jsontext', layoutEvent);
 			CommunityFeedController.postActions(params2);
 
@@ -452,11 +459,10 @@ private class CommunityTest2 {
 	static testMethod void test_CommunityMenuController() {
 		CommunityTest3.testDataFactory df = new CommunityTest3.testDataFactory(
 			new Set<String> {
-				'communityUser',
-				'communitySuperUser'
+				'communityUser'
 			}
 		);
-
+		
 		System.runAs(df.communityUser) {
 			Test.setCurrentPage(Page.CommunityHome);
 			Community_Resource__c crc = new Community_Resource__c(Name = 'testMenuName', Link__c = 'testLinkName', Sort__c = 1, Quick_Link__c = true, Status__c = 'Active');
@@ -475,6 +481,49 @@ private class CommunityTest2 {
 			cmc.getBackCRMlink();
 			CommunityMenuController.LinkItem li = new CommunityMenuController.LinkItem('testN','testL');
 			System.assertEquals(String.valueOf('testN'),String.valueOf(li.Name));
+
+		}
+	}
+
+	static testMethod void test_CommunityMenuController2() {
+		Test.setCurrentPage(Page.CommunityHome);
+		Account acc = new Account(Name='testAccount');
+		insert acc;
+		List<Contact> cons = new List<Contact> {
+			new Contact(LastName='TCLN', MailingPostalCode='99013', email='testc@testdomain.com', AccountId=acc.Id, Primary_Role__c='Student'),
+			new Contact(LastName='TCLO', MailingPostalCode='99013', email='testo@testdomain.com', AccountId=acc.Id, Primary_Role__c='Student')
+		};
+		insert cons;
+		Profile profile = [SELECT Id FROM Profile WHERE Name = 'System Administrator'];
+		List<User> us = new List<User> {
+			new User(alias='alias', email='email@email.com', emailencodingkey='UTF-8', lastname='lopez', firstname = 'guillermo', languagelocalekey='en_US',
+				localesidkey='en_US', profileid=profile.Id, timezonesidkey='America/Los_Angeles', username='ttsde.tedf2@testmail.com',
+				FederationIdentifier='TestContactName.TestContactLastname2', Community_Contact_ID__c=cons[0].Id, isActive = true),
+			new User(alias='alias2', email='email2@email.com', emailencodingkey='UTF-8', lastname='hu', firstname = 'yovo', languagelocalekey='en_US',
+				localesidkey='en_US', profileid=profile.Id, timezonesidkey='America/Los_Angeles', username='ttsde.tedf3@testmail.com',
+				FederationIdentifier='TestContactName.TestContactLastname6', Community_Contact_ID__c=cons[1].Id, isActive = true)
+		};
+		insert us;
+		System.runAs(us[0]){
+			CommunityFeed_MyMessagesController cfmc = new CommunityFeed_MyMessagesController();
+			CommunityFeed_MyMessagesController.ChatterMessage cm = cfmc.newConversation('balalayka',us[1].Id);
+			CommunityFeed_MyMessagesController.postMessage(cm.ConversationId,'gorbachev',cm.MessageId);
+
+			CommunityMenuController cmc = new CommunityMenuController();
+			String cur = cmc.currentUserRole;
+			String ci = cmc.conversationId;
+			Boolean r = cmc.read;
+			Integer muc = cmc.MessageUnreadCount;
+			Integer ap = cmc.getActivePage();
+			Boolean spm = CommunityMenuController.getShowPrivateMessages();
+			User curU = cmc.getCurrentUser();
+
+			List<CommunityMenuController.ChatterConversation> listConv = cmc.getUnityConversations();
+			System.assertEquals(1, listConv.size());
+
+			cmc.conversationId = cm.ConversationId;
+			cmc.read = false;
+			cmc.readConversation();
 		}
 	}
 
@@ -498,11 +547,23 @@ private class CommunityTest2 {
 			insert new Community_News__c(Title__c='t',Make_Entry_Sticky__c=true,Status__c = 'Appoowed',Teaser__c='t',Entry_Date__c=Datetime.now(),Expiration_Date__c=Datetime.now().addDays(1));
 			CommunityHomeComponentController chc = new CommunityHomeComponentController();
 			chc.getCampusNews();
+			chc.getHomeNews();
 			System.assert(chc.getCampusNews().size()>0);
 			chc.getMyNews();
 			CommunityHomeComponentController.News news1 = new CommunityHomeComponentController.News(cnews);
 			news1.getImagePath();
 			Boolean boolMute = chc.isMuteAvailable;
+
+			Community_Events__c event = new Community_Events__c();
+			event.Name__c = 'Event Test';
+			event.Start__c = system.now().addDays(1);
+			event.End__c = system.now().addDays(2);
+			event.Description__c = 'Description';
+			event.Public__c = true;
+			insert event;
+
+			List<CommunityHomeComponentController.Events> eve = chc.getHomeEvents();
+			System.assert(eve.size()>0);
 		}
 	}
 
