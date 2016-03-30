@@ -195,6 +195,21 @@
 			}
 			checkPhotoUrl();
 		});
+		//mark notifications as read
+		$('.feedMenuItem').on('click', '.read', function(){
+
+	        var countEmail = parseInt($('.emails .number').first().text(), 10); 
+	        if(!$(this).parent('.feedMenuItem').hasClass('unread')){
+	            $(this).parent('.feedMenuItem').addClass('unread');
+	            $(this).parent('.feedMenuItem').attr('title', '{!$Label.LBL_UnRead}');
+	            $('.emails .number').text(countEmail+1);
+	        }else{
+	            $(this).parent('.feedMenuItem').removeClass('unread');
+	            $(this).parent('.feedMenuItem').attr('title', '{!$Label.LBL_Read}');
+	            $('.emails .number').text(countEmail-1);
+	        }
+	        
+	    });
 		function readNotification(elem, id){
 			var read = $(elem).parent('.feedMenuItem').hasClass('unread') ? true : false;
 			readConversation(id,read);

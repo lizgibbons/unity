@@ -315,7 +315,7 @@ public with sharing class CommunityEventController {
 		String groupId = CommunityUtils.validateId(ApexPages.currentPage().getParameters().get('gr'));
 		if(String.isBlank(groupId)) {
 			if (!SObjectType.Community_Event_Tag__c.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.Community_Event_Tag__c);
-			List<Community_Event_Tag__c> cet = [SELECT Community_Group_Control__r.Chatter_Group_ID__c FROM Community_Event_Tag__c WHERE Community_Event__c = :event.Id AND Community_Group_Control__c != NULL];
+			List<Community_Event_Tag__c> cet = [SELECT Community_Group_Control__r.Chatter_Group_ID__c FROM Community_Event_Tag__c WHERE Community_Event__c = :event.Id AND Community_Group_Control__c != NULL AND Community_Event__c != NULL];
 			groupId = cet.isEmpty() ? NULL : cet[0].Community_Group_Control__r.Chatter_Group_ID__c;
 		}
 		connectedGroupStr = '';
@@ -376,7 +376,6 @@ public with sharing class CommunityEventController {
 					WHERE Community_Event__c =: event.Id and Community_Group_Control__c != null
 					ORDER BY CreatedDate DESC
 				];
-			
 			if(string.isBlank(connectedGroupStr)) {
 				// delete all records related for this Event where group is not null
 				//delete communityEventTagList;
@@ -388,11 +387,11 @@ public with sharing class CommunityEventController {
 			else {
 				// create group
 				if (!SObjectType.Community_Group_Control__c.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.Community_Group_Control__c);
-				String queryConnectedGroupStr = String.escapeSingleQuotes(connectedGroupStr);
+				String queryConnectedGroupStr = connectedGroupStr; 
 				List<Community_Group_Control__c> communityGroupControll = [
 						SELECT Id, Chatter_Group_ID__c
 						FROM Community_Group_Control__c
-						WHERE Name like :queryConnectedGroupStr
+						WHERE Name =:queryConnectedGroupStr
 						ORDER BY CreatedDate DESC
 					];
 				// delete all events if there was more than one record	
