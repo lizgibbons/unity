@@ -555,6 +555,7 @@
         <members>LBL_PrivateGroup</members>
         <members>LBL_Profile</members>
         <members>LBL_ProfilePosts</members>
+        <members>LBL_Read</members>
         <members>LBL_Read_More</members>
         <members>LBL_Read_More_News</members>
         <members>LBL_Recent_Messages</members>
@@ -607,6 +608,7 @@
         <members>LBL_Topic</members>
         <members>LBL_Topics</members>
         <members>LBL_Unity_Post</members>
+		<members>LBL_UnRead</members>
         <members>LBL_Unmute_Feed</members>
         <members>LBL_Upcoming_Events</members>
         <members>LBL_Update_Managers</members>
