@@ -89,12 +89,7 @@
 				</div>
 				<div class="col-xs-12 col-sm-6">
 					<ul class="list-inline top-v1-data">
-						<apex:outputPanel layout="none" rendered="{!Unity20Template}">
-							<li><a href="{!$Page.UnityHome}" title="{!$Label.LBL_Home}"><i class="fa fa-home"></i></a></li>
-						</apex:outputPanel>
-						<apex:outputPanel layout="none" rendered="{!!Unity20Template}">
 						<li><a href="{!$Page.CommunityHome}" title="{!$Label.LBL_Home}"><i class="fa fa-home"></i></a></li>
-						</apex:outputPanel>		
 						<apex:outputPanel layout="none" rendered="{!!ISBLANK(BackCRMlink)}">
 							<li><a href="{!BackCRMlink}" title="{!$Label.LBL_Back_to_CRM}"><i class="fa fa-cloud"></i></a></li>
 						</apex:outputPanel>
