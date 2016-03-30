@@ -52,7 +52,7 @@
     <description>This object is used to store links to external systems and resource documents.  Resources will be organized by Themes and Tags where Theme.Type = Resource</description>
     <enableActivities>false</enableActivities>
     <enableBulkApi>true</enableBulkApi>
-    <enableFeeds>false</enableFeeds>
+    <enableFeeds>true</enableFeeds>
     <enableHistory>true</enableHistory>
     <enableReports>true</enableReports>
     <enableSearch>true</enableSearch>
@@ -69,7 +69,7 @@
         <displayedFields>
             <field>Status__c</field>
             <isFieldManaged>false</isFieldManaged>
-            <isRequired>false</isRequired>
+            <isRequired>true</isRequired>
         </displayedFields>
         <displayedFields>
             <field>Description__c</field>
@@ -115,6 +115,7 @@
         <inlineHelpText>Represents a description of the Resource that is presented in the Community.</inlineHelpText>
         <label>Description</label>
         <length>15000</length>
+        <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
         <trackTrending>false</trackTrending>
         <type>Html</type>
@@ -126,6 +127,7 @@
         <description>if checked, link will be the Help link</description>
         <externalId>false</externalId>
         <label>Help Link</label>
+        <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
         <trackTrending>false</trackTrending>
         <type>Checkbox</type>
@@ -136,6 +138,7 @@
         <externalId>false</externalId>
         <label>Link</label>
         <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
         <trackTrending>false</trackTrending>
         <type>Url</type>
@@ -160,6 +163,7 @@
         <relationshipLabel>Resources Tagged w Primary</relationshipLabel>
         <relationshipName>Resource_Tagged_w_Primary</relationshipName>
         <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
         <trackTrending>false</trackTrending>
         <type>Lookup</type>
@@ -171,6 +175,7 @@
         <externalId>false</externalId>
         <inlineHelpText>f checked, link will be displayed in the &quot;Links&quot; menu</inlineHelpText>
         <label>Quick Link</label>
+        <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
         <trackTrending>false</trackTrending>
         <type>Checkbox</type>
@@ -183,6 +188,7 @@
         <label>Resource Name</label>
         <length>150</length>
         <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
         <trackTrending>false</trackTrending>
         <type>Text</type>
@@ -210,6 +216,7 @@
         <precision>2</precision>
         <required>false</required>
         <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
         <trackTrending>false</trackTrending>
         <type>Number</type>
@@ -231,6 +238,7 @@
             </picklistValues>
             <sorted>false</sorted>
         </picklist>
+        <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
         <trackTrending>false</trackTrending>
         <type>Picklist</type>
@@ -284,6 +292,7 @@
     </listViews>
     <nameField>
         <label>Resource Title</label>
+        <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
         <type>Text</type>
     </nameField>

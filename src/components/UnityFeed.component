@@ -1,0 +1,1618 @@
+<!--  
+ * Unity - Communities
+ * 
+ * Community is critical to the student experience--but building community is 
+ * just plain hard. Built on Communities and designed specifically for higher ed, 
+ * Unity is a powerful networking tool to help you generate engagement and 
+ * connect your campus.
+ * 
+ * Copyright (C) 2015 Motivis Learning Systems Inc.
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * To contact Motivis Learning Systems Inc.
+ * 25 Pelham Road
+ * Salem, NH 03790
+ * unity@motivislearning.com
+-->
+
+<apex:component controller="CommunityFeedController">
+	<apex:attribute name="pid" type="String" assignTo="{!parentId}" required="false" description="Parent Id" />
+	<apex:attribute name="ft" type="String" assignTo="{!feedType}" required="false" description="Feed Type" />
+	<apex:attribute name="ti" type="String" assignTo="{!topicId}" required="false" description="Topic Id" />
+	<apex:attribute name="fe" type="Boolean" assignTo="{!fromEmail}" required="false" description="from email" />
+	<apex:attribute name="ffe" type="String" assignTo="{!feedfromEmailId}" required="false" description="feed id from email" />
+	<apex:attribute name="fm" type="Boolean" assignTo="{!fullMode}" required="false" default="true" description="Full Mode" />
+	<apex:attribute name="fu" type="Boolean" assignTo="{!showFileUpload}" required="false" default="true" description="Show File Upload" />
+	<apex:attribute name="sjcb" type="Boolean" required="false" default="false" description="show Join the Conversation button" />
+	<apex:attribute name="tf" type="Boolean" required="false" default="false" description="show feeds from" />
+	<apex:attribute name="gID" type="Boolean" assignTo="{!grID}" required="false" default="false" description="ID for Group" />
+	<apex:attribute name="he" type="Boolean" assignTo="{!hideEventBtn}" required="false" default="false" description="hide create event button" />
+	<script type="text/javascript" src="{!$Resource.assets}/plugins/mentions/jquery.mentionsInput.js" ></script>
+	<script type="text/javascript" src="{!$Resource.assets}/plugins/mentions/jquery.events.input.js" ></script>
+	<script type="text/javascript" src="{!$Resource.assets}/plugins/sky-forms/version-2.0.1/js/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="{!$Resource.assets}/plugins/sky-forms/version-2.0.1/js/jquery.validate.min.js"></script> <!--  path contains old version -->
+	<script type="text/javascript" src="/soap/ajax/33.0/connection.js"></script>
+	<script type="text/javascript" src="{!$Resource.assets}/plugins/ImageLoad/load-image.all.min.js"></script>
+
+	<apex:stylesheet value="{!$Resource.assets}/plugins/datetimepicker/jquery.datetimepicker.css" />
+	<script type="text/javascript" src="{!$Resource.assets}/plugins/datetimepicker/jquery.datetimepicker.js"></script>
+	<!-- script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.13.1/jquery.validate.min.js"></script-->
+	
+	<article id="mainFeed">
+		<apex:outputPanel rendered="{!fromEmail}">
+		<div class="preloader__container">
+			<div class="preloader__element">
+				<i class="fa fa-refresh fa-spin preloader__icon"></i>
+			</div>
+		</div>
+		</apex:outputPanel>
+		<apex:outputPanel layout="block" id="mainFeed" rendered="{!fullMode}">
+			
+			<div class="post-box">
+				<div class="clearfix"></div>
+				<div id="postform-error" class="alert alert-danger fade in" style="display:none;"></div>
+				<div id="postarea">
+					<form name="postform">
+						<textarea name="message" id="post-area" class="form-control share" onclick="checkmi(this);"></textarea>
+					</form>
+				</div>
+				<div class="hide">
+					<input type="file" id="fileUploader" name="fileUploader"/>
+					<div class="post-upload-content-holder">
+						<div class="post-upload-content" id="postUpload">
+						</div>
+					</div>
+				</div>
+				<div class="post-options" id="palist">
+				   <apex:repeat value="{!AvailableActions}" var="aa">
+				   		<button data-content-target="{!aa.holderClass}" class="{!aa.actionClass}" style="{!IF(aa.name == 'FeedItem.TextPost', 'display: none', '')}" title="{!aa.label}" id="{!aa.name}" onclick="setActiveli(this);"><i class="lrm {!aa.iconClass}"></i> <span>{!aa.label}</span></button>
+				   </apex:repeat>
+				</div>
+			</div>
+			
+			<div id="cfcmp"></div>
+			<button id="shmbtn" type="button" class="btn-u btn-u-default btn-block" style="display:none;"></button>
+			<div class="loader" style="display:none;">
+		        <div class="ispinner gray animating">
+		            <div class="ispinner-blade"></div>
+		            <div class="ispinner-blade"></div>
+		            <div class="ispinner-blade"></div>
+		            <div class="ispinner-blade"></div>
+		            <div class="ispinner-blade"></div>
+		            <div class="ispinner-blade"></div>
+		            <div class="ispinner-blade"></div>
+		            <div class="ispinner-blade"></div>
+		            <div class="ispinner-blade"></div>
+		            <div class="ispinner-blade"></div>
+		            <div class="ispinner-blade"></div>
+		            <div class="ispinner-blade"></div>
+		        </div>
+		    </div>
+					<!-- section for edit post-->	
+			<script id="ttp1" type="text/template">
+				<% if(viewFromEmail && rc.elements == null) {%>
+					<p><a class="font-weight-bold" href="<%- rc %>">{!$Label.LBL_All_Updates}</a> ) {!$Label.LBL_This_Update}</p>
+					<p>{!$Label.LBL_There_Are_No_Updates}<p>
+				<% } %>	
+				<% _.each(rc.elements, function(p2){ %>
+					<% if(viewFromEmail) {%>
+						<% if(p2.parentType) {%>
+							<span class="pull-right">
+								<p class="font-weight-bold"><strong><%- p2.parentType %> / <%- p2.parentName %></strong></p>
+							</span>
+						<% } %>
+						<% if(p2.parentLink){%>
+							<p><a class="font-weight-bold" href="<%- p2.parentLink %>">{!$Label.LBL_All_Updates}</a> ) {!$Label.LBL_This_Update} </p>
+						<% }else if(p2.parentId == "{!currentUserId}"){%>
+							<p><a class="font-weight-bold" href="{!$Page.CommunityFeed_MyFeed}">{!$Label.LBL_All_Updates}</a> ) {!$Label.LBL_This_Update}</p>
+						<% }else {%>
+							<p><a class="font-weight-bold" href="{!$Page.CommunityProfilePage}?id=<%- p2.parentId %>&f=2">{!$Label.LBL_All_Updates}</a> ) {!$Label.LBL_This_Update}</p>
+						<%}%>
+					<% } %>	
+				<% if (p2.showLink){ %><div class="card post-link" id="m<%- p2.id %>">
+				<% }else if(p2.showContent){ %><div class="card post-file" id="m<%- p2.id %>">
+				<% }else if(p2.capabilities.poll){ %><div class="card post-poll" id="m<%- p2.id %>">
+				<% }else{ %><div class="card post-comment" id="m<%- p2.id %>">
+				<% } %>
+					<div class="card-header">
+						<a class="avatar it-avatar1" href="{!$Page.CommunityProfilePage}?id=<%- p2.actor.id %>">
+							<img src="<%- printPhotoUrl(p2.actor.photo.smallPhotoUrl) %>" alt=""/>
+						</a>
+						<h3><a class="it-userName1" href="{!$Page.CommunityProfilePage}?id=<%- p2.actor.id %>"><%- p2.actor.displayName %></a>
+							<span class="post-type"> posted a <strong>
+							<% if (p2.showLink){ %>{!$Label.LBL_Link}</strong>
+							<% }else if(p2.showContent){ %>{!$Label.LBL_File}</strong>
+							<% }else if(p2.capabilities.poll){ %>{!$Label.LBL_Poll}</strong>
+							<% }else{ %>{!$Label.LBL_Comment}</strong>
+							</span>
+							<% } %>
+							<div>
+			                    <time><%- p2.dateStr %></time>
+			                    <% if(p2.parentType != null && {!tf}){ %> &nbsp;|&nbsp;
+			                    	<a class="normal-weight it-groupLinkExample" href="<%- p2.parentLink %>"><%- p2.parentName %></a>
+			                    <% } %>
+			                </div>
+						</h3>
+						<% if((p2.capabilities.mute != null && {!isMuteShow}) || (p2.showFlag && chekFlagOnPage(p2.parentType)) || p2.isDeleteRestricted || p2.capabilities.edit.isEditRestricted){ %>
+						<% if({!isModerateNetworkFeeds} || p2.flagStatus == 'true'){
+						 	if(p2.flagCount > 0 || p2.flagStatus == 'true') { %>
+						 		<div class="flag" id="f<%- p2.id %>">
+							<% }else { %>
+								<div class="flag" id="f<%- p2.id %>" style="display:none">
+							<% } %>	
+						<% }else{ %> 
+						<div class="flag" id="f<%- p2.id %>" style="display:none">
+						<% } %>
+							<a role="button" title="Flag" alt="Flag" class="card-btn flag-btn it-flagBtn1 active">Flag</a>
+			            </div>
+						<div class="dropmenu">
+			                <a title="More Options" alt="More Options" role="button" class="it=moreOptions2" onclick="dropUpMenu(this);"><i class="lrm lrm-more"></i></a>
+			                <ul id="drop<%- p2.id %>">
+			                	<% if (!p2.showContent && !p2.capabilities.poll && !p2.capabilities.edit.isEditRestricted){ %>
+									<li><a role="button" class="editPost it-editPost2" onclick="dropDownMenu(this);editPost('<%- p2.id %>');"><i class="lrm lrm-edit outline-icon"></i><i class="lrm lrm-edit solid-icon"></i>{!$Label.BTN_Edit}</a></li>
+								<% } %>
+			                	<% if(p2.capabilities.mute != null && {!isMuteShow}){ %>
+									<% if({!muteShowTooltip}){%>	
+			                    		<li><a role="button" class="it-mutePost1" onclick="dropDownMenu(this); muteFeed('<%- p2.id %>', '<%- p2.capabilities.mute.isMutedByMe %>');"><i class="lrm lrm-mute outline-icon"></i><i class="lrm lrm-mute-solid solid-icon"></i>{!$Label.LBL_MuteFeed}</a></li>
+			                    	<% } %>
+									<% if({!!muteShowTooltip}){%>
+										<li><a role="button" class="it-mutePost1" onclick=" dropDownMenu(this); muteFeed('<%- p2.id %>', '<%- p2.capabilities.mute.isMutedByMe %>');"><i class="lrm lrm-mute outline-icon"></i><i class="lrm lrm-mute-solid solid-icon"></i>{!$Label.LBL_Unmute_Feed}</a></li>
+									<% } %>
+								<% } %>
+								<% if ( (p2.showFlag) && chekFlagOnPage(p2.parentType) ) { %>
+			                    	<% if({!!isModerateNetworkFeeds}) { %>
+			                    		<li><a role="button" class="it-flagPost1" onclick="dropDownMenu(this); inlAct('<%- p2.id %>','fa-flag','<%- p2.flagStatus %>');"><i class="lrm lrm-flag outline-icon"></i><i class="lrm lrm-flag-solid solid-icon"></i><% if(p2.flagStatus){ %> {!$Label.LBL_Remove_Flag}
+			                    			<% } else {%> {!$Label.LBL_Flag} <%}%></a></li>
+			                    	<% } else{ %>
+			                    		<% if(!p2.flagStatus){ %>
+			                    			<li><a role="button" class="it-flagPost1" onclick="dropDownMenu(this); inlAct('<%- p2.id %>','fa-flag','');"><i class="lrm lrm-flag outline-icon"></i><i class="lrm lrm-flag-solid solid-icon"></i> {!$Label.LBL_Flag}</a></li>
+			                    		<% } %>
+			                    		<% if (p2.flagCount > 0){ %>
+			                    			<li><a role="button" class="it-flagPost1" onclick="dropDownMenu(this); inlAct('<%- p2.id %>','fa-flag','true');"><i class="lrm lrm-flag outline-icon"></i><i class="lrm lrm-flag-solid solid-icon"></i> {!$Label.LBL_Remove_Flags}</a></li>
+			                   			 <% } %>	
+			                    	<% } %>	
+			                    <% } %>
+			                    <% if (p2.isDeleteRestricted) { %>
+			                    	<li><a role="button" class="it-deletePost1" onclick=" dropDownMenu(this); inlAct('<%- p2.id %>','fa-times','');"><i class="lrm lrm-remove outline-icon"></i><i class="lrm lrm-remove solid-icon"></i>{!$Label.LBL_Delete}</a></li>
+			                    <% } %>
+			                </ul>
+			            </div>
+			            <% } %>
+					</div>	
+					<div class="card-content">
+						<p>	<% var p2p = parseFeedBody(p2.body,p2.topicsUser);
+								print(wrapnl(p2p)); %>
+						</p>
+						<% if (!p2.showContent && !p2.capabilities.poll && !p2.capabilities.edit.isEditRestricted){ %>
+							<div id="editPanel<%- p2.id %>" style="display: none;"></div>
+						<% } %>
+						<% if(p2.showContent && !p2.capabilities.content.fileExtension){ %>
+							<p>
+								<i class="fa fa-file-o"></i> The file is no longer available.
+							</p>
+						<% } %>
+					</div>
+					<% if (p2.showLink) { %>
+						<div class="card-attachment">
+				            <h2><a href="<%- p2.linkHref %>" target="_blank" class="it-linkTitle"><%- p2.linkName %></a></h2>
+				            <small class="limit-1-line"><a href="<%- p2.linkHref %>" target="_blank" class="it-linkURL"><% print(wrapnl(p2.linkHref)); %></a></small>
+				        </div>
+					<% } %>
+					<% if (p2.showContent) { %>
+						<% if (p2.capabilities.content.fileExtension) { %>
+							<% if(['png', 'gif', 'jpg', 'jpeg'].indexOf(p2.capabilities.content.fileExtension) != -1 ) {%>
+								<div class="card-cover-photo">
+						            <img src="<%- p2.capabilities.content.downloadUrl %>">
+						        </div>
+						        <div class="card-content card-attachment">
+						            <a href="{!$Page.CommunityGroupFiles}?f=<%- p2.capabilities.content.id %>&fi=<%- p2.id %>" target="_self" class="file-path it-filePathExample"><i class="lrm lrm-img"></i><span class="file-name"><%- p2.capabilities.content.title %> (<% print(fileSizeIEC(p2.capabilities.content.fileSize)) %>)</span></a>
+						            <a href="<%- p2.capabilities.content.downloadUrl %>" class="download-btn context-btn it-filePathDownload"><i class="lrm lrm-upload"></i> {!$Label.BTN_Download}</a>
+						        </div>
+						    <% }else{%>
+						    	<div class="card-content card-attachment">
+						            <a href="{!$Page.CommunityGroupFiles}?f=<%- p2.capabilities.content.id %>&fi=<%- p2.id %>" target="_self" class="file-path it-filePathExample">
+						            <% if(p2.capabilities.content.fileExtension){
+						            	if(p2.capabilities.content.fileExtension == 'pdf'){ %><i class="lrm lrm-pdf"></i>
+						            	<% 	}else if(['ppt', 'pptx'].indexOf(p2.capabilities.content.fileExtension) != -1){ %><i class="lrm lrm-ppt"></i>
+						            	<% 	}else if(['doc', 'docx'].indexOf(p2.capabilities.content.fileExtension) != -1){ %><i class="lrm lrm-doc"></i>
+						            	<% 	}else if(['xls', 'xlsx'].indexOf(p2.capabilities.content.fileExtension) != -1){ %><i class="lrm lrm-xls"></i>
+						            	<% 	}else if(['avi', 'wmv', 'mkv', 'mov','3gp', 'flv', 'swf', 'vob', 'ifo', 'mp4'].indexOf(p2.capabilities.content.fileExtension) != -1){ %><i class="lrm lrm-video"></i>
+						            	<% 	}else if(['ac3', 'aud', 'flac', 'midi', 'mp3', 'voc', 'wav', 'wma'].indexOf(p2.capabilities.content.fileExtension) != -1){ %><i class="lrm lrm-audio"></i>
+						            	<% 	}else{ %><i class="lrm lrm-genericfile"></i><% } %>
+						            <% } %>
+						            <span class="file-name"><%- p2.capabilities.content.title %> (<% print(fileSizeIEC(p2.capabilities.content.fileSize)) %>)</span></a>
+						            <a href="<%- p2.capabilities.content.downloadUrl %>" class="download-btn context-btn it-filePathDownload"><i class="lrm lrm-upload"></i> {!$Label.BTN_Download}</a>
+						        </div>
+						    <% } %>         
+						<% } %>    
+					<% } %>
+
+					<% if (p2.capabilities.poll && p2.capabilities.poll.choices) { %>
+						<% if ((p2.capabilities.poll.myChoiceId && !changeVoteId(p2.id)) || viewRes(p2.id)) {%>
+							<div class="card-content card-poll-results show">
+						<% } else { %>
+							<div class="card-content card-poll-choices">
+						<%}%>					
+						<% _.each(p2.capabilities.poll.choices, function(choice) { %>
+							<% if ((p2.capabilities.poll.myChoiceId && !changeVoteId(p2.id)) || viewRes(p2.id)) {%>
+								<p>
+								    <strong><% print(wrapnl(choice.text)) %></strong>
+								    <strong class="pull-right"><%-Math.round(choice.voteCountRatio*100)%>%</strong>
+								</p>
+								<div class="poll-result-graph">
+								    <div style="width:<%-choice.voteCountRatio*100 %>%;"></div>
+								</div>
+							<% } else { %>
+								<div class="radioOption" onclick="enableBtn('vote_<%- p2.id %>')">
+								   	<p><% print(wrapnl(choice.text))%></p>
+								   	<label class="radio it-pollOption1" for="<%-choice.id%>"><% print(wrapnl(choice.text))%><input id="<%-choice.id%>" type="radio" name="pollchoicesgroup__<%-p2.id%>"></label>
+								</div>
+							<%}%>
+						<% }); %>
+							<% if ((!p2.capabilities.poll.myChoiceId || changeVoteId(p2.id)) && !viewRes(p2.id)) {%>
+								<p>
+									<a class="btn-fill-custom it-pollVote btn disabled" role="button" value="Vote" title="{!$label.LBL_Vote}" onclick="vote(this);" id="vote_<%- p2.id %>">{!$label.LBL_Vote}</a>
+									<small>
+							            <%-p2.capabilities.poll.totalVoteCount%> Votes &#8226;
+							<%}%>		
+							<% if ((p2.capabilities.poll.myChoiceId && !changeVoteId(p2.id)) || (viewRes(p2.id) && p2.capabilities.poll.myChoiceId)) { %>
+								<a href="javascript: void(0);" class="it-refreshPoll" onclick="refreshFeed();">{!$label.LBL_Refresh}</a> &#8226;
+                    			<a href="javascript: void(0);" class="change-vote it-changeVote" onclick="changeVote('<%- p2.id %>');">{!$label.LBL_Change_Vote}</a>
+							<%}%>
+							<% if ((!p2.capabilities.poll.myChoiceId || changeVoteId(p2.id)) && !viewRes(p2.id)) {%>
+								<a href="javascript: void(0);" class="it-refreshPoll" onclick="viewResults('<%- p2.id %>');">{!$label.LBL_View_Results}</a>
+							<%}%>
+							<% if (!p2.capabilities.poll.myChoiceId && viewRes(p2.id)) {%>
+								<a href="javascript: void(0);" class="it-refreshPoll" onclick="refreshFeed();">{!$label.LBL_Refresh}</a> &#8226;
+								<a href="javascript: void(0);" class="it-refreshPoll" onclick="viewResults('<%- p2.id %>');">{!$label.LBL_Vote}</a>
+							<%}%>
+									</small>
+				                </p>
+							</div>	
+					<%} %>
+						
+					<div class="card-options" id="ul<%- p2.id %>">
+						<a role="button" href="javascript:void(0);" title="{!$Label.LBL_Feed_Like}" alt="{!$Label.LBL_Feed_Like}" class="card-btn like-btn it-likeBtn1 fa-thumbs-up <%- p2.likeStyle %>" onclick="inlAct('<%- p2.id %>','fa-thumbs-up','<%- p2.likeId %>');">{!$Label.LBL_Feed_Like}<span name="countLikes"><%- p2.countLikes %></span></a>
+						<% if (!p2.showLink && !p2.showContent && !p2.capabilities.poll) { %>
+			            	<a role="button" title="{!$Label.LBL_Share}" alt="{!$Label.LBL_Share}" class="card-btn share-btn it-shareBtn1">{!$Label.LBL_Share}</a>
+			            <% } %>    
+			            <a role="button" title="{!$Label.LBL_Feed_Bookmark}" alt="{!$Label.LBL_Feed_Bookmark}" class="card-btn bookmark-btn it-bookmarkBtn1 fa-bookmark <%- p2.bookmarkStyle %>" onclick="inlAct('<%- p2.id %>','fa-bookmark','<%- p2.bookmarkStatus %>');">{!$Label.LBL_Feed_Bookmark}</a>
+			        </div>	
+					<div class="clearfix"></div>
+					<% if (p2.showComments) { %>
+						<div class="card-comments" id="c<%- p2.id %>" name="<%- p2.id %>">	
+						<% if (p2.capabilities.comments.page.showNextComments) { %>
+							<p class="older-comments">
+								<strong><%- p2.capabilities.comments.page.total %> {!$Label.LBL_Comments_Title}</strong>&nbsp;<span name="delim">|</span>&nbsp;
+				                <a id="l<%- p2.id %>" href="javascript:void(0);" onclick="getComments('<%- p2.id %>', '<%- p2.capabilities.comments.page.nextPageToken%>');">{!$Label.LBL_View_Previous_Comments}</a>
+				            </p>
+				        <% } %>
+				        	
+						<% _.each(p2.capabilities.comments.page.items, function(c2){ %>
+							
+			</script>
+			<script id="ttp21" type="text/template">
+							<% _.each(rc.items, function(c2){ %>
+			</script>
+			<script id="ttp2" type="text/template">
+								<div class="comment" id="m<%- c2.id %>">
+									<a class="avatar it-avatar4" href="{!$Page.CommunityProfilePage}?id=<%- c2.user.id %>">
+										<img src="<%- printPhotoUrl(c2.user.photo.smallPhotoUrl) %>" alt=""/>
+									</a>
+									<div class="comment-holder">
+											<p><strong><a href="{!$Page.CommunityProfilePage}?id=<%- c2.user.id %>" class="it-userCommentAvatar1"><%- c2.user.displayName %></a></strong>
+												<% var p2p = parseFeedBody(c2.body,c2.topicsUser);
+												print(wrapnl(p2p)); %>
+											</p>
+											<div id="editPanel<%- c2.id %>" style="display: none;"></div>
+											<p id="ul<%- c2.id %>"><time><%- c2.dateStr %></time>
+												<% if(!c2.capabilities.edit.isEditRestricted){ %> 
+												| <a href="javascript:void(0);" class="normal-weight editComment it-commentLike2" onclick="editComment('<%- c2.id %>');">{!$Label.BTN_Edit}</a>
+												<% } %>
+												<% if (c2.isDeleteRestricted) { %>
+												| <a href="javascript:void(0);" class="normal-weight it-commentLike2" onclick="inlAct('<%- c2.id %>','fa-times','');">{!$Label.LBL_Delete}</a>
+												<% } %> 
+												| <a class="normal-weight fa-thumbs-up" href="javascript:void(0);" class="it-commentLike1" onclick="inlAct('<%- c2.id %>','fa-thumbs-up','<%- c2.likeId %>');" >{!$Label.LBL_Feed_Like}</a> &nbsp;<span name="countLikes"><%- c2.countLikes %></span>
+											</p>
+									</div>
+								</div>
+							<% }); %>
+			</script>
+			<script id="ttp3" type="text/template">
+						<% } else { %>
+							<div class="card-comments" id="c<%- p2.id %>" name="<%- p2.id %>">
+						<% } %>
+							<div id="d<%- p2.id %>" class="comment-box">
+								<a class="avatar it-avatar2" href="javascript:void(0);">
+									<img src="{!currentUserPhoto}" alt=""/>
+								</a>
+								<div>
+									<textarea id="a<%- p2.id %>" class="it-commentBox1" onclick="checkmi(this); focusComm(this, '#b<%- p2.id %>');" onkeyup="checkbtn(this,'#b<%- p2.id %>');" placeholder="{!$Label.LBL_Write_A_Comment}"></textarea>
+									<a class="btn-fill-custom right-btn disabled it-submitCommentBtn1" role="button" id="b<%- p2.id %>" onclick="postComment($('#a<%- p2.id %>').val(),'<%- p2.id %>', '<%-p2.topicsUser.length%>'); return false;">{!$Label.LBL_Comment}</a>
+								</div>
+							</div>
+						</div>
+				</div>
+				<% }); %>
+			</script>
+			
+			<script id="atp" type="text/template">
+				<form name="postform">
+					<a class="avatar" href="{!$Page.CommunityProfilePage}?id=<%- rc.user.Id %>">
+						<img src="<%- printPhotoUrl(rc.user.SmallPhotoUrl) %>" alt=""/>
+					</a>
+					<textarea id="post-area" name="message" class="validate-textarea" onFocus="checkmi(this);"  onclick="checkmi(this);" placeholder="<%- rc.unPlaceholder %>" data-field-for-post></textarea>
+					<div id="post-area-heightmatch"></div>
+					<% if(rc.name != "FeedItem.TextPost"){%>
+						<div class="post-extra-content">
+							<div class="<%- rc.divClass %>">
+					<%}%>	
+					<% _.each(rc.items, function(ii){ %>
+						
+						<% if (ii.ftype != "post" && ii.ftype != "inputfile") { %>
+								<label><%= ii.label %></label>
+								<input id="<%- ii.fieldName %>" name="<%- ii.fieldName %>" type="<%- ii.inputtype %>" <%- ii.requiredAttr %> class="form-control <%- ii.validationClass %>" data-field-for-post/>
+						<% } %>
+					<% }); %>
+					<% if(rc.name != "FeedItem.TextPost"){ %>
+						<% if (rc.name == "FeedItem.PollPost") { %>
+							<a href="javascript: void(0);" class="add-choices context-btn" title="{!$Label.LBL_Add_More_Choices}" id="polladdchoice" onclick="addPollChoiceInputElement(this);"><i class="lrm lrm-plus"></i> {!$Label.LBL_Add_More_Choices}</a>
+						<% } %>
+							</div>
+						</div>
+					<%}%>
+
+					<% if (rc.post) { %>
+						<a class="btn-fill-custom post-btn disabled" role="button" id="mesbtn" onclick="initTextareaBTN(this);postAction($('#post-area').val());return false;">{!$Label.LBL_Unity_Post}</a>
+					<% } else { %>
+						<a class="btn-fill-custom post-btn disabled" role="button" id="mesbtn" onclick="postAction(''); return false;">{!$Label.LBL_Unity_Post}</a>
+					<%}%>
+
+				</form>
+			</script>
+
+			<script id="etp" type="text/template">
+				<form name="editform" class="edit-form" novalidate="novalidate">
+					<% if(rc.elements){ 
+                    	_.each(rc.elements, function(editel){%>
+							<textarea id="message" name="message" class="form-control tagged_text share validate-textarea" onFocus="checkmi(this);" onkeyup="toggleEditButton(this,'<%- editel.id %>');" onclick="checkmi(this);"><%print(wrapnl(parseFeedBodyEdit(editel.body))); 
+									parseBody(editel.body,editel.topicsUser);
+								%>
+							</textarea>
+							<div class="blockBtnWrapper" id="editBtnBlock">
+			                	<a id="svbtn<%- editel.id %>" role="button" class="block-btn-half btn-fill-custom" onclick="initTextareaBTN(this);updateAction($('#editPanel<%- editel.id %> #message').val(),'<%- editel.id %>');return false;">{!$Label.BTN_Save}</a>
+			                	<a id="cnsbtn<%- editel.id %>" role="button" class="block-btn-half btn-fill-light" onclick="closeEditDialog('<%- editel.id %>');return false;">{!$Label.BTN_Cancel}</a>
+			                </div>
+						<%}); 
+                    }else{
+                    	_.each(rc.items, function(editel){%>
+							<textarea id="message" name="message" class="form-control tagged_text share validate-textarea" onFocus="checkmi(this);"  onkeyup="toggleEditButton(this,'<%- editel.id %>');" onclick="checkmi(this);"><%print(wrapnl(parseFeedBodyEdit(editel.body))); 
+									parseBody(editel.body,editel.topicsUser);
+								%>
+							</textarea>
+							<div class="blockBtnWrapper" id="editBtnBlock">
+			                	<a id="svbtn<%- editel.id %>" role="button" class="btn-fill-custom block-btn-half" onclick="initTextareaBTN(this);updateAction($('#editPanel<%- editel.id %> #message').val(),'<%- editel.id %>');return false;">{!$Label.BTN_Save}</a>
+			                	<a id="cnsbtn<%- editel.id %>" role="button" class="btn-fill-light block-btn-half" onclick="closeEditDialog('<%- editel.id %>');return false;">{!$Label.BTN_Cancel}</a>
+			                </div>
+						<%}); 
+                    }%>
+                </form>
+            </script>
+
+			<script>
+				function showFeedError(msg) {
+					//$('#postform-error').text(msg).show();
+					alert(_.unescape(msg));
+				}
+				function hideFeedError() {
+					//$('#postform-error').hide();
+				}
+
+				function dropUpMenu(menu){
+        			$(menu).next('ul').slideToggle();
+   				};
+
+   				function dropDownMenu(el){
+   					$(el).parent().parent().slideToggle();
+   				};
+   				
+				var chekFlagOnPage = function(type){
+					if(!(_.contains(['News','Events','Manager','Resources'], type)) ) {
+						listPages = ['CommunityNewsDetail', 'CommunityEventDetail', 'CommunityGroupManager', 'communityresourcedetail'];
+						_.each(listPages, function(value, key, obj){ obj[key] = '{!packagePrefix}'+ value.toLowerCase(); });
+						return !(_.contains(listPages, '{!$CurrentPage.Name}'.toLowerCase()));
+					}
+					else return false;
+				}
+				var changeVoteIds = [];
+				var viewResultsArray = [];
+				var viewFromEmail = {!fromEmail} && '{!feedfromEmailId}'.length > 0 ? true : false;
+				//Global variables for edit post dialog
+				var idForEditPost = '';
+				var idForEditComment = '';
+				var bodyObjects = [];
+				var editMessageText = '';
+				var countTopicsEdit = 0;
+				var namesTopicsEdit = [];
+				var chatactionForEdit;
+				
+				$(document).ready(function() {
+					var top = '{!topicId}';
+					if(viewFromEmail){
+						loadFeedFromEmail(null);
+						$(".nav-tabs").hide();
+						$('#palist').hide();
+						$('#postarea').hide();
+					}else if(top){
+						loadFeedsForTopic(null);
+						if({!!isTopicAssignmentCreateable}){
+							$('#palist').hide();
+							$('#postarea').hide();
+						}
+					}else{
+						loadFeeds(null);
+					}
+
+					$(window).scroll(function() {
+						if($(window).scrollTop() == $(document).height() - $(window).height()) {
+							if($('#shmbtn').attr('onclick')){
+								$('#shmbtn').click();
+								$('#shmbtn').removeAttr('onclick');
+								$('.loader').show();
+							}
+						}
+					});
+				});
+
+				function loadFeeds(inpt) {
+					$('a.curr i.fa-comment').removeClass('fa-comment').addClass('fa-spinner fa-pulse');
+					Visualforce.remoting.Manager.invokeAction(
+						'{!$RemoteAction.CommunityFeedController.feeds}',
+						'{!JSENCODE(parentId)}',
+						'{!feedType}',
+						inpt,
+						function(result, event) {
+							if (event.result) {
+								_.templateSettings.variable = 'rc';
+								var template = _.template($('#ttp1').html() + $('#ttp2').html() + $('#ttp3').html());
+								var tt = jsonObj(result);
+								$('#cfcmp').append(template(tt));
+								if(tt.nextPageToken){
+									$('#shmbtn').attr('onclick','loadFeeds(\'' + tt.nextPageToken + '\');return false;');
+								}
+								$('.loader').hide();
+								if({!fromEmail}){
+									$('.preloader__container').hide();
+								}
+							}
+							else {
+								showFeedError(event.message);
+							}
+							$('a.curr i.fa-spinner').removeClass('fa-spinner fa-pulse').addClass('fa-comment');
+						}
+					);
+					initValidator();
+				}
+
+				function loadFeedsForTopic(inpt) {
+					$('a.curr i.fa-comment').removeClass('fa-comment').addClass('fa-spinner fa-pulse');
+					var params = {'parentId' : '{!JSENCODE(parentId)}',
+								'feedType' 	 : '{!feedType}',
+								'inpt'		 : inpt,
+								'topicId' 	 : '{!JSENCODE(topicId)}'};
+					Visualforce.remoting.Manager.invokeAction(
+						'{!$RemoteAction.CommunityFeedController.feedsForTopics}',
+						params,
+						function(result, event) {
+							if (event.result) {
+								_.templateSettings.variable = 'rc';
+								var template = _.template($('#ttp1').html() + $('#ttp2').html() + $('#ttp3').html());
+								var tt = jsonObj(result);
+								$('#cfcmp').append(template(tt));
+								$('#shmbtn').attr('onclick','loadFeedsForTopic(\'' + tt.nextPageToken + '\');return false;');
+								$('.loader').hide();
+							}
+							else {
+								showFeedError(event.message);
+							}
+							$('a.curr i.fa-spinner').removeClass('fa-spinner fa-pulse').addClass('fa-comment');
+						}
+					);
+					initValidator();
+				}
+
+				function loadFeedFromEmail(inpt) {
+					var params = {'parentId' : '{!JSENCODE(parentId)}', 
+								'feedType' 	 : '{!feedType}',
+								'inpt'		 : inpt, 
+								'feedId' 	 : '{!JSENCODE(feedfromEmailId)}'};
+					Visualforce.remoting.Manager.invokeAction(
+						'{!$RemoteAction.CommunityFeedController.feedFromEmail}',
+						params,
+						function(result, event) {
+							if (event.result) {
+								_.templateSettings.variable = 'rc';
+								var template = _.template($('#ttp1').html() + $('#ttp2').html() + $('#ttp3').html());
+								var tt = jsonObj(result);
+								$('#cfcmp').append(template(tt));
+								$('#shmbtn').attr('onclick','loadFeedsForTopic(\'' + tt.nextPageToken + '\');return false;');
+								$('.loader').hide();
+								$('.preloader__container').hide();
+							}else{
+								showFeedError(event.message);
+								$('.preloader__container').hide();
+							}
+						}
+					);
+					initValidator();
+				}
+
+
+				function postFeed(text) {
+					if($('#mesbtn').hasClass('disabled')) return false;
+					disableBtn('mesbtn');
+					var params = {'parentId' : '{!JSENCODE(parentId)}', 
+								'inText' 	 : text, 
+								'topicId' 	 : '{!JSENCODE(topicId)}'};
+
+					if($("form[name='postform']").data('validator').checkForm()) {
+						$('#post-area').mentionsInput('val', function(text) {
+							Visualforce.remoting.Manager.invokeAction(
+								'{!$RemoteAction.CommunityFeedController.postFeeds}',
+								params,
+								function(result, event) {
+									if (event.result) {
+										_.templateSettings.variable = 'rc';
+										var template = _.template($('#ttp1').html() + $('#ttp2').html() + $('#ttp3').html());
+										var tt = jsonObj(result);
+										$('#cfcmp').prepend(template(tt));
+										$('#post-area').val('');
+									}
+									else {
+										showFeedError(event.message);
+									}
+								}
+							);
+						});
+					}
+					else {
+						$("form[name='postform']").data('validator').showErrors(); 
+					}
+				}
+					
+				uploadAttachment = function(binary,fName,fType) {
+					// send attacment
+					var __sfdcSessionId = '{!GETSESSIONID()}';
+					if('{!JSENCODE(parentIdForAtt)}'.length == 0) {
+							showFeedError('{!JSINHTMLENCODE($Label.ERR_Set_Up_Community_Profile)}');
+							return null;
+						}
+						sforce.connection.serverUrl = '{!$Site.Prefix}/services/Soap/u/33.0';
+						sforce.connection.sessionId = __sfdcSessionId;
+						var Attachment = new sforce.SObject('Attachment');
+						Attachment.Name = fName;
+						Attachment.ContentType = fType;
+						Attachment.Body  = binary;
+						Attachment.ParentId = '{!JSENCODE(parentIdForAtt)}';
+						sforce.connection.create([Attachment],
+						{
+							onSuccess : function(result, source) {
+								if (result[0].getBoolean("success")) {
+								if($("#post-area").val()) {
+										$("#post-area").mentionsInput('val', function(text) {
+											chataction.layout.items[messageItemIndex].value = text;
+											insertAttIntoFeed(result[0].id, JSON.stringify(chataction.layout));
+										});
+									}
+									else {
+										insertAttIntoFeed(result[0].id, null);
+									}
+								}
+								else {
+									showFeedError(result[0].errors.message);
+								}
+							},
+							onFailure : function(error, source) {
+								showFeedError(error);
+								$(".post-box").css('pointer-events', '').css('opacity', '');
+							}
+					});
+					// end sending
+				}
+
+				function postAction(text) {
+					if($('#mesbtn').hasClass('disabled')) return false;
+					if( checkTopicsCount(text) == -1 ) return ;
+					$(".post-box").css('pointer-events', 'none').css('opacity', '0.8');
+					hideFeedError();
+					disableBtn('mesbtn');
+					var messageItemIndex = -1;
+					var fBaseStr = null;
+					var fType = null;
+					var fName = null;
+					var sendFile = false;
+					if($("form[name='postform']").data('validator').checkForm()) {
+						_.each(chataction.layout.items, function(item) {
+							if(item.fieldName == 'message') {
+								messageItemIndex = chataction.layout.items.indexOf(item);
+							}
+							if(item.ftype == 'inputfile') {
+								sendFile = true;
+								var inputfile = $("#fileUploader")[0].files[0];
+								if(inputfile != undefined) {
+									fType = inputfile.type.length ? inputfile.type : 'application/octet-stream';
+									fName = inputfile.name;
+									if(inputfile.size>26214400) {
+										showFeedError('{!JSINHTMLENCODE($Label.LBL_File_Upload_Size_Limit)}');  // change - need label
+								 		$(".post-box").css('pointer-events', '').css('opacity', '');
+								 		return null;
+									}
+									// my code
+									if(fType.indexOf("image/")>-1) {
+										var options = {
+											maxWidth: 1000,
+											maxHeight: 1000,
+											canvas: true
+										};
+										loadImage.parseMetaData(inputfile, function (data) {
+											if(data.exif) {
+												// get orientation from image if it is
+												options.orientation = data.exif.get('Orientation');
+											}
+											loadImage( inputfile,
+												function (img) {
+													if(img.type != 'error'){ 
+														var binary = img.toDataURL(fType).substring(img.toDataURL(fType).indexOf("base64,")+"base64,".length);
+														uploadAttachment(binary,fName,fType);
+													}else{
+														var reader = new FileReader();
+														reader.onloadend = function(){
+															var binary = "";
+															var bytes = new Uint8Array(reader.result);
+															var length = bytes.byteLength;
+															for (var i = 0; i < length; i++)
+															{
+																binary += String.fromCharCode(bytes[i]);
+															}
+															uploadAttachment(new sforce.Base64Binary(binary).toString(),fName,fType);
+														};
+													}
+												}, options
+											);
+										});
+									}else{
+										// end my code
+										var reader = new FileReader();
+										reader.onloadend = function(){
+											var binary = "";
+											var bytes = new Uint8Array(reader.result);
+											var length = bytes.byteLength;
+											for (var i = 0; i < length; i++)
+											{
+												binary += String.fromCharCode(bytes[i]);
+											}
+											uploadAttachment(new sforce.Base64Binary(binary).toString(),fName,fType);
+										};
+										reader.readAsArrayBuffer(inputfile);
+									}
+								}
+							}
+							item.value = $("[name='" + item.fieldName + "']").val();
+						});
+						if(sendFile == false) {
+							if($("[name='message']").val()) {
+								$('#post-area').mentionsInput('val', function(text) {
+									chataction.layout.items[messageItemIndex].value = text;
+									sendPostAction(JSON.stringify(chataction.layout), fBaseStr, fType, fName);
+								});
+							}
+							else {
+								sendPostAction(JSON.stringify(chataction.layout), fBaseStr, fType, fName);
+							}
+							$(".post-box").css('pointer-events', '').css('opacity', '');
+						}
+					}
+					else {
+						$("form[name='postform']").data('validator').showErrors();
+						$(".post-box").css('pointer-events', '').css('opacity', ''); 
+					}
+				}
+
+				function updateAction(text, objId) {
+					if( checkTopicsCount(text) == -1 ) return ;
+					hideFeedError();
+					$("#editPanel"+objId).css('pointer-events', 'none').css('opacity', '0.8');
+					var messageItemIndex = -1;
+					if(idForEditPost){
+						if($("#editPanel"+objId+" form").data('validator').checkForm()) {
+							_.each(chatactionForEdit.layout.items, function(item) {
+								messageItemIndex = chatactionForEdit.layout.items.indexOf(item);
+								item.value = $("#editPanel"+objId+" [name='message']").val();
+							});
+							if($("#editPanel"+objId+" [name='message']").val()) {
+								$('#editPanel'+objId+' [name="message"]').mentionsInput('val', function(text) {
+									chatactionForEdit.layout.items[messageItemIndex].value = text;
+									updateFeedPostAction(JSON.stringify(chatactionForEdit.layout));
+								});
+							}
+						}
+						else {
+							$("#editPanel"+objId+" form").data('validator').showErrors(); 
+							$("#editPanel"+objId).css('pointer-events', '').css('opacity', '');
+						}
+					}
+					if(idForEditComment){
+						$('#editPanel'+objId+' [name="message"]').mentionsInput('val', function(text) {
+							hideFeedError();
+							var params = {
+								'inText' 	 : text, 
+								'commId'	 : idForEditComment,
+								'feedId'	 : $('#editPanel'+objId).parent().parent().parent().attr('name')
+							};
+							Visualforce.remoting.Manager.invokeAction(
+								'{!$RemoteAction.CommunityFeedController.updateComment}',
+								params,
+								function(result, event) {
+									if (event.result) {
+										_.templateSettings.variable = 'rc';
+										var template = _.template($('#ttp21').html() + $('#ttp2').html());
+										var tt = jsonObj(result);
+										$('#m'+tt.items[0].id).replaceWith(template(tt));		
+										closeEditDialog(tt.items[0].id);
+										setActiveli();
+										$('#editPanel [name="message"]').val('');
+										if (typeof(switchToMemberMode) == 'function') switchToMemberMode();
+									}
+									else {
+										showFeedError('{!JSENCODE($Label.ERR_Comment_Too_Large)}'); 
+										$("#editPanel"+objId).css('pointer-events', '').css('opacity', '');
+									}
+								}
+							);
+						});
+					}
+				}
+
+				function insertAttIntoFeed(attId, jsontext) {
+					hideFeedError();
+					Visualforce.remoting.Manager.invokeAction(
+						'{!$RemoteAction.CommunityFeedController.insertAttacmentIntoFeed}',
+						'{!JSENCODE(parentId)}',
+						attId,
+						jsontext,
+						function(result, event){
+							if(event.result){
+								refreshFeed();
+								bodyObjects = [];
+								editMessageText = '';
+								$('#post-area').val('');
+								$('#fileUploader').val('');
+								$('#fileUploader').change();
+								$(".post-box").css('pointer-events', '').css('opacity', '');
+								setActiveli();
+								if (typeof(switchToMemberMode) == 'function') switchToMemberMode();
+							}
+							else {
+								showFeedError(event.message);
+							}
+						}
+					);
+					
+				}
+
+				function updateFeedPostAction (jsontext) {
+					Visualforce.remoting.timeout = 120000;
+					var err = false;
+					var params = {
+						'parentId'	 : '{!JSENCODE(parentId)}',
+						'inText' 	 : jsontext, 
+						'feedId'	 : idForEditPost
+					};
+					hideFeedError();
+					Visualforce.remoting.Manager.invokeAction(
+						'{!$RemoteAction.CommunityFeedController.updateFeed}',
+						params,
+						function(result, event) {
+							if (event.result) {
+								_.templateSettings.variable = 'rc';
+								var template = _.template($('#ttp1').html() + $('#ttp2').html() + $('#ttp3').html());
+								var tt = jsonObj(result);
+								$('#m'+tt.elements[0].id).replaceWith(template(tt));		
+								closeEditDialog(tt.elements[0].id);
+								setActiveli();
+								$('#editPanel [name="message"]').val('');
+								if (typeof(switchToMemberMode) == 'function') switchToMemberMode();
+							} 
+							else {
+								showFeedError(event.message); 
+								$("[id^='editPanel']").css('pointer-events', '').css('opacity', '');
+							}
+						}
+					);					
+				}
+
+				function sendPostAction (jsontext, infilebstr, infiletype, infilename) {
+					Visualforce.remoting.timeout = 120000;
+					var err = false;
+					var params = {
+						'parentId'	 : '{!JSENCODE(parentId)}',
+						'jsontext'	 : jsontext,
+						'infilebstr' : infilebstr,
+						'infiletype' : infiletype,
+						'infilename' : infilename,
+						'topicId' 	 : '{!JSENCODE(topicId)}'
+					};
+					hideFeedError();
+					Visualforce.remoting.Manager.invokeAction(
+						'{!$RemoteAction.CommunityFeedController.postActions}',
+						params,
+						function(result, event) {
+							if (event.result) {
+								_.templateSettings.variable = 'rc';
+								var template = _.template($('#ttp1').html() + $('#ttp2').html() + $('#ttp3').html());
+								var tt = jsonObj(result);
+								$('#cfcmp').prepend(template(tt));
+								_.each(chataction.layout.items, function(item) {
+									$("[name='" + item.fieldName + "']").val('');
+								});
+								bodyObjects = [];
+								editMessageText = '';
+								setActiveli();
+							}
+							else {
+								showFeedError(event.message);
+							}
+						}
+					);
+					if (typeof(switchToMemberMode) == 'function') switchToMemberMode();
+				}
+
+				function muteFeed(feedid, isMutedByMe){
+					disableBtn('mesbtn');
+					var params = {'feedId' 			: feedid, 
+								  'isMutedByMe' 	: isMutedByMe };
+
+					Visualforce.remoting.Manager.invokeAction(
+						'{!$RemoteAction.CommunityFeedController.muteFeeds}',
+						params,
+						function(result, event) {
+							if (event.result) {
+								$('#m'+feedid).remove();
+								if (typeof(switchToMemberMode) == 'function') switchToMemberMode();
+							}
+							else {
+								showFeedError(event.message);
+							}
+						}
+					);
+						
+				}
+
+				function getComments(feedid, token) {
+					hideFeedError();
+					Visualforce.remoting.Manager.invokeAction(
+						'{!$RemoteAction.CommunityFeedController.getComments}',
+						feedid,
+						token,
+						function(result, event) {
+							if (event.result) {
+								_.templateSettings.variable = 'rc';
+								var template = _.template($('#ttp21').html() + $('#ttp2').html());
+								var tt = jsonObj(result);
+								$('#c'+tt.feedId+' .comment').first().before(template(tt));
+								$('#l'+tt.feedId).css('display',tt.showNextComments?'inline':'none').attr('onclick','getComments(\'' + tt.feedId + '\',\'' + tt.nextPageToken + '\');return false;');
+								$('[name = "delim"]').css('display',tt.showNextComments?'inline':'none');
+							}
+							else {
+								showFeedError(event.message);
+							}
+						}
+					);
+				}
+
+				
+				var checkTopicsCount = function (text) {
+					if({!!isTopicAssignmentCreateable}) return 1;
+					var pos = 0;
+					var countTopicsBeforeEdit = 0;
+					_.each(namesTopicsEdit, function(nte){
+						if(text.toLowerCase().indexOf(nte.toLowerCase()) != -1){
+							countTopicsBeforeEdit += text.toLowerCase().split(nte.toLowerCase()).length-1;
+						}
+					});						
+					var numbertopics = countTopicsEdit;
+					do {
+						var foundPos = text.indexOf('#[', pos);
+						numbertopics = foundPos!=-1? numbertopics+1:numbertopics;
+						pos = foundPos + 1;
+					}
+					while (foundPos!=-1);
+					numbertopics = numbertopics - countTopicsBeforeEdit;
+					if(numbertopics>10) {
+						showFeedError("{!$Label.ERR_Maximum_number_topics}");
+						numbertopics = 0;
+						return -1;
+					}
+					return 1;
+				}
+				function postComment(text, feedid, size) {
+					if(($('#b'+feedid)).hasClass('disabled')) return false;
+					$('#b'+feedid).hide();
+					disableBtn('b'+feedid);
+					$('#a'+feedid).mentionsInput('val', function(text) {
+						hideFeedError();
+						Visualforce.remoting.Manager.invokeAction(
+							'{!$RemoteAction.CommunityFeedController.postComment}',
+							feedid,
+							text,
+							function(result, event) {
+								if (event.result) {
+									_.templateSettings.variable = 'rc';
+									var template = _.template($('#ttp21').html() + $('#ttp2').html());
+									var tt = jsonObj(result);
+									$('#d'+tt.feedId).before(template(tt));
+									$('#a'+tt.feedId).val('').css("height","");
+								}
+								else {
+									showFeedError(event.message);
+								}
+							}
+						);
+					});
+				}
+				function focusComment(inid) {
+					$('#c'+inid).show();
+					$('#s'+inid).show();
+					$('#a'+inid).focus();
+					checkmi($('#a'+inid)[0]);
+				}
+				
+				function disableBtn(inid,inm) {
+					$('#'+inid).addClass('disabled');
+				}
+				function enableBtn(inid) {
+					$('#'+inid).removeClass('disabled');
+				}
+				function toggleEditButton(el, elId) {
+				    if ($(el).filter(function() { return $(this).val(); }).length > 0) {
+				        $('#svbtn'+elId).css('pointer-events', '').css('opacity', '');
+				    } else {
+				        $('#svbtn'+elId).css('pointer-events', 'none').css('opacity', '0.8');
+				    }
+				};
+				function inlAct(inpid,ins,ini) {
+					$('#ul'+inpid+' .'+ins).removeClass(ins).removeClass('active').addClass('fa-spinner fa-pulse').attr('name',ins);
+					hideFeedError();
+					Visualforce.remoting.Manager.invokeAction(
+						'{!$RemoteAction.CommunityFeedController.inlineAction}',
+						inpid,
+						ins,
+						ini,
+						function(result, event) {
+							if (event.result) {
+								var tt = jsonObj(result);
+								if (tt.cname=='fa-times') {
+									$('#m'+tt.pid).remove();
+									if (typeof(switchToMemberMode) == 'function') switchToMemberMode();
+								}
+								else {
+									var nocl = 'inlAct(\''+tt.pid+'\',\''+tt.cname+'\',\''+tt.oid+'\');';
+									$('#ul'+tt.pid+' [name="'+tt.cname+'"]').removeClass('fa-spinner fa-pulse').addClass(tt.cname+tt.stl).attr('onclick',nocl);
+									if (tt.cname=='fa-thumbs-up') {
+										var dti = parseInt($('#ul'+tt.pid+' [name="countLikes"]').first().text());
+										$('#ul'+tt.pid+' [name="countLikes"]').first().text(tt.oid==''?(dti-1):(dti+1));
+									}
+									if(tt.cname == 'fa-flag'){
+										refreshFeed();	
+									}
+								}
+							}
+							else {
+								showFeedError(event.message);
+							}
+						}
+					);
+				}
+				function initTextareaBTN(element) {
+					$(element).mentionsInput({
+						onDataRequest:function (mode, query, callback) {
+							Visualforce.remoting.Manager.invokeAction(
+								'{!$RemoteAction.CommunityFeedController.getUsers}',
+								query,
+								function(result, event) {
+									callback(jsonObj(result));
+								}
+							);
+						},
+						elastic: false
+					}).focus();
+				}
+				
+				function initTextarea(element) {
+					$(element).mentionsInput({
+						onDataRequest:function (mode, charValue, query, callback) {
+							if(charValue == '@') {
+								Visualforce.remoting.Manager.invokeAction(
+									'{!$RemoteAction.CommunityFeedController.getUsers}',
+									query,
+									function(result, event) {
+										callback(jsonObj(result));
+									}
+								);
+							}
+							else if(charValue == '#') {
+								Visualforce.remoting.Manager.invokeAction(
+									'{!$RemoteAction.CommunityFeedController.getTopics}',
+									query,
+									function(result, event) {
+										callback(jsonObj(result));
+									}
+								);
+							}
+						},
+						elastic: false,
+						editMessage: editMessageText,
+						prefillMentions: bodyObjects
+					}).focus();
+				}
+
+				$.fn.setCursorPosition = function (pos) {
+				    this.each(function (index, elem) {
+				        if (elem.setSelectionRange) {
+				            elem.setSelectionRange(pos, pos);
+				        } else if (elem.createTextRange) {
+				            var range = elem.createTextRange();
+				            range.collapse(true);
+				            range.moveEnd('character', pos);
+				            range.moveStart('character', pos);
+				            range.select();
+				}
+				    });
+				    return this;
+				};
+
+
+				function checkmi(element) {
+					if(!$(element).attr('data-mentions-input')) {
+						initTextarea(element);
+					}
+				}
+				function checkbtn(element,btnid) {
+					if (element.value.trim()=='') {
+						$(btnid).addClass('disabled');
+					}
+					else if ($(btnid).hasClass('disabled')) {
+						$(btnid).removeClass('disabled');
+					}
+				}
+
+				function focusComm(element, btnid){
+					$('.comment-box a[role="button"]').hide();
+					$('.comment-box textarea').css("height","");		
+					$(btnid).show();
+					$(element).css("height","72px");
+				}
+
+				$('#fileUploader').bind('changeUpload',function(){
+					fileChanged = true;
+					setActiveli($('.upload-btn')[0]);
+				});
+
+				$('.post-box').on('click', '.post-upload-content .remove', function(){
+					fileChanged = false;
+					setActiveli();
+				});
+
+				var chataction = {loading:false};
+				var fileChanged = false;
+				function setActiveli(element, bool) {
+					if(element){
+						if(element.id.indexOf('ContentPost') != -1){
+							if(!fileChanged) return false;
+						}
+					}
+					editMessageText = '';
+					var previousText = $('#post-area').val();
+					if(previousText.length){
+						$('#post-area').mentionsInput('getMentions', function(text) {
+							bodyObjects = text;
+						});
+						editMessageText = previousText;
+					}
+					if(!element){
+						element = $("#palist button").get(0);
+						$("#palist button").removeClass('active');
+					} 
+					if($(element).attr('class').indexOf('active') != -1) element = $("#palist button").get(0); 
+					if (!chataction.loading) {
+						hideFeedError();
+						chataction.loading = true;
+						// params for invoke remote actions
+						var resultLayout = null;
+						var invokeActionStr = '{!$RemoteAction.CommunityFeedController.actionLayout}';
+						var invokeActionParam = element.id;
+						// for not FeedItem actions
+						if(element.id.indexOf("FeedItem") == -1) {
+							invokeActionStr = '{!$RemoteAction.CommunityFeedController.actionLayoutSForce}'
+							var namesActionsPref = ['{!packagePrefix}'+element.id];
+							var namesActions = [element.id];
+							var __sfdcSessionId = '{!GETSESSIONID()}';
+							sforce.connection.serverUrl = '{!$Site.Prefix}/services/Soap/u/33.0';
+							sforce.connection.sessionId = __sfdcSessionId;
+							var resultLayoutSF = new sforce.SObject('QuickAction.DescribeQuickActionResult');
+							resultLayoutSF = sforce.connection.describeQuickActions(namesActions);
+							if(resultLayoutSF == ''){
+								resultLayoutSF = sforce.connection.describeQuickActions(namesActionsPref);
+							}
+							var stringResult = namesActions + "," + resultLayoutSF[0].targetSobjectType;
+							_.each(resultLayoutSF[0].layout.layoutRows, function(rows){
+								stringResult +=","+rows.layoutItems[0].layoutComponents.value+':'+rows.layoutItems[0].required;
+							});
+							
+							resultLayout = JSON.stringify(stringResult);
+							invokeActionParam = resultLayout;
+						}
+						Visualforce.remoting.Manager.invokeAction(
+							invokeActionStr,
+							invokeActionParam,
+							function(result, event) {
+								if (event.result) {
+									chataction.loading = false;
+									chataction.layout = jsonObj(result);
+									_.templateSettings.variable = 'rc';
+									var template = _.template($('#atp').html());
+									$('#postarea').html(template(chataction.layout));
+									
+									initValidator();
+									if($('.hide .post-upload-content.fileAdded').length && chataction.layout.name == 'FeedItem.ContentPost'){
+										$('.post-extra-content').html($('.hide .post-upload-content.fileAdded').clone());
+										togglePostButton();
+									}
+									//previous text
+									if(editMessageText.length){
+										checkmi($('#postarea [name="message"]'));
+										togglePostButton();
+										$('#post-area-heightmatch').text($('#post-area').val());
+										$('#post-area').height($('#post-area-heightmatch').height());
+									}
+								
+									//datetime
+									if($('.validate-datetimepicker')) {
+										var currentdate = new Date(); 
+										var datetime = (currentdate.getMonth()+1) + '/' + currentdate.getDate() + '/' + currentdate.getFullYear() + ' ' + currentdate.getHours() + ":"  + currentdate.getMinutes();
+										$('.validate-datetimepicker').datetimepicker({
+											minDate:datetime,
+											format:'m/d/Y h:i A',
+											formatTime:'h:i A',
+											formatDate:'m/d/Y',
+											step:30
+										});
+									}
+									//date
+									if(jQuery('.validate-datepicker')) {
+										var currentdate = new Date(); 
+										var datetime = (currentdate.getMonth()+1) + '/' + currentdate.getDate() + '/' + currentdate.getFullYear();
+										$('.validate-datepicker').datetimepicker({
+											timepicker:false,
+											minDate:datetime,
+											format:'m/d/Y',
+											formatDate:'m/d/Y',
+										});
+								}
+							}
+								else {
+									showFeedError(event.message);
+								}
+							}
+						);
+					}
+				}
+				function addPollChoiceInputElement (t) {
+					var t_el = $(t);
+					var totalChoices = t_el.parent().find('input[name*="choice"]');
+					var mkp = '<label>Choice {0}</label><input id="choice{0}" name="choice{0}" type="text" required="required" class="form-control" data-field-for-post aria-required="true"/>';
+					var nextChoice = (totalChoices.length+1);
+					$(mkp.replace(/\{0}/g, nextChoice)).insertBefore(t_el);
+					var lastitemcopy = chataction.layout.items[chataction.layout.items.length-1];
+					var newitemcopy = lastitemcopy.constructor(); // changed
+					for(var key in lastitemcopy) {
+						if(lastitemcopy.hasOwnProperty(key)) {
+							newitemcopy[key] = lastitemcopy[key];
+						}
+					}
+					newitemcopy.label = 'Choice ' + nextChoice;
+					newitemcopy.fieldName = 'choice' + nextChoice;
+					newitemcopy.required = false;
+					newitemcopy.requiredAttr = '';
+					chataction.layout.items = chataction.layout.items.concat([newitemcopy]);
+					nextChoice++;
+					if (nextChoice == 11) {
+						t_el.remove();
+					}
+					togglePostButton();
+				}
+				
+				function vote(t) {
+					var t_el = $(t);
+					var choice = t_el.parent().parent().find('input[type=radio]:checked');
+					if (choice) {
+						var cName = choice.attr('name');
+						var pollId = cName.substring(cName.indexOf('__')+2, cName.length);
+						t_el.parent().find('input[type=radio]:checked');
+						t_el.attr('disabled', true);
+						hideFeedError();
+						var params = {	'pollId' 		: pollId,
+										'choiceId' 	 	: choice.attr("id"),
+										'inParentId'	: '{!JSENCODE(parentId)}',
+										'inFeedType' 	: '{!feedType}',
+										'fromEmail'		: '{!fe}' };
+						if(_.contains(changeVoteIds, pollId)){
+							changeVoteIds.splice(changeVoteIds.indexOf(pollId), 1);
+						}					
+						Visualforce.remoting.Manager.invokeAction(
+							'{!$RemoteAction.CommunityFeedController.votesOnPoll}',
+							params,
+							function(result, event) {
+								if (event.result) {
+									_.templateSettings.variable = 'rc';
+									var template = _.template($('#ttp1').html() + $('#ttp2').html() + $('#ttp3').html());
+									var tt = jsonObj(result);
+									$('#cfcmp').empty();
+									$('#cfcmp').prepend(template(tt));
+									t_el.removeAttr('disabled');
+								}
+								else {
+									showFeedError(event.message);
+								}
+							}
+						);
+					}
+					setActiveli();
+				}
+
+				function editPost(objId){
+					if($("[id^='editPanel'].active").length){
+						closeEditDialog($("[id^='editPanel'].active").attr('id').split('editPanel')[1]);
+					}
+					idForEditPost = objId;
+					var params = {'parentId' : '{!JSENCODE(parentId)}', 
+								'feedType' 	 : '{!feedType}',
+								'inpt'		 : null, 
+								'feedId' 	 : objId};
+					Visualforce.remoting.Manager.invokeAction(
+						'{!$RemoteAction.CommunityFeedController.feedFromEmail}',
+						params,
+						function(result, event) {
+							if (event.result) {
+								_.templateSettings.variable = 'rc';
+								var template = _.template($('#etp').html());
+								var tt = jsonObj(result);
+								$('#editPanel'+objId).empty();
+								$('#editPanel'+objId).prepend(template(tt));
+								$('#editPanel'+objId).addClass('active');
+								$('#editPanel'+objId+' #message').height($('#m'+objId+' .comment-holder p').height() < 50 ? 50 : $('#m'+objId+' .comment-holder p').height());
+								$('#editPanel'+objId+' #message').css('margin-bottom', '0');
+								$('#editPanel'+objId+' #editBtnBlock').css('position','relative').css('top','-3px');
+								$('#editPanel'+objId).show();
+								$('#m'+objId+' .card-content p').hide();
+								initValidator(objId);
+								checkmi($('#editPanel'+objId+' textarea'));
+							}else{
+								showFeedError(event.message);
+							}
+						}
+					);
+				}
+
+				function editComment(objId){
+					if($("[id^='editPanel'].active").length){
+						closeEditDialog($("[id^='editPanel'].active").attr('id').split('editPanel')[1]);
+					}
+					idForEditComment = objId;
+					var params = {
+						'commentId'	 	: objId
+					};
+					Visualforce.remoting.Manager.invokeAction(
+						'{!$RemoteAction.CommunityFeedController.getCommentForEdit}',
+						params,
+						function(result, event) {
+							if (event.result) {
+								_.templateSettings.variable = 'rc';
+								var template = _.template($('#etp').html());
+								var tt = jsonObj(result);
+								$('#editPanel'+objId).empty();
+								$('#editPanel'+objId).prepend(template(tt));
+								$('#editPanel'+objId).addClass('active');
+								$('#editPanel'+objId+' #message').height($('#m'+objId+' .comment-holder p').height() < 47 ? 47 : $('#m'+objId+' .comment-holder p').height());
+								$('#editPanel'+objId+' #message').css('margin-bottom', '0');
+								$('#editPanel'+objId+' #editBtnBlock').css('position','relative').css('top','-2px');
+								$('#editPanel'+objId).show();
+								$('#m'+objId+' .comment-holder p').hide();
+								initValidator(objId);
+								checkmi($('#editPanel'+objId+' textarea'));
+							}else{
+								showFeedError(event.message);
+							}
+						}
+					);
+				}
+
+				function closeEditDialog(objId){
+					$('#editPanel'+objId).hide();
+					$('#editPanel'+objId).empty();
+					$('#editPanel'+objId).removeClass('active');
+					$('#m'+objId+' .card-content p').show();
+					$('#m'+objId+' .comment-holder p').show();
+					$('#editPanel'+objId+' [name="message"]').val('');
+					idForEditPost = '';
+					idForEditComment = '';
+					bodyObjects = [];
+					editMessageText = '';
+					countTopicsEdit = 0;
+					namesTopicsEdit = [];
+
+				}
+
+				function refreshFeed() {
+					hideFeedError();
+					var top = '{!topicId}';
+					if(viewFromEmail){
+						$('#cfcmp').empty();
+						loadFeedFromEmail('');
+					}else if(top){
+						$('#cfcmp').empty();
+						loadFeedsForTopic(null);
+						if({!!isTopicAssignmentCreateable}){
+							$('#palist').hide();
+							$('#postarea').hide();
+						}
+					}else{
+						$('#cfcmp').empty();
+						loadFeeds(null);
+					}
+				}
+				function changeVote(voteId){
+					_.templateSettings.variable = 'rc';
+					changeVoteIds.push(voteId);
+					if(_.contains(viewResultsArray, voteId)){
+						viewResultsArray.splice(viewResultsArray.indexOf(voteId), 1);
+					}				
+					refreshFeed();
+				}
+
+				function changeVoteId(voteId){
+					return _.contains(changeVoteIds, voteId);
+				}
+
+				function viewRes(pollId){
+					return _.contains(viewResultsArray, pollId);
+				}
+				
+				function viewResults(pollId){
+					_.templateSettings.variable = 'rc';
+					if(!_.contains(viewResultsArray, pollId)){
+						viewResultsArray.push(pollId);
+					}else{
+						viewResultsArray.splice(viewResultsArray.indexOf(pollId), 1);
+					}
+					if(_.contains(changeVoteIds, pollId)){
+						changeVoteIds.splice(changeVoteIds.indexOf(pollId), 1);
+					}
+					refreshFeed();
+				}
+				function initValidator (editFlag) {
+					chatactionForEdit = (chatactionForEdit && chatactionForEdit.layout) ? chatactionForEdit : _.clone(chataction);
+					var elementForValidate;
+					if(editFlag){
+						elementForValidate = $("form[name='editform']");
+					}else{
+						elementForValidate = $("form[name='postform']");
+					}
+					if(elementForValidate[0]) {
+						elementForValidate.validate({
+							onkeyup: false,
+							focusCleanup: true,
+							focusInvalid: false,
+							rules: {
+							},
+							highlight: function(element) {
+								$(element).closest("label[class*='input']").addClass('state-error');
+							},
+							unhighlight: function(element) {
+								$(element).closest("label[class*='input']").removeClass('state-error');
+							},
+							errorElement: 'div',
+							errorClass: 'note note-error',
+							errorPlacement: function(error, element) {
+								if(element.parent().length) {
+									if(element.attr('name') == 'message') {
+										error.insertBefore($(element));
+									}
+									else {
+										error.insertBefore($(element));
+									}
+								} 
+								else {
+									if(element.attr('name') == 'message') {
+										error.insertBefore($(element));
+									}
+									else {
+										error.insertBefore($(element));
+									}
+								}
+							}
+						});
+						if(chataction.layout) {
+							_.each(chataction.layout.items, function(item) {
+								if(item.fieldName == 'message') {
+									messageItemIndex = chataction.layout.items.indexOf(item);
+								}
+								var currentItem = editFlag ? $("#editPanel"+editFlag+" [name='message']") : $("[name='" + item.fieldName + "']");
+								if(currentItem && item.ftype != 'inputfile') {
+									if(currentItem.rules()) {
+										currentItem.rules('remove');
+									}
+									currentItem.rules('add', { required : item.required });
+									if(item.inputtype == 'url') {
+										currentItem.rules('add', { url : true });
+									}
+								}
+							});
+						}
+						else {
+							$("[name='message']").rules('add', { required : true });
+						}
+					}
+				}
+				function fileSizeIEC(a,b,c,d,e){
+					return (b=Math,c=b.log,d=1024,e=c(a)/c(d)|0,a/b.pow(d,e)).toFixed(0)+' '+(e?'KMGTPEZY'[--e]+'B':'Bytes')
+				}
+			</script>
+		</apex:outputPanel>
+	</article>
+	<script>
+
+		function parseFeedBody(o,t){
+			var outString = "";
+			_.each(o.messageSegments,function(item){
+				if(item.record != null){
+					if(item.record.id.indexOf("005") == 0){
+						outString += '<a href="{!$Page.CommunityProfilePage}?id='+item.record.id+'">@'+item.name+'</a>';
+					}else{
+						outString += '<a href="{!$Page.CommunityGroupDetailPage}?gr='+item.record.id+'">@'+item.name+'</a>';
+					}
+				}
+				if(item.text != null && (item.type == "Text" || item.type == "Link")){
+					if(item.type == "Link"){
+						if(item.text.indexOf('@') != -1){
+							outString += '<a href="mailto:'+item.text+'">'+item.text+'</a>';
+						}else if(item.text.indexOf('ftp') == 0){
+							outString += '<a target="_blank" href="ftp:'+item.text.split('ftp:')[1]+'">'+item.text+'</a>';
+						}else if(item.text.indexOf('http') == 0) {
+							outString += '<a target="_blank" href="'+item.text+'">'+item.text+'</a>';
+					}else{
+							outString += '<a target="_blank" href="http://'+item.text+'">'+item.text+'</a>';
+						}
+					}else{
+					outString += item.text;
+				}
+				}
+				if(item.type == 'Hashtag'){
+					var topicObj = {}; _.each(_.values(t), function(val){
+						topicObj[val.id] = val.name.toLowerCase();
+					});
+					var itemText = item.text.substring(1).toLowerCase().toString();
+					itemText = _.unescape(itemText);
+					itemText = itemText.replace(/&#39;/g,"'");
+					itemText = itemText.replace(/&#92;/g,"\\");
+					outString += '<a href="{!$Page.CommunityTopic}?id='+_.invert(topicObj)[itemText]+'&pid={!parentId}">'+item.text+'</a>';
+				}
+			});
+			return outString;
+		}
+
+		function parseFeedBodyEdit(o){
+			editMessageText = '';
+			_.each(o.messageSegments,function(item){
+				item.text = item.record != null ? item.text.replace('@','@[') + ']' : item.text;
+				item.text = item.type == 'Hashtag' ? item.text.replace('#','#[') + ']' : item.text;
+				editMessageText += item.text;
+			});
+			return editMessageText;
+		}
+
+		function parseBody(o, t){
+			bodyObjects = [];
+			_.each(o.messageSegments,function(item){
+				var objectMention = {};
+				if(item.record != null){
+					objectMention['id'] = item.record.id;
+					objectMention['name'] = _.unescape(item.name).replace(/&#39;/g,"'").replace(/&#92;/g,"\\");
+					objectMention['value'] = _.unescape(item.name).replace(/&#39;/g,"'").replace(/&#92;/g,"\\");
+					if(item.record.id.indexOf("005") == 0){
+						objectMention['type'] = 'user';
+					}else{
+						objectMention['type'] = 'group';
+					}
+				}else if(item.type == 'Hashtag'){
+					var topicObj = {}; _.each(_.values(t), function(val){
+						topicObj[val.id] = val.name.toLowerCase();
+					});
+					var itemText = item.text.substring(1).toLowerCase().toString();
+					itemText = _.unescape(itemText);
+					itemText = itemText.replace(/&#39;/g,"'");
+					itemText = itemText.replace(/&#92;/g,"\\");
+					itemText = itemText.replace("[","").replace("]","");
+					objectMention['id'] = _.invert(topicObj)[itemText];
+					objectMention['name'] = item.text;
+					objectMention['value'] = item.text;
+					objectMention['type'] = 'topic';	
+				}
+				if(!_.isEmpty(objectMention)) bodyObjects.push(objectMention);
+			});
+			namesTopicsEdit = [];
+			if(idForEditComment.length > 0){
+				var topicsArray = $('#m'+idForEditComment).parent().parent().find('[id*="topiclabel"] a'); 
+				_.each(topicsArray, function(top){
+					if(!top.id.length){ 
+						namesTopicsEdit.push('#['+top.text+']');
+					}
+				});
+				countTopicsEdit = namesTopicsEdit.length;
+			}else{
+			_.each(t, function(top){
+				if(top.entityId != null){ 
+						namesTopicsEdit.push('#['+top.name+']');
+				}
+
+			});
+				countTopicsEdit = namesTopicsEdit.length;
+			}
+		}
+
+		function wrapnl(intext) {
+			return intext ? intext.replace(/\r\n/g, '<br />').replace(/[\r\n]/g, '<br />') : '';
+		}
+		var selector = '';
+		function wraptop(inObj, inId){
+			var outString = "";
+			var count = 1;
+			_.each(inObj, function(top){
+				if(top.entityId != null){ 
+					outString += '<a href="{!$Page.CommunityTopic}?id='+top.id+'&pid={!parentId}">'+top.name.replace(/</g,"&lt;").replace(/>/g,"&gt;")+'</a>, ';
+				}
+			});
+			if(outString.lastIndexOf(',') == outString.length-2){
+				outString = outString.substring(0, outString.length-2);
+			}
+			
+			return outString;
+		}
+
+		function printPhotoUrl(photoUrl){
+			var url = photoUrl.split('/');
+			if(url[url.length-2].length == 3){
+				return '{!$Resource.assets2}/images/home/default-male.jpg';
+			}
+			return photoUrl;
+		}
+		$(document).ready(function() {
+			if($("form[name='postform']")[0]) {<apex:includeScript value="{!$Resource.CommunityResources}/js/underscore/underscore-min.js"/>
+				initValidator();
+				setActiveli();
+			}
+		});
+	</script>
+</apex:component>

@@ -1,0 +1,114 @@
+<!--  
+ * Unity - Communities
+ * 
+ * Community is critical to the student experience--but building community is 
+ * just plain hard. Built on Communities and designed specifically for higher ed, 
+ * Unity is a powerful networking tool to help you generate engagement and 
+ * connect your campus.
+ * 
+ * Copyright (C) 2015 Motivis Learning Systems Inc.
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * To contact Motivis Learning Systems Inc.
+ * 25 Pelham Road
+ * Salem, NH 03790
+ * unity@motivislearning.com
+-->
+
+<apex:page controller="CommunityFeedNavigationController" showHeader="false" sideBar="false" standardStylesheets="false" docType="html-5.0" applyBodyTag="false" applyHtmlTag="false" >
+<apex:composition template="Unity2SiteTemplate">
+<apex:define name="title">{!$Label.LBL_Page_Title}</apex:define>
+<apex:define name="body">
+	<!--=== Content Part ===-->
+    <div class="mobile-select hidden-md hidden-lg">
+        <div class="droptoggle">
+            <a class="toggle-header it-mobileFeedDropdown" role="button">Main Feed <i class="lrm lrm-arrow"></i></a>
+            <ul>
+                <li><a data-href="#homeFeed" class="selected it-mobileFeedMain" role="button">Main Feed</a></li>
+                <li><a data-href="#eventsBlock" class="it-mobileFeedEvents" role="button">Upcoming Events</a></li>
+                <li><a data-href="#newsBlock" class="it-mobileFeedNews" role="button">Current News</a></li>
+            </ul>
+        </div>
+    </div>
+	<section id="mainContent" class="mainContent">
+		<div class="inner"> 
+			<apex:outputPanel layout="block" StyleClass="row" rendered="{!IF(homeAlerts.size > 0, true, false)}">
+                <div class="col-xs-24">
+                    <div class="carousel important">
+                        <div class="carousel-header">
+                            <h3><i class="lrm lrm-formvalidation"></i> {!$Label.LBL_News_Alert} <small>( <span class="current-slide-counter">1</span> of <span class="total-slides">{!homeAlerts.size}</span> )</small></h3>
+                            <a role="button" class="minimize it-minimizeAlert"><i class="lrm lrm-close"></i></a>
+                        </div>
+                        <div class="carousel-controls" style="{!IF(homeAlerts.size == 1, 'display: none', '')}">
+                            <a role="button" class="prev"><i class="lrm lrm-chevronright"></i></a>
+                            <a role="button" class="next"><i class="lrm lrm-chevronright"></i></a>
+                            <div class="carousel-buttons"></div>
+                        </div>
+                        <div class="carousel-items">
+                            <apex:repeat value="{!homeAlerts}" var="alert">
+	                            <div class="carousel-item" style="width:100%">
+	                                <a href="{!$Page.CommunityNewsDetail}?id={!alert.id}" style="text-decoration: none; color: black;">
+                                       <h3>{!alert.title}</h3>
+	                                   <p>{!alert.teaser}</p>
+                                    </a>
+	                            </div>
+	                        </apex:repeat>
+	                    </div>
+	                    <script>
+	                       	$('div.carousel-item').first().addClass('active');
+	                    </script>  
+                    </div>
+                </div>
+            </apex:outputPanel>
+			<!-- Begin Content -->
+			<div class="row">
+				<div class="col-md-16">
+                    <div id="homeFeed" class="mobile-toggle-visibility visible">
+                        <!-- Community Feed -->
+                        <c:UnityFeed tf="true" ft="1"/>
+                    </div>
+                </div>
+                <div class="col-md-8 col-lg-7 col-lg-offset-1">
+                    <nav>
+                        <div id="eventsBlock" class="mobile-toggle-visibility">
+                            <c:UnityHomeEvents />
+                        </div>
+                        <hr class="hidden-xs hidden-sm" />
+                      	<div id="newsBlock" class="mobile-toggle-visibility">
+                	        <c:UnityHomeNews /> 
+                        </div>
+                        <hr class="hidden-xs hidden-sm" />
+                        <div class="hidden-xs hidden-sm">
+                            <!-- Twitter Feed -->
+                            <apex:outputPanel styleClass="block" layout="block" rendered="{!hasTwitterFeed}">
+							    <h2>
+							        Twitter
+							        <span class="subtitle">{!$Label.LBL_FollowMe} <a href="https://twitter.com/{!twitterHandle}" target="_blank">@{!twitterHandle}</a></span>
+							    </h2>
+							    <a class="twitter-timeline" href="https://twitter.com/{!twitterHandle}"
+							    data-widget-id="{!twitterDataWidgetId}"
+							    data-chrome="noborders transparent noheader"
+							    >Tweets by @{!twitterHandle}</a>
+							    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+							</apex:outputPanel>
+                        </div>
+                    </nav>
+                </div>
+			</div>
+		</div>
+	</section>
+</apex:define>
+</apex:composition>
+</apex:page>

@@ -386,6 +386,13 @@
         <shortDescription>ERR NotGroupManager</shortDescription>
         <value>You do not have the permission to view this page.</value>
     </labels>
+	<labels>
+        <fullName>ERR_Only_One_Help_Link</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>ERR Only One Help Link</shortDescription>
+        <value>Only one active resource can be tagged as a Help Link.</value>
+    </labels>
     <labels>
         <fullName>ERR_Please_Enter_Value</fullName>
         <language>en_US</language>
@@ -485,6 +492,13 @@
         <value>About this group</value>
     </labels>
     <labels>
+        <fullName>LBL_Account_Settings</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Account Settings</shortDescription>
+        <value>Account Settings</value>
+    </labels>
+    <labels>
         <fullName>LBL_Add</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -497,6 +511,13 @@
         <protected>true</protected>
         <shortDescription>Add to Calendar label</shortDescription>
         <value>Add to My Calendar</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Add_More_Choices</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Add More Choices</shortDescription>
+        <value>Add more choices</value>
     </labels>
     <labels>
         <fullName>LBL_Add_Photo</fullName>
@@ -632,6 +653,13 @@
         <value>Choose from library</value>
     </labels>
     <labels>
+        <fullName>LBL_Comment</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Comment</shortDescription>
+        <value>Comment</value>
+    </labels>
+    <labels>
         <fullName>LBL_CommentsAfterMe</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -723,6 +751,13 @@
         <value>Current Events</value>
     </labels>
     <labels>
+        <fullName>LBL_Current_News</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Current News</shortDescription>
+        <value>Current News</value>
+    </labels>
+    <labels>
         <fullName>LBL_Current_News_Title</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -798,6 +833,13 @@
         <protected>true</protected>
         <shortDescription>Label Weekly Digest</shortDescription>
         <value>Weekly Digest</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Discover</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Discover</shortDescription>
+        <value>Discover</value>
     </labels>
     <labels>
         <fullName>LBL_Done</fullName>
@@ -940,6 +982,13 @@
         <value>Write about this file...</value>
     </labels>
     <labels>
+        <fullName>LBL_File_Placeholder</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL File Placeholder</shortDescription>
+        <value>Write something about this file...</value>
+    </labels>
+    <labels>
         <fullName>LBL_File_Upload_Size_Limit</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -1057,6 +1106,13 @@
         <protected>true</protected>
         <shortDescription>LBL First</shortDescription>
         <value>First</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Flag</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Flag</shortDescription>
+        <value>Flag</value>
     </labels>
     <labels>
         <fullName>LBL_Follow</fullName>
@@ -1211,6 +1267,20 @@
         <protected>true</protected>
         <shortDescription>LBL Link InputBox</shortDescription>
         <value>Say something about this link...</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Link_Placeholder</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Link Placeholder</shortDescription>
+        <value>Write something about this link...</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Links</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Links</shortDescription>
+        <value>Links</value>
     </labels>
     <labels>
         <fullName>LBL_Load_More</fullName>
@@ -1401,6 +1471,13 @@
         <shortDescription>Label My News</shortDescription>
         <value>My News</value>
     </labels>
+	<labels>
+        <fullName>LBL_My_Profile</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL My Profile</shortDescription>
+        <value>My Profile</value>
+    </labels>
     <labels>
         <fullName>LBL_Name</fullName>
         <language>en_US</language>
@@ -1456,6 +1533,13 @@
         <protected>true</protected>
         <shortDescription>LBL NoUsersFound</shortDescription>
         <value>No Users have been found.</value>
+    </labels>
+    <labels>
+        <fullName>LBL_No_Events</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL No Events</shortDescription>
+        <value>You have no upcoming events</value>
     </labels>
     <labels>
         <fullName>LBL_No_Upcoming_Events_Group</fullName>
@@ -1612,6 +1696,13 @@
         <value>Poll</value>
     </labels>
     <labels>
+        <fullName>LBL_Poll_Placeholder</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Poll Placeholder</shortDescription>
+        <value>What would you like to ask?</value>
+    </labels>
+    <labels>
         <fullName>LBL_Post</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -1624,6 +1715,13 @@
         <protected>true</protected>
         <shortDescription>LBL Post InputBox</shortDescription>
         <value>Type your message here…</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Post_Placeholder</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Post Placeholder</shortDescription>
+        <value>Welcome, what would you like to share?</value>
     </labels>
     <labels>
         <fullName>LBL_Posted</fullName>
@@ -1668,6 +1766,13 @@
         <value>Posts on my Profile</value>
     </labels>
     <labels>
+        <fullName>LBL_Read</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Read</shortDescription>
+        <value>Read</value>
+    </labels>
+    <labels>
         <fullName>LBL_Read_More</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -1680,6 +1785,13 @@
         <protected>true</protected>
         <shortDescription>LBL Read More News</shortDescription>
         <value>Read More News</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Recent_Messages</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Recent Messages</shortDescription>
+        <value>Recent Messages</value>
     </labels>
     <labels>
         <fullName>LBL_RecommendedGroups</fullName>
@@ -1729,6 +1841,20 @@
         <protected>true</protected>
         <shortDescription>Related Tags</shortDescription>
         <value>Related Tags</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Remove_Flag</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Remove Flag</shortDescription>
+        <value>Remove Flag</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Remove_Flags</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Remove Flags</shortDescription>
+        <value>Remove Flags</value>
     </labels>
     <labels>
         <fullName>LBL_Remove_From_Favorites</fullName>
@@ -1787,6 +1913,13 @@
         <value>You changes has been successfully saved.</value>
     </labels>
     <labels>
+        <fullName>LBL_Search</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Search</shortDescription>
+        <value>Search</value>
+    </labels>
+    <labels>
         <fullName>LBL_SearchAllMessages</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -1821,6 +1954,13 @@
         <value>Search words with regular expressions...</value>
     </labels>
     <labels>
+        <fullName>LBL_Search_Question</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Search Question</shortDescription>
+        <value>What can we help you find ...</value>
+    </labels>
+    <labels>
         <fullName>LBL_Select_Image</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -1840,6 +1980,13 @@
         <protected>true</protected>
         <shortDescription>Select Tags field label</shortDescription>
         <value>Select Tags</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Settings</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Settings</shortDescription>
+        <value>Settings</value>
     </labels>
     <labels>
         <fullName>LBL_Share</fullName>
@@ -1924,6 +2071,13 @@
         <protected>true</protected>
         <shortDescription>LBL Show All</shortDescription>
         <value>Show All</value>
+    </labels>
+	<labels>
+        <fullName>LBL_Sign_Out</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Sign Out</shortDescription>
+        <value>Sign Out</value>
     </labels>
     <labels>
         <fullName>LBL_Sure_To_Delete_Topic</fullName>
@@ -2017,6 +2171,20 @@
         <shortDescription>LBL Topics I Use</shortDescription>
         <value>Topics I Use</value>
     </labels>
+	<labels>
+        <fullName>LBL_UnRead</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL UnRead</shortDescription>
+        <value>Unread</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Unity_Post</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Unity Post</shortDescription>
+        <value>Post</value>
+    </labels>
     <labels>
         <fullName>LBL_Unmute_Feed</fullName>
         <language>en_US</language>
@@ -2081,6 +2249,20 @@
         <value>Verify New Password</value>
     </labels>
     <labels>
+        <fullName>LBL_View_All</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL View All</shortDescription>
+        <value>View All</value>
+    </labels>
+    <labels>
+        <fullName>LBL_View_Previous_Comments</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL View Previous Comments</shortDescription>
+        <value>View previous comments</value>
+    </labels>
+    <labels>
         <fullName>LBL_View_Results</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -2093,6 +2275,13 @@
         <protected>true</protected>
         <shortDescription>LBL When</shortDescription>
         <value>When:</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Write_A_Comment</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Write A Comment</shortDescription>
+        <value>Write a Comment . . .</value>
     </labels>
     <labels>
         <fullName>LBL_of</fullName>

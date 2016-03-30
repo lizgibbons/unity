@@ -39,6 +39,13 @@ global with sharing class CommunityFeedController {
 	public static Boolean fromEmail { get; set; }
 	public static String feedfromEmailId { get; set; }
 	public static Map<String, String> parentManagerId { get; set;}
+	public static Boolean unity20_Template_Use { 
+		get{
+			Community_Template_Settings__c cts = Community_Template_Settings__c.getOrgDefaults();
+			return cts.Enable_Unity2_0_Template__c; 
+		}
+	}
+	public static Boolean isModerateNetworkFeeds { get{ return CommunityUtils.isModerateChatterAndModerateNetworkFeeds();} }
 	public Boolean grID { get; set; }
 	public Boolean hideEventBtn { get { return hideEventBtn == true; } set; }
 	public String parentId { get { return parentId == NULL ? UserInfo.getUserId() : parentId; } set; }
@@ -51,7 +58,7 @@ global with sharing class CommunityFeedController {
 	public Boolean muteShowTooltip { get; set; }
     public Boolean isMuteShow { 
         get{
-            if(ApexPages.currentPage().getUrl().containsIgnoreCase('CommunityFeed_MyFeed')){
+            if(ApexPages.currentPage().getUrl().containsIgnoreCase('CommunityFeed_MyFeed') || ApexPages.currentPage().getUrl().containsIgnoreCase('UnityHome')){
                 muteShowTooltip = feedType == '1' ? true : false;
                 return feedType == '1' || feedType == '4';
             }
@@ -109,7 +116,8 @@ global with sharing class CommunityFeedController {
 
 	public String currentUserPhoto {
 		get {
-            return ConnectApi.UserProfiles.getPhoto(Network.getNetworkId(),'me').smallPhotoUrl;
+			String imgPhoto =  ConnectApi.UserProfiles.getPhoto(Network.getNetworkId(),'me').smallPhotoUrl;
+			return unity20_Template_Use ? CommunityUtils.checkUrlForImage(imgPhoto) : imgPhoto;
             //return ConnectApi.UserProfiles.getPhoto(Network.getNetworkId(),'me').smallPhotoUrl;
 		}
 	}
@@ -407,7 +415,6 @@ global with sharing class CommunityFeedController {
 			}
 			
 		}
-		
 		for(FeedElement fe : currentFeedPage.elements){
 			if(feedIdParentId.containsKey(fe.Id)){
 				fe.parentId = feedIdParentId.get(fe.Id);
@@ -788,8 +795,14 @@ global with sharing class CommunityFeedController {
 		fei.body = Test.isRunningTest() ? werewolfText('test') : werewolfText(layout.items[0].value);
 		try{
 			ConnectApi.FeedElement feedEl = ConnectApi.ChatterFeeds.updateFeedElement(Network.getNetworkId(), feedId, fei);
-		}catch(Exception ex){
-			throw new UnityFeedException(ex.getMessage());
+			String newFeed = json.serialize(feedEl);
+			FeedElementPage fepResult = new FeedElementPage();
+			fepResult.elements = new List<FeedElement> { (FeedElement)JSON.deserialize(newFeed,FeedElement.class) };
+			fepResult = initialRoles(fepResult);
+			fepResult = initialTopics(fepResult);
+			return json.serialize(fepResult);
+		}catch(ConnectApi.ConnectApiException ex){
+			throw new UnityFeedException(Label.ERR_Post_Too_Large);
 		}	
 		
 		return json.serialize('Success');
@@ -797,18 +810,26 @@ global with sharing class CommunityFeedController {
 
 	@RemoteAction
 	global static String updateComment(Map<String, String> params) {
+		
 		String inCommentText = params.get('inText');
 		String inCommId = params.get('commId');
+		String inFeedId = params.get('feedId');
 
 		ConnectApi.CommentInput ci = new ConnectApi.CommentInput();
-		ci.body = werewolfText(inCommentText);
 		
+		ci.body = werewolfText(inCommentText);
 		try{
 			ConnectApi.Comment editedComment = ConnectApi.ChatterFeeds.updateComment(Network.getNetworkId(), inCommId, ci);
-		}catch(Exception ex){
-			throw new UnityFeedException(ex.getMessage());
+			String newComment = json.serialize(editedComment);
+			Page2 commentPage = new Page2();
+			commentPage.feedId = inFeedId;
+			commentPage.items = new List<FeedElementComment> { (FeedElementComment)JSON.deserialize(newComment,FeedElementComment.class) };
+			commentPage = initialRoles(commentPage);
+			commentPage = initialTopicsForComment(commentPage);
+			return json.serialize(commentPage);
+		}catch(ConnectApi.ConnectApiException ex){
+			throw new UnityFeedException(Label.ERR_Comment_Too_Large);
 		}	
-		
 		return json.serialize('Success');
 	}
 
@@ -1164,11 +1185,12 @@ global with sharing class CommunityFeedController {
 		else if (inCname == 'fa-flag') {
 			String resultOid = '';
 			if (String.isNotBlank(inOid)) {
+				String usId = (unity20_Template_Use && isModerateNetworkFeeds) ? null : UserInfo.getUserId();
 				if (inPid.startsWith('0D5')) {
-					ConnectApi.CommunityModeration.removeFlagFromFeedElement(Network.getNetworkId(), inPid, UserInfo.getUserId());
+					ConnectApi.CommunityModeration.removeFlagFromFeedElement(Network.getNetworkId(), inPid, usId);
 				}
 				else {
-					ConnectApi.CommunityModeration.removeFlagFromComment(Network.getNetworkId(), inPid, UserInfo.getUserId());
+					ConnectApi.CommunityModeration.removeFlagFromComment(Network.getNetworkId(), inPid, usId);
 				}
 			}
 			else {
@@ -1380,10 +1402,7 @@ global with sharing class CommunityFeedController {
 	private static Boolean bool ;
 	public static Boolean checkBool(){
 		if(bool == null){
-			Profile prof = [SELECT PermissionsModerateChatter, PermissionsModerateNetworkFeeds FROM Profile WHERE Id = :UserInfo.getProfileId() Limit 1];
-			Boolean moderateChatter = prof.PermissionsModerateChatter;
-			Boolean moderateFeeds = prof.PermissionsModerateNetworkFeeds;
-			bool = moderateChatter || moderateFeeds;
+			bool = CommunityUtils.isModerateChatterAndModerateNetworkFeeds();
 		}
 		return bool;
 	}
@@ -1417,6 +1436,7 @@ global with sharing class CommunityFeedController {
 		public Boolean showContent { get { return capabilities.content != NULL; } }
 		public Boolean showFlag { get { return capabilities.moderation != NULL; } }
 		public Boolean flagged { get { return (showFlag && capabilities.moderation != NULL && capabilities.moderation.moderationFlags != NULL) ? capabilities.moderation.moderationFlags.flaggedByMe : false; } }
+		public Integer flagCount { get { return (showFlag && capabilities.moderation != NULL && capabilities.moderation.moderationFlags != NULL) ? capabilities.moderation.moderationFlags.flagCount : 0; } }
 		public String flagStatus { get { return flagged ? 'true' : ''; } }
 		public String flagStyle { get { return flagged ? ' active' : ''; } }
 
@@ -1502,6 +1522,7 @@ global with sharing class CommunityFeedController {
 
 	public class ModerationFlags {
 		public Boolean flaggedByMe { get; set; }
+		public Integer flagCount { get; set; }
 	}
 
 	public class ChatterLikes {
@@ -1701,13 +1722,14 @@ global with sharing class CommunityFeedController {
 	}
 	
 	private static List<List<String>> CHATTER_ACTIONS = new List<List<String>> {
-		new List<String> { label.LBL_Post, 'FeedItem.TextPost', 'fa-comment', 'TextPost'},
-		new List<String> { label.LBL_File, 'FeedItem.ContentPost', 'fa-file-o', 'ContentPost'},
-		new List<String> { label.LBL_Link, 'FeedItem.LinkPost', 'fa-link', 'LinkPost'},
-		new List<String> { Label.LBL_Poll, 'FeedItem.PollPost', 'fa-bar-chart', 'PollPost'},
-		new List<String> { 'Create Event', 'Create_Event', 'fa-calendar', 'Create_Event'}
+		new List<String> { label.LBL_Post, 'FeedItem.TextPost', 'fa-comment', 'TextPost', '', '', ''},
+		new List<String> { unity20_Template_Use ? label.LBL_Upload_File : label.LBL_File, 'FeedItem.ContentPost', 'fa-file-o', 'ContentPost', unity20_Template_Use ? 'upload-btn' : '', unity20_Template_Use ? 'post-upload-content-holder' : '', unity20_Template_Use ? 'lrm-upload' : ''},
+		new List<String> { label.LBL_Link, 'FeedItem.LinkPost', 'fa-link', 'LinkPost', unity20_Template_Use ? 'link-btn' : '', unity20_Template_Use ? 'post-link-content-holder' : '', unity20_Template_Use ? 'lrm-link-feed' : ''},
+		new List<String> { Label.LBL_Poll, 'FeedItem.PollPost', 'fa-bar-chart', 'PollPost', unity20_Template_Use ? 'poll-btn' : '', unity20_Template_Use ? 'post-poll-content-holder' : '', unity20_Template_Use ? 'lrm-poll-feed' : ''},
+		new List<String> { unity20_Template_Use ? 'News' : 'Create Event', unity20_Template_Use ? 'Create_News' : 'Create_Event', 'fa-calendar', unity20_Template_Use ? 'Create_News' : 'Create_Event', unity20_Template_Use ? 'news-btn' : '', unity20_Template_Use ? 'post-news-content-holder' : '',unity20_Template_Use ? 'lrm-news-feed' : ''}
 	};
 
+	
 	private static Map<String, ChatterActionLayout> ACTION_LAYOUT = new Map<String, ChatterActionLayout> {
 		'FeedItem.TextPost' => new ChatterActionLayout(
 			'FeedItem.TextPost', 
@@ -1727,7 +1749,10 @@ global with sharing class CommunityFeedController {
 			},
 			NULL, // after fields
 			NULL, //post
-			NULL //button text
+			NULL, //button text
+			NULL, // div class for Unity new design
+			unity20_Template_Use ? Label.LBL_Post_Placeholder : NULL //placeholder for Unity new design
+
 		),
 		'FeedItem.LinkPost' => new ChatterActionLayout(
 			'FeedItem.LinkPost', //name
@@ -1738,7 +1763,7 @@ global with sharing class CommunityFeedController {
 					'Link URL',
 					'message-link-url',	//fieldName
 					'input',	//ftype
-					'url',	//inputtype
+					unity20_Template_Use ? 'text' : 'url',	//inputtype
 					null,	//value
 					'http://',	//placeholder
 					true,	//required
@@ -1771,7 +1796,9 @@ global with sharing class CommunityFeedController {
 			},
 			NULL, // after fields
 			NULL, //post
-			NULL //button text
+			NULL, //button text
+			unity20_Template_Use ? 'post-link-content' : NULL, // div class for Unity new design
+			unity20_Template_Use ? Label.LBL_Link_Placeholder : NULL //placeholder for Unity new design
 		),
 		'FeedItem.ContentPost' => new ChatterActionLayout(
 			'FeedItem.ContentPost', //name
@@ -1803,7 +1830,9 @@ global with sharing class CommunityFeedController {
 			},
 			NULL, // after fields
 			NULL, //post
-			NULL //button text
+			NULL, //button text
+			unity20_Template_Use ? 'post-upload-content' : NULL, // div class for Unity new design
+			unity20_Template_Use ? Label.LBL_File_Placeholder : NULL //placeholder for Unity new design
 		),
 		'FeedItem.PollPost' => new ChatterActionLayout(
 			'FeedItem.PollPost', //name
@@ -1817,7 +1846,7 @@ global with sharing class CommunityFeedController {
 					'post',	//ftype
 					'text',	//inputtype
 					null,	//value
-					'What would you like to ask?',	//placeholder
+					Label.LBL_Poll_Placeholder,	//placeholder
 					true,	//required
 					'validate-textarea'	//validationClass
 				),
@@ -1846,7 +1875,9 @@ global with sharing class CommunityFeedController {
 			},
 			true, // after fields
 			NULL, //post
-			NULL //button text
+			NULL, //button text
+			unity20_Template_Use ? 'post-poll-content' : NULL, // div class for Unity new design
+			unity20_Template_Use ? Label.LBL_Poll_Placeholder : NULL //placeholder for Unity new design
 		)
 	};
 	private static Map<String, String> getAvailableQuickActions() {
@@ -1865,13 +1896,13 @@ global with sharing class CommunityFeedController {
 		
 		for (List<String> caa : CHATTER_ACTIONS) {
 			for(String key : actionAvailable.keySet()){
-				if (actionAvailable.get(key).contains(caa[3])
-					&& ( (caa[3] != 'ContentPost' && caa[3] != 'Create_Event')
+				if (actionAvailable.get(key).contains(caa[3]) && caa[3] != ''
+					&& ( (caa[3] != 'ContentPost' && caa[3] != (unity20_Template_Use ? 'Create_News' : 'Create_Event'))
 					|| (caa[3] == 'ContentPost' && showFileUpload && CommunityUtils.checkAPIEnable())
-					|| (caa[3] == 'Create_Event' && hideEventBtn != true && CommunityUtils.checkCRUDforObject(CommunityUtils.getPackagePrefix()+'Community_Events__c').get('isCreateable') && CommunityUtils.checkAPIEnable())
+					|| (caa[3] == (unity20_Template_Use ? 'Create_News' : 'Create_Event') && hideEventBtn != true && CommunityUtils.checkCRUDforObject(CommunityUtils.getPackagePrefix()+(unity20_Template_Use ? 'Community_News__c' : 'Community_Events__c')).get('isCreateable') && CommunityUtils.checkAPIEnable())
 				)
 			) {
-				resultList.add(new ChatterActionItem(caa[0],caa[1],caa[2]));
+					resultList.add(new ChatterActionItem(caa[0],caa[1],caa[2], caa[4], caa[5], caa[6]));
 			}
 		}
 		}
@@ -1882,11 +1913,17 @@ global with sharing class CommunityFeedController {
 		public String label { get; set; }
 		public String name { get; set; }
 		public String icon { get; set; }
+		public String actionClass { get; set; }
+		public String holderClass { get; set; }
+		public String iconClass { get; set; }
 
-		public ChatterActionItem(String l, String n, String i) {
+		public ChatterActionItem(String l, String n, String i, String c, String h, String ic) {
 			label = l;
 			name = n;
 			icon = i;
+			actionClass = c;
+			holderClass = h;
+			iconClass = ic;
 		}
 	}
 
@@ -1898,6 +1935,9 @@ global with sharing class CommunityFeedController {
 		public Boolean afterFields { get { return afterFields == NULL ? false : afterFields; } set; }
 		public Boolean post { get { return post == NULL ? true : post; } set; }
 		public String btntxt { get { return btntxt == NULL ? 'Share' : btntxt; } set; }
+		public User user { get{ return CommunityUtils.getUser();} set; }
+		public String divClass { get; set; }
+		public String unPlaceholder { get; set; }
 
 		public ChatterActionLayout(QuickAction.DescribeQuickActionResult inDqar) {
 			name = inDqar.getName();
@@ -1923,7 +1963,7 @@ global with sharing class CommunityFeedController {
 			}
 		}
 
-		public ChatterActionLayout(String n,  String obn, Boolean bf, List<ChatterActionLayoutItem> i, Boolean af, Boolean p, String bt) {
+		public ChatterActionLayout(String n,  String obn, Boolean bf, List<ChatterActionLayoutItem> i, Boolean af, Boolean p, String bt, String cl, String pl) {
 			this.name = n;
 			this.objectName = obn;
 			this.beforeFields = bf;
@@ -1931,6 +1971,8 @@ global with sharing class CommunityFeedController {
 			this.afterFields = af;
 			this.post = p;
 			this.btntxt = bt;
+			this.divClass = cl;
+			this.unPlaceholder = pl;
 		}
 	}
 
@@ -2010,12 +2052,11 @@ global with sharing class CommunityFeedController {
 			String fName = splitSTR[0];
 			String objName = splitSTR[1];
 			for(Integer i = 2; i < splitSTR.size(); i++){
-				String fNameSplit = CommunityUtils.getPackagePrefix() + splitSTR[i].split(':')[0].replaceAll(' ','_')+'__c';
+				String fNameSplit = CommunityUtils.getPackagePrefix() + splitSTR[i].split(':')[0].replaceAll(' ','_');
 				Boolean fReqSplit =  Boolean.valueOf(splitSTR[i].split(':')[1]);
 				fieldNames.add(fNameSplit);
 				nameReq.put(fNameSplit, fReqSplit);
 			}
-			
 			SObjectType objectType = Schema.getGlobalDescribe().get(objName);
 			if(objectType == null){ 
 				objectType = Schema.getGlobalDescribe().get(CommunityUtils.getPackagePrefix() + objName);
@@ -2040,7 +2081,7 @@ global with sharing class CommunityFeedController {
 						lc.getValidationClass()));
 				}
 			}
-			result = new ChatterActionLayout(fName, objName, null, chatActionLI, null, false, 'Save'); 
+			result = new ChatterActionLayout(fName, objName, null, chatActionLI, null, false, 'Save', null, null); 
 		}
 
 		return JSON.serialize(result);

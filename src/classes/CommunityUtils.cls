@@ -262,6 +262,21 @@ public with sharing class CommunityUtils {
 		return inUrl;
 	}
 
+	public static String checkUrlForImage(String inUrl) {
+		List<String> url = inUrl.split('/');
+		String imgUrl = inUrl;
+		if(url[url.size()-2].length() == 3){
+			String ns = getPackagePrefix();
+			List<StaticResource> srList = [SELECT SystemModstamp FROM StaticResource WHERE Name = 'assets2' AND NamespacePrefix = :ns.replace('__','')];
+			imgUrl = (srList.size() == 0) ? imgUrl : ('/resource/' + srList[0].SystemModstamp.getTime() +'/' + ns + 'assets2/images/home/default-male.jpg');
+			
+			if (String.isNotBlank(Site.getPathPrefix()) && !imgUrl.startsWith(Site.getPathPrefix())) {
+				imgUrl = Site.getPathPrefix() + imgUrl;
+			}
+		}
+		return imgUrl;
+	}
+
 	public static Boolean checkNewsOverlapInterval(String uCondition, Datetime uStart, Datetime uEnd) {
 		if (!SObjectType.Community_News__c.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.Community_News__c);
 		String uQuery = 'SELECT Id FROM Community_News__c WHERE ' + uCondition;
@@ -571,6 +586,10 @@ public with sharing class CommunityUtils {
 		return new Community_Resource__c(Description__c = String.isNotBlank(value) ? value.unescapeHtml4() : '');
 	}
 
+	public static User getUser (){
+		return [SELECT Id, SmallPhotoURL, Name FROM User WHERE Id =: UserInfo.getUserId() LIMIT 1];
+	}
+
 	//wrapper classes
 
 	public class GroupAction {
@@ -584,4 +603,7 @@ public with sharing class CommunityUtils {
 		public String lnkIcon { get; set; }
 		public String lnkStyle { get; set; }
 	}
+
+	public static Boolean isGroupTriggerWorked = false;
+	public static Boolean isChatterGroupTriggerWorked = false;
 }

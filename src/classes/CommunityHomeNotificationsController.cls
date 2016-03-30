@@ -35,10 +35,10 @@ global with sharing class CommunityHomeNotificationsController {
 
 	@RemoteAction
 	global static String notifications(){
-		
+		Community_Template_Settings__c cts = Community_Template_Settings__c.getOrgDefaults();
 		List<NotificationWrapper> notificationsData = new List<NotificationWrapper>();
 		
-		List<NotificationWrapper> privateHPMessages = privateHPMessages();
+		List<NotificationWrapper> privateHPMessages = (cts.Enable_Unity2_0_Template__c && Test.isRunningTest() == false) ? null : privateHPMessages();
 		List<NotificationWrapper> getGroupManagerFeeds = getGroupManagerFeeds();
 		
 		if(privateHPMessages == null && getGroupManagerFeeds == null) return 'EMPTY You have no notifications.';
@@ -72,6 +72,7 @@ global with sharing class CommunityHomeNotificationsController {
 				hpMessages.add(new NotificationWrapper(
 					feedMessage.LatestMessage.Sender.MemberId,
 					feedMessage.LatestMessage.Sender.MemberName,
+					feedMessage.LatestMessage.Sender.MemberPhotoUrl,
 					Label.LBL_Notifications_Message,
 					prepareUrl(Page.CommunityFeed_MyMessages.getUrl())+'?c='+feedMessage.ConversationId,
 					feedMessage.LatestMessage.SentDate));
@@ -174,6 +175,7 @@ global with sharing class CommunityHomeNotificationsController {
 						feedPosted.CreatedById,
 						userPhotoAndName.get(feedPosted.CreatedById)[1].replace(Site.getBaseUrl(), ''),
 						Label.LBL_Notifications_Post.replace('{0}',gControlGroups.get(feedPosted.ParentId)[1]),
+						gControlGroups.get(feedPosted.ParentId)[1],
 						prepareUrl(Page.CommunityGroupManager.getUrl())+'?gr='+gControlGroups.get(feedPosted.ParentId)[0],
 						feedPosted.LastModifiedDate,
 						userPhotoAndName.get(feedPosted.CreatedById)[0]));
@@ -208,6 +210,7 @@ global with sharing class CommunityHomeNotificationsController {
 
 		public String Name {get; set;}
 		public String Message {get; set;}
+		public String StrongMessage { get; set; }
 		public String DateString {get; set;}
 		public String Type {get; set;}
 		public String ClassStyle {get; set;}
@@ -216,7 +219,7 @@ global with sharing class CommunityHomeNotificationsController {
 		public Datetime SentDate {get; set;}
 		public String ParentURL {get; set;}
 
-		public NotificationWrapper(String memberId, String name, String message, String urlPath, Datetime dateD){
+		public NotificationWrapper(String memberId, String name, String sPhoto, String message, String urlPath, Datetime dateD){
 
 			this.MemberId = memberId;
 			this.Name = name;
@@ -226,9 +229,10 @@ global with sharing class CommunityHomeNotificationsController {
 			this.DateString = CommunityFeedController.convertTimeDiff(dateD);
 			this.Type = 'Message';
 			this.ClassStyle = 'icon-custom icon-sm rounded-x icon-bg-red icon-line icon-envelope';
+			this.Image = sPhoto;
 		}
 
-		public NotificationWrapper(String memberId, String name, String message, String urlPath, Datetime dateD, String image){
+		public NotificationWrapper(String memberId, String name, String message, String strongMessage, String urlPath, Datetime dateD, String image){
 
 			this.MemberId = memberId;
 			this.Name = name;
@@ -238,6 +242,7 @@ global with sharing class CommunityHomeNotificationsController {
 			this.DateString = CommunityFeedController.convertTimeDiff(dateD);
 			this.Type = 'Person';
 			this.Image = image;
+			this.StrongMessage = strongMessage;
 		}
 
 

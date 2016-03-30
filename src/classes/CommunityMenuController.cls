@@ -29,6 +29,42 @@
 
 public with sharing class CommunityMenuController {
 
+	
+	public String currentUserRole { get{ return CommunityFeedController.getUserRoles(new List<String>{UserInfo.getUserId()}).get(UserInfo.getUserId());} }
+	public String conversationId { get; set; }
+	public Boolean read { get; set; }
+
+	public List<ChatterConversation> getUnityConversations(){
+		UnityMessage umn = new UnityMessage();
+		umn.Conversations.sort();
+		return umn.Conversations;
+	}
+
+	public CommunityMenuController(){
+	}
+
+	public Integer MessageUnreadCount { get {
+			Integer unreadCountMessages;
+			try {
+				ConnectApi.UnreadConversationCount unreadCount = ConnectApi.ChatterMessages.getUnreadCount(Network.getNetworkId());
+				unreadCountMessages = unreadCount.UnreadCount;
+			}
+			catch (exception e) {
+				return 0;
+			}
+			return unreadCountMessages;
+		} }
+
+	public Integer getActivePage(){
+		String currentPage = ApexPages.currentPage().getUrl().replace('/apex','');
+		if(currentPage.containsIgnoreCase('Home')) return 1;
+		if(currentPage.containsIgnoreCase('Groups')) return 2;
+		if(currentPage.containsIgnoreCase('Events')) return 3;
+		if(currentPage.containsIgnoreCase('Discover')) return 4;
+		if(currentPage.containsIgnoreCase('Resourses')) return 5;
+		return 0;
+	}	
+
 	private static Boolean currentPage(String urlToCompare) {
 		String currentPageName = ApexPages.currentPage().getUrl().replace('/apex','');
 		urlToCompare = urlToCompare.replace('/apex','');
@@ -50,6 +86,11 @@ public with sharing class CommunityMenuController {
 			result = crtc.checkAndPrepareMenu();
 		}
 		return result;
+	}
+	
+	public static Boolean getShowPrivateMessages(){
+		if(Network.getNetworkId() == NULL) return true;
+		return [SELECT OptionsPrivateMessagesEnabled, Id FROM Network WHERE Id =: Network.getNetworkId() LIMIT 1].OptionsPrivateMessagesEnabled;
 	}
 	
 	public static Boolean getShowHideMenu() {
@@ -83,7 +124,8 @@ public with sharing class CommunityMenuController {
 			SELECT Id, Name, Teaser__c
 			FROM Community_News__c
 			WHERE Alert__c = true AND Status__c != 'Pending'
-			AND Entry_Date__c <= :Now AND Expiration_Date__c >= :Now
+			AND Entry_Date__c <= :Now AND (Expiration_Date__c >= :Now OR Expiration_Date__c = NULL)
+			ORDER BY CreatedDate ASC
 			LIMIT 1
 		];
 		return newsList.isEmpty() ? NULL : newsList[0].Teaser__c;
@@ -137,6 +179,16 @@ public with sharing class CommunityMenuController {
 		}
 	}
 	
+	public User getCurrentUser(){
+		return CommunityUtils.getUser();
+	}
+	
+	public void readConversation(){
+		try{
+			ConnectApi.ChatterConversationSummary ccs = ConnectApi.ChatterMessages.markConversationRead(Network.getNetworkId(), conversationId, read);
+		}catch(Exception ex){}
+	}
+
 	// -- Wrapper class --
 	public class LinkItem {
 		public String Name {get; set;}
@@ -147,4 +199,124 @@ public with sharing class CommunityMenuController {
 			this.Link = Link;
 		} 
 	}
+
+	
+	public class UnityMessage{
+		private final Integer MESSAGES_PER_PAGE = 10;
+		public List<ChatterConversation> Conversations { get; set; }
+
+		public UnityMessage(){
+			this.Conversations = new List<ChatterConversation>();
+			this.Conversations = getConversations(NULL, NULL, this.MESSAGES_PER_PAGE);
+		}
+
+		public List<ChatterConversation> getConversations(String query, String pageToken, Integer messagesPerPage) {
+			List<ChatterConversation> result = new List<ChatterConversation>();
+
+			ConnectApi.ChatterConversationPage conversationPage = ConnectApi.ChatterMessages.getConversations(Network.getNetworkId(), pageToken, messagesPerPage);
+			
+			for (ConnectApi.ChatterConversationSummary conversationSummary : conversationPage.conversations) {
+				result.add(new ChatterConversation(conversationPage.currentPageToken, conversationPage.nextPageToken, conversationSummary));
+			}
+			return result;
+		}
+	}
+
+	public class ChatterConversation implements Comparable{
+		public String ConversationId { get; set; }
+		public Boolean IsRead { get; set; }
+		public ChatterMessage LatestMessage { get; set; }
+		
+		public ChatterConversation(String cPageToken, String nPageToken, ConnectApi.ChatterConversationSummary summary) {
+			this.ConversationId = summary.Id;
+			this.IsRead = summary.Read;
+			this.LatestMessage = new ChatterMessage(summary.LatestMessage);
+		}
+		public Integer compareTo(Object compareTo) {
+	    	ChatterConversation compareToEmp = (ChatterConversation)compareTo;
+	        if (this.IsRead == compareToEmp.IsRead) return 0;
+	        if (this.IsRead == true && compareToEmp.IsRead == false) return 1;
+	        return -1;   
+		}
+	}	
+	public class ChatterMessage {
+		public String MessageId { get; set; }
+		public String ConversationId { get; set; }
+		public ChatterMessageBody MessageBody { get; set; }
+		public Datetime SentDate { get; set; }
+		public String SentDateFormatted { 
+			get { 
+				if (String.isBlank(this.SentDateFormatted) && this.SentDate != NULL) {
+					this.SentDateFormatted = formatSentDate();
+				}
+				return this.SentDateFormatted;
+			}
+			set;
+		}
+		public ChatterGroupMember Sender { get; set; }
+		private String formatSentDate() {
+			return String.format('{0} at {1}',
+				new List<String> {
+					this.SentDate.format('MMMMM d, yyyy'),
+					this.SentDate.format('HH:mm a')
+				}
+			);
+		}
+
+		public ChatterMessage(ConnectApi.ChatterMessage message) {
+			this.MessageId = message.Id;
+			this.ConversationId = message.ConversationId;
+			this.MessageBody = new ChatterMessageBody(message.Body);
+			this.SentDate = message.SentDate;
+			this.SentDateFormatted = formatSentDate();
+			this.Sender = new ChatterGroupMember(message.Sender);
+		}
+	}
+
+	public class ChatterMessageBody {
+		public String Text { get; set; }
+	
+		public ChatterMessageBody(ConnectApi.AbstractMessageBody body) {
+			this.Text = body.Text;
+		}
+	}
+
+	public class ChatterGroupMember {
+		public Id MemberId { get; set; }
+		public String MemberName { get; set; }
+		public String MemberRole { get; set; }
+		public String MemberContactRole { get; set; }
+		public String MemberPhotoUrl {
+			get {
+				if (String.isBlank(this.MemberPhotoUrl)) {
+					this.MemberPhotoUrl = '/profilephoto/005/T';
+				}
+				//this.MemberPhotoUrl = this.MemberPhotoUrl.replace(Site.getBaseUrl(), '');
+				return this.MemberPhotoUrl;
+			}
+			set;
+		}
+		public String SubscriptionId { get; set; }
+		public Boolean MemberIsFollowing { get; set; }
+
+		public ChatterGroupMember(ConnectApi.UserSummary member) {
+			this.MemberId = member.Id;
+			this.MemberName = String.format('{0}{1}',
+				new List<String> {
+					!String.isBlank(member.FirstName) ? member.FirstName + ' ' : '',
+					!String.isBlank(member.LastName) ? member.LastName : ''
+				}
+			);
+			String roleMember = (CommunityFeedController.getUserRoles(new List<String>{this.MemberId})).get(this.MemberId);
+			if(roleMember != null){
+				this.MemberRole = '('+roleMember+')';
+			}else{
+				this.MemberRole = '';
+			}
+			//this.MemberRole = '';
+			this.MemberPhotoUrl = (member.Photo != NULL) ? member.Photo.SmallPhotoUrl : NULL;
+		}
+
+	}
+
 }
