@@ -241,7 +241,7 @@
 				});
 				PeoplesApp.filter('quickSearch', function() {
 					return function(input, scope) {
-						var searchWords = scope.quickSearchQuery.match(/(\w){2,}/g);
+						var searchWords = scope.quickSearchQuery.match(/(\w|'){2,}/g);
 						//scope.debug.searchBy = searchWords;
 						if (searchWords) {
 							//var re = new RegExp(searchWords.join('|'), "ig");
@@ -251,8 +251,10 @@
 							}
 							var re = new RegExp(reText, "ig");
 							var output = [];
+							
 							for (var j = 0; j < input.length; j++) {
-								if (input[j].MemberName.match(re) != null) {
+								var mName = input[j].MemberName.replace(/&#39;/g,'\'');
+								if (mName.match(re) != null) {
 									output.push(input[j]);
 								}
 							}
