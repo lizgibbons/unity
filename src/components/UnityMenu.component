@@ -103,7 +103,7 @@
 				</li>
 				<!-- End Links -->
 				<!--Recent Messages-->
-				<li class="icon hasChildren">
+				<li class="icon hasChildren" id="recentMessages" style="display: none;">
 	                <a href="#" title="{!$Label.LBL_Messages}" class="emails it-navMastheadViewEmails">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Messages}</span><span class="number" style="display:none">{!MessageUnreadCount}</span></span></a>
 	                <ul class="subMenu feedMenu">
 	                    <li class="feedMenuHeader">
@@ -112,7 +112,7 @@
 	                    </li>
 	                    <!-- Messages block -->
 	                    <div class="feedMenuHolder" id="conversations">
-	                    	<apex:repeat value="{!unityConversations}" var="conv">
+	                    	<apex:repeat value="{!unityConversations}" var="conv" rendered="{!showPrivateMessages}">
 		                    	<li class="{!IF(conv.IsRead, 'feedMenuItem', 'feedMenuItem unread')}">
 				                    <a href="{!$Page.CommunityProfilePage}?id={!conv.LatestMessage.Sender.MemberId}" class="avatar it-navatar1">
 										<img src="{!conv.LatestMessage.Sender.MemberPhotoUrl}" alt="{!conv.LatestMessage.Sender.MemberName}" />
@@ -124,7 +124,7 @@
 											<small>{!conv.LatestMessage.SentDateFormatted}</small>
 										</p>
 									</a>	
-									<a class="read it-removeNotification1" role="button" onclick="readNotification(this,'{!conv.ConversationId}');"></a>
+									<a class="read it-removeNotification1" role="button" onclick="readNotification(this,'{!JSENCODE(conv.ConversationId)}');"></a>
 								</li>
 							</apex:repeat>	
 	                    </div>
@@ -136,7 +136,7 @@
 	            </li>
 	            <!--END Recent Messages-->
 	            <li class="icon hasChildren">
-	                <a href="#" title="{!$Label.LBL_Notifications}" class="alerts it-navMastheadViewAlerts">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Notifications}</span><span class="number"></span></span></a>
+	                <a href="#" title="{!$Label.LBL_Notifications}" class="alerts it-navMastheadViewAlerts">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Notifications}</span><span class="number" style="display:none"></span></span></a>
 	                <ul class="subMenu feedMenu">
 	                    <li class="feedMenuHeader">
 	                        <h4>{!$Label.LBL_Notifications}</h4>
@@ -188,8 +188,12 @@
 </header>
 	<script>
 		$(document).ready(function() {
-			var countEmail = parseInt($('.emails .number').first().text(), 10); 
-			if(countEmail > 0) $('.emails .number').show();
+			if({!showPrivateMessages}) {
+				$('#recentMessages').show();
+				var countEmail = parseInt($('.emails .number').first().text(), 10); 
+				if(countEmail > 0) $('.emails .number').show();
+			}
+			checkPhotoUrl();
 		});
 		//mark notifications as read
 		$('.feedMenuItem').on('click', '.read', function(){
@@ -212,6 +216,25 @@
 			var countEmail = parseInt($('.emails .number').first().text(), 10);
 			if(!read && (countEmail+1) > 0) $('.emails .number').show();
 			if(read && (countEmail-1) <= 0) $('.emails .number').hide();
+       	}
+       	function checkPhotoUrl(){
+       		//check for current user photo
+       		var image = $('.profileNav span.avatar'); 
+       		var styleAttr = image.attr('style'); 
+       		var styleUrl = styleAttr.substring(styleAttr.indexOf('(')+1, styleAttr.indexOf(')'))
+       		var url = styleUrl.split('/');
+       		if(url[url.length-2].length == 3){
+				image.attr('style', 'background-image: url({!$Resource.assets2}/images/home/default-male.jpg)');
+			}
+			
+       		//check for conversation users photos
+			var images = $('#conversations img');
+			for(var i = 0; i < images.length; i++){
+				var url = images[i].src.split('/');
+				if(url[url.length-2].length == 3){
+					images[i].src = '{!$Resource.assets2}/images/home/default-male.jpg';
+				}
+			}
 		}
 	</script>
 </apex:component>

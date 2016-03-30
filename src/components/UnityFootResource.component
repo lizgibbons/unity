@@ -32,4 +32,6 @@
 	<apex:includeScript value="{!$Resource.CommunityResources}/js/underscore/underscore-min.js"/>
 	<apex:includeScript value="{!$Resource.assets}/js/custom.js"/>
 	
+	<apex:stylesheet value="{!$Resource.assets2}/css/mentionsList.css" />
+	
 </apex:component>

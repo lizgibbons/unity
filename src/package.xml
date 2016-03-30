@@ -5,6 +5,8 @@
         <members>CommunityAboutGroupComponentController</members>
         <members>CommunityAccess</members>
         <members>CommunityAccessException</members>
+        <members>CommunityBatch</members>
+        <members>CommunityBatchHelper</members>
         <members>CommunityEventController</members>
         <members>CommunityFeedController</members>
         <members>CommunityFeedNavigationController</members>
@@ -221,6 +223,7 @@
         <members>Community_Profile_Tag__c.Active__c</members>
         <members>Community_Profile_Tag__c.Community_Tag__c</members>
         <members>Community_Profile_Tag__c.Contact__c</members>
+        <members>Community_Profile_Tag__c.Related_Contact__c</members>
         <members>Community_Profile_Tag__c.Profile_Tag_SF_ID__c</members>
         <members>Community_Profile_Tag__c.Theme__c</members>
         <members>Community_Profile__c.Advisor__c</members>
@@ -366,6 +369,7 @@
         <members>LBL_Account_Settings</members>
         <members>LBL_Add</members>
         <members>LBL_AddToCalendar</members>
+        <members>LBL_Add_More_Choices</members>
         <members>LBL_Add_Photo</members>
         <members>LBL_Add_To_Favorites</members>
         <members>LBL_Add_Remove_Members</members>
@@ -386,6 +390,7 @@
         <members>LBL_Change_Owner</members>
         <members>LBL_Change_Vote</members>
         <members>LBL_Choose_from_Library</members>
+        <members>LBL_Comment</members>
         <members>LBL_CommentsAfterMe</members>
         <members>LBL_CommentsOnBookmarked</members>
         <members>LBL_CommentsOnLike</members>
@@ -435,6 +440,7 @@
         <members>LBL_FeedsTime</members>
         <members>LBL_File</members>
         <members>LBL_File_InputBox</members>
+        <members>LBL_File_Placeholder</members>
         <members>LBL_File_Upload_Size_Limit</members>
         <members>LBL_Files_Actions_Header</members>
         <members>LBL_Files_EditFile_Title</members>
@@ -452,6 +458,7 @@
         <members>LBL_Files_SharePeople</members>
         <members>LBL_Files_Upload_WhatChanged</members>
         <members>LBL_First</members>
+        <members>LBL_Flag</members>
         <members>LBL_Follow</members>
 		<members>LBL_MyFavorites</members>
 		<members>LBL_PeopleTalkingAboutThis</members>
@@ -479,6 +486,7 @@
         <members>LBL_LikesPost</members>
         <members>LBL_Link</members>
         <members>LBL_Link_InputBox</members>
+        <members>LBL_Link_Placeholder</members>
         <members>LBL_Links</members>
         <members>LBL_Load_More</members>
         <members>LBL_Location</members>
@@ -537,8 +545,10 @@
         <members>LBL_Person_Talking</members>
         <members>LBL_PictureUploadModal_SizeWarning</members>
         <members>LBL_Poll</members>
+        <members>LBL_Poll_Placeholder</members>
         <members>LBL_Post</members>
         <members>LBL_Post_InputBox</members>
+        <members>LBL_Post_Placeholder</members>
         <members>LBL_Posted</members>
         <members>LBL_PostsLikes_Title</members>
         <members>LBL_Previous</members>
@@ -556,6 +566,8 @@
         <members>LBL_RegProfilePicture_Title</members>
         <members>LBL_RegTerms_Title</members>
         <members>LBL_Related_Tags</members>
+        <members>LBL_Remove_Flag</members>
+        <members>LBL_Remove_Flags</members>
         <members>LBL_Remove_From_Favorites</members>
         <members>LBL_RequestToJoin</members>
         <members>LBL_Requested</members>
@@ -595,6 +607,7 @@
         <members>LBL_Today_is</members>
         <members>LBL_Topic</members>
         <members>LBL_Topics</members>
+        <members>LBL_Unity_Post</members>
 		<members>LBL_UnRead</members>
         <members>LBL_Unmute_Feed</members>
         <members>LBL_Upcoming_Events</members>
@@ -606,7 +619,9 @@
         <members>LBL_Username</members>
         <members>LBL_VerifyNewPassword</members>
         <members>LBL_View_All</members>
+        <members>LBL_View_Previous_Comments</members>
         <members>LBL_When</members>
+        <members>LBL_Write_A_Comment</members>
         <members>LBL_of</members>
 		<members>LBL_View_Results</members>
 		<members>LBL_Change_Vote</members>
