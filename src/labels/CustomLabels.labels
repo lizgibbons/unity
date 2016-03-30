@@ -1766,6 +1766,13 @@
         <value>Posts on my Profile</value>
     </labels>
     <labels>
+        <fullName>LBL_Read</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Read</shortDescription>
+        <value>Read</value>
+    </labels>
+    <labels>
         <fullName>LBL_Read_More</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -2163,6 +2170,13 @@
         <protected>true</protected>
         <shortDescription>LBL Topics I Use</shortDescription>
         <value>Topics I Use</value>
+    </labels>
+	<labels>
+        <fullName>LBL_UnRead</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL UnRead</shortDescription>
+        <value>Unread</value>
     </labels>
     <labels>
         <fullName>LBL_Unity_Post</fullName>
