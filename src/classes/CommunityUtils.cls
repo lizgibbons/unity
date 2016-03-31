@@ -42,6 +42,11 @@ public with sharing class CommunityUtils {
 		return Result;
 	}
 	
+	public static Boolean getUnity20TemplateUse(){
+		Community_Template_Settings__c cts = Community_Template_Settings__c.getOrgDefaults();
+		return cts.Enable_Unity2_0_Template__c; 
+	}
+	
  public static Boolean isModerateChatterAndModerateNetworkFeeds() {
 		Profile prof = [SELECT PermissionsModerateChatter, PermissionsModerateNetworkFeeds, Name, Id FROM Profile WHERE Id =: UserInfo.getProfileId()];
 		Boolean Result = false;
