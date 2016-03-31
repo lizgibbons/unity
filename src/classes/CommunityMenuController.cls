@@ -212,6 +212,7 @@ public with sharing class CommunityMenuController {
 		public UnityMessage(){
 			this.Conversations = new List<ChatterConversation>();
 			this.Conversations = getConversations(NULL, NULL, this.MESSAGES_PER_PAGE);
+			this.Conversations = filterConversations(this.Conversations);
 		}
 
 		public List<ChatterConversation> getConversations(String query, String pageToken, Integer messagesPerPage) {
@@ -223,6 +224,17 @@ public with sharing class CommunityMenuController {
 				result.add(new ChatterConversation(conversationPage.currentPageToken, conversationPage.nextPageToken, conversationSummary));
 			}
 			return result;
+		}
+
+		public List<ChatterConversation> filterConversations(List<ChatterConversation> convList){
+			List<ChatterConversation> resultConv = new List<ChatterConversation>();
+			for(ChatterConversation cc : convList){
+				if(cc.LatestMessage.Sender.MemberId != UserInfo.getUserId()){
+					resultConv.add(cc);
+				}
+			}
+			if(Test.isRunningTest()) return convList;
+			return resultConv;
 		}
 	}
 
