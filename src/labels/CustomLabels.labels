@@ -1367,6 +1367,20 @@
         <value>Manage Group Managers</value>
     </labels>
     <labels>
+        <fullName>LBL_Mark_As_Read</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Mark As Read</shortDescription>
+        <value>Mark As Read</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Mark_As_Unread</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Mark As Unread</shortDescription>
+        <value>Mark As Unread</value>
+    </labels>
+    <labels>
         <fullName>LBL_Member</fullName>
         <language>en_US</language>
         <protected>true</protected>

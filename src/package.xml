@@ -500,6 +500,8 @@
         <members>LBL_ManagerFeed</members>
         <members>LBL_ManagerGroupMembers</members>
         <members>LBL_MangeGroupManagers</members>
+        <members>LBL_Mark_As_Read</members>
+        <members>LBL_Mark_As_Unread</members>
         <members>LBL_Member</members>
         <members>LBL_Members</members>
         <members>LBL_MentionsMeComment</members>
