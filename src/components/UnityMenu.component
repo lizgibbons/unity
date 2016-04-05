@@ -58,7 +58,7 @@
 			<ul>
 				<li class="mobileOnly">
 	                <ul>
-	                    <li><a href="#" class="emails it-navMastheadViewEmails">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Messages}</span><span class="number" style="display: none">{!MessageUnreadCount}</span></span></a></li>
+	                    <li><a href="#" class="emails it-navMastheadViewEmails">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Messages}</span><apex:form id="unreadCountMobileOnly" rendered="{!MessageUnreadCount > 0}"><span class="number">{!MessageUnreadCount}</span></apex:form></span></a></li>
 	                    <li><a href="#" class="alerts it-navMastheadViewAlerts">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Notifications}</span><span class="number"></span></span></a></li>
 	                    <li><a href="#" class="search it-navMastheadOpenSearch">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Search}</span></span></a></li>
 	               	</ul>
@@ -104,30 +104,32 @@
 				<!-- End Links -->
 				<!--Recent Messages-->
 				<li class="icon hasChildren" id="recentMessages" style="display: none;">
-	                <a href="#" title="{!$Label.LBL_Messages}" class="emails it-navMastheadViewEmails">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Messages}</span><span class="number" style="display:none">{!MessageUnreadCount}</span></span></a>
+	                <a href="#" title="{!$Label.LBL_Messages}" class="emails it-navMastheadViewEmails">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Messages}</span><apex:form id="unreadCount" rendered="{!MessageUnreadCount > 0}"><span class="number">{!MessageUnreadCount}</span></apex:form></span></a>
 	                <ul class="subMenu feedMenu">
 	                    <li class="feedMenuHeader">
 	                        <h4>{!$Label.LBL_Recent_Messages}</h4>
 	                        <a href="#" class="it-messageSettings">{!$Label.LBL_Settings}</a>
 	                    </li>
 	                    <!-- Messages block -->
-	                    <div class="feedMenuHolder" id="conversations">
-	                    	<apex:repeat value="{!unityConversations}" var="conv" rendered="{!showPrivateMessages}">
-		                    	<li class="{!IF(conv.IsRead, 'feedMenuItem', 'feedMenuItem unread')}">
-				                    <a href="{!$Page.CommunityProfilePage}?id={!conv.LatestMessage.Sender.MemberId}" class="avatar it-navatar1">
-										<img src="{!conv.LatestMessage.Sender.MemberPhotoUrl}" alt="{!conv.LatestMessage.Sender.MemberName}" />
-									</a>
-									<a href="{!$Page.CommunityFeed_MyMessages}?c={!conv.ConversationId}">
-										<p>
-											<strong>{!conv.LatestMessage.Sender.MemberName} {!conv.LatestMessage.Sender.MemberRole}</strong>
-											<span class="message-snippet">{!conv.LatestMessage.MessageBody.Text}</span>
-											<small>{!conv.LatestMessage.SentDateFormatted}</small>
-										</p>
-									</a>	
-									<a class="read it-removeNotification1" role="button" onclick="readNotification(this,'{!JSENCODE(conv.ConversationId)}');"></a>
-								</li>
-							</apex:repeat>	
-	                    </div>
+						<div class="feedMenuHolder" id="conversations">
+							<apex:form id="unityConversations">
+								<apex:repeat value="{!unityConversations}" var="conv" rendered="{!showPrivateMessages}">
+									<li class="{!IF(conv.IsRead, 'feedMenuItem', 'feedMenuItem unread')}">
+										<a href="{!$Page.CommunityProfilePage}?id={!conv.LatestMessage.Sender.MemberId}" class="avatar it-navatar1">
+											<img src="{!conv.LatestMessage.Sender.MemberPhotoUrl}" alt="{!conv.LatestMessage.Sender.MemberName}" />
+										</a>
+										<a href="{!$Page.CommunityFeed_MyMessages}?c={!conv.ConversationId}">
+											<p>
+												<strong>{!conv.LatestMessage.Sender.MemberName} {!conv.LatestMessage.Sender.MemberRole}</strong>
+												<span class="message-snippet">{!conv.LatestMessage.MessageBody.Text}</span>
+												<small>{!conv.LatestMessage.SentDateFormatted}</small>
+											</p>
+										</a>	
+										<a class="read it-removeNotification1" role="button" onclick="readNotification(this,'{!JSENCODE(conv.ConversationId)}');" title="{!IF(conv.IsRead, $Label.LBL_UnRead, $Label.LBL_Read)}"></a>
+									</li>
+								</apex:repeat>
+							</apex:form>
+						</div>
 	                    <!-- END Messages block -->
 	                    <li class="blockBtnWrapper">
 	                        <a href="{!$Page.CommunityFeed_MyMessages}" class="block-btn-full it-showAllMessages">{!$Label.LBL_Show_All}</a>
@@ -177,7 +179,7 @@
 			<!--</apex:outputPanel>--><!--/navbar-collapse-->
 			<apex:outputPanel id="form"/>
 			<apex:form >
-				<apex:actionFunction action="{!readConversation}" name="readConversation" rerender="form">
+				<apex:actionFunction action="{!readConversation}" name="readConversation" rerender="form,unityConversations,unreadCountMobileOnly,unreadCount" oncomplete="afterRerenderConversations();">
 			        <apex:param name="conversationId" assignTo="{!conversationId}" value="" />
 			        <apex:param name="read" assignTo="{!read}" value="" />
 			    </apex:actionFunction>
@@ -195,27 +197,19 @@
 			}
 			checkPhotoUrl();
 		});
-		//mark notifications as read
-		$('.feedMenuItem').on('click', '.read', function(){
-
-	        var countEmail = parseInt($('.emails .number').first().text(), 10); 
-	        if(!$(this).parent('.feedMenuItem').hasClass('unread')){
-	            $(this).parent('.feedMenuItem').addClass('unread');
-	            $(this).parent('.feedMenuItem').attr('title', '{!$Label.LBL_UnRead}');
-	            $('.emails .number').text(countEmail+1);
-	        }else{
-	            $(this).parent('.feedMenuItem').removeClass('unread');
-	            $(this).parent('.feedMenuItem').attr('title', '{!$Label.LBL_Read}');
-	            $('.emails .number').text(countEmail-1);
-	        }
-	        
-	    });
+		function afterRerenderConversations() {
+			var convesatins = $('#conversations form > ul');
+			if (convesatins && convesatins.children()) {
+				convesatins.replaceWith(convesatins.children());
+			}
+		}
 		function readNotification(elem, id){
 			var read = $(elem).parent('.feedMenuItem').hasClass('unread') ? true : false;
 			readConversation(id,read);
-			var countEmail = parseInt($('.emails .number').first().text(), 10);
-			if(!read && (countEmail+1) > 0) $('.emails .number').show();
-			if(read && (countEmail-1) <= 0) $('.emails .number').hide();
+			// var countEmail = parseInt($('.emails .number').first().text(), 10);
+			// if(!read && (countEmail+1) > 0) $('.emails .number').show();
+			// if(read && (countEmail-1) <= 0) $('.emails .number').hide();
+			// $('.emails .number').text(countEmail + (read ? -1 : 1));
        	}
        	function checkPhotoUrl(){
        		//check for current user photo
