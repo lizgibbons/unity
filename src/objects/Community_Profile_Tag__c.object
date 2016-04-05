@@ -82,7 +82,6 @@
         <referenceTo>Community_Tag__c</referenceTo>
         <relationshipLabel>Users Tagged</relationshipLabel>
         <relationshipName>Community_Users_Tagged</relationshipName>
-        <relationshipOrder>1</relationshipOrder>
         <reparentableMasterDetail>false</reparentableMasterDetail>
         <trackTrending>false</trackTrending>
         <type>MasterDetail</type>
@@ -96,7 +95,6 @@
         <referenceTo>Contact</referenceTo>
         <relationshipLabel>Profile Tags</relationshipLabel>
         <relationshipName>Contact_Profile_Tags</relationshipName>
-        <relationshipOrder>0</relationshipOrder>
         <reparentableMasterDetail>false</reparentableMasterDetail>
         <trackTrending>false</trackTrending>
         <type>MasterDetail</type>
