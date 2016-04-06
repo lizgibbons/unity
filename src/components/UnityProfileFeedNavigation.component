@@ -1,0 +1,222 @@
+<!--  
+ * Unity - Communities
+ * 
+ * Community is critical to the student experience--but building community is 
+ * just plain hard. Built on Communities and designed specifically for higher ed, 
+ * Unity is a powerful networking tool to help you generate engagement and 
+ * connect your campus.
+ * 
+ * Copyright (C) 2015 Motivis Learning Systems Inc.
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * To contact Motivis Learning Systems Inc.
+ * 25 Pelham Road
+ * Salem, NH 03790
+ * unity@motivislearning.com
+-->
+
+<apex:component controller="CommunityFeedNavigationController" layout="none" allowDml="true">
+	<apex:attribute name="currentGroupId" description="Current Group Id" type="String" required="false" assignTo="{!chatterGroupId}"/>
+	<apex:attribute name="returnToGroup" description="Return to group" type="Boolean" required="false" default="false"/>
+	
+	<apex:attribute name="current" description="this is current user and photo is uploaded" type="Boolean" required="false" default="true" assignTo="{!currentUser}"/>
+    <apex:attribute name="photoUrl" description="" type="String" required="false" assignTo="{!controllerPhotoUrl}"/>
+    <apex:attribute name="currentGroupRole" description="role of the user to this group" type="String" required="false" assignTo="{!groupRole}" />
+    <apex:attribute name="currentUsId" description="" type="String" required="false" assignTo="{!currentUserId}"/>
+    <apex:attribute name="stName" description="" type="String" required="false" assignTo="{!studentName}"/>
+    <apex:attribute name="stRole" description="" type="String" required="false" assignTo="{!studentRole}"/>
+    <apex:attribute name="isSubscr" description="" type="Boolean" required="false" default="false" assignTo="{!isSubscribe}"/>
+	
+	<nav class="cover-nav">
+		<div class="cover-photo" style="background-image: url('{!$Resource.assets2}/images/home/profile-cover.png');">
+			<div class="inner clearfix">
+	            <div class="row">
+	                <div class="col-xs-24">
+	                    <div class="profile-image">
+	                        <img src="{!controllerPhotoUrl}" id="profileImg" style="display: none;"/>
+	                        <div class="blockBtnWrapper">
+	                            <apex:outputPanel layout="none" id="btnFollow" rendered="{!!currentUser}">
+		                            <apex:form rendered="{!!isSubscribe}" id="follow">
+		                            	<apex:commandLink styleClass="btn-fill-custom block-btn-full" action="{!subscribeUser}" rerender="btnFollow">{!$Label.BTN_Follow}</apex:commandLink>
+		                            </apex:form>
+		                            <apex:form rendered="{!isSubscribe}" id="folowing">	
+			                            <div class="card-status-following">
+			                                <i class="lrm lrm-check"></i>&nbsp;<span>{!$Label.BTN_Following}</span>
+			                                <div class="dropmenu">
+			                                    <a onclick="dropmenu(this);" role="button" class="it-peerProfileDropdownMenu"><i class="lrm lrm-more"></i></a>
+			                                    <ul>
+			                                        <li><a role="button" data-href="#sendMessageModal" class="simpleModal it-peerProfileDropdownMenuOptionMessage">{!$Label.LBL_Message}</a></li>
+			                                        <li><apex:commandLink styleClass="it-peerProfileDropdownMenuOptionUnfollow" action="{!subscribeUser}" rerender="btnFollow" onclick="disableDropMenu();">{!$Label.LBL_Unfollow}</apex:commandLink></li>
+			                                    </ul>
+			                                </div>
+			                            </div>
+		                            </apex:form>
+		                        </apex:outputPanel>
+		                        <apex:outputPanel layout="none" id="btnEditPhoto" rendered="{!currentUser}">
+		                        	<a data-href="" role="button" class="btn-fill-custom block-btn-full simpleModal it-editPhoto">{!$Label.LBL_Edit_Photo}</a>
+		                        </apex:outputPanel>
+	                        </div>
+	                    </div>
+	                    <div class="user-information">
+	                        <h1>{!StudentName}</h1>
+	                        <small class="subheader">{!StudentRole}</small>
+	                        <a role="button" data-href="#sendMessageModal" class="btn-outline-white simpleModal it-sendMessageBtn">{!$Label.LBL_Send_Message}</a>
+	                    </div>
+	                </div>
+	            </div>
+        	</div>
+    	</div>
+	    <div class="inner">
+	        <div class="row">
+	            <div class="col-xs-24">
+	                <ul class="navItems">
+	                    <li><a name="FeedNI" class="active it-peerProfileMenuFeed" href="" onclick="changeActiveMenu(this);">{!$Label.LBL_Feed}</a></li>
+	                    <li><a name="AboutNI" class="it-peerProfileMenuAbout" href="" onclick="changeActiveMenu(this);">{!$Label.LBL_About}</a></li>
+	                    <apex:outputPanel layout="none" rendered="{!!currentUser}">
+	                    	<li>
+			            		<a name="GroupsNI" class="it-peerProfileMenuGroups" href="" onclick="changeActiveMenu(this);">{!$Label.LBL_Groups}</a>
+			            	</li>
+			            </apex:outputPanel>
+	                    <li><a name="FollowersNI" class="it-peerProfileMenuFollowers" href="" onclick="changeActiveMenu(this);">{!$Label.LBL_Followers}</a></li>
+	                    <li><a name="FollowingNI" class="it-peerProfileMenuFollowing" href="" onclick="changeActiveMenu(this);">{!$Label.BTN_Following}</a></li>
+	                    <apex:outputPanel layout="none" rendered="{!currentUser}">
+	                    	<li>
+			            		<a name="BookmarkedNI" class="it-profileNavBookmarked" href="" onclick="changeActiveMenu(this);">{!$Label.LBL_Bookmarked}</a>
+			            	</li>
+			            </apex:outputPanel>
+	                </ul>
+	            </div>
+	        </div>
+		</div>
+	</nav>
+	<div class="fixedNavMarginBlock"></div>
+	<div class="mobile-select hidden-sm hidden-md hidden-lg">
+	    <div class="droptoggle">
+	        <a role="button" class="toggle-header it-mobileFeedDropdown">{!$Label.LBL_Feed}&nbsp;<i class="lrm lrm-arrow"></i></a>
+	        <ul>
+	            <li><a name="FeedDT" role="button" class="selected it-peerProfileMenuFeed" href="" onclick="changeActiveMenu(this);">{!$Label.LBL_Feed}</a></li>
+	            <li><a name="AboutDT" role="button" class="it-peerProfileMenuAbout" href="" onclick="changeActiveMenu(this);">{!$Label.LBL_About}</a></li>
+	            <apex:outputPanel layout="none" rendered="{!!currentUser}">
+		            <li>
+		            	<a name="GroupsDT" role="button" class="it-peerProfileMenuGroups" href="" onclick="changeActiveMenu(this);">{!$Label.LBL_Groups}</a>
+		            </li>
+	            </apex:outputPanel>
+	            <li><a name="FollowersDT" role="button" class="it-peerProfileMenuFollowers" href="" onclick="changeActiveMenu(this);">{!$Label.LBL_Followers}</a></li>
+	            <li><a name="FollowingDT" role="button" class="it-peerProfileMenuFollowing" href="" onclick="changeActiveMenu(this);">{!$Label.BTN_Following}</a></li>
+	            <apex:outputPanel layout="none" rendered="{!currentUser}">
+		            <li>
+		            	<a name="BookmarkedDT" role="button" class="it-peerProfileMenuGroups" href="" onclick="changeActiveMenu(this);">{!$Label.LBL_Bookmarked}</a>
+		            </li>
+	            </apex:outputPanel>
+	        </ul>
+	    </div>
+	</div>
+	<div id="sendMessageModal" class="simpleModalBox" >
+	    <div class="backdrop"></div>
+	    <section class="modalContent">
+	        <div class="inner">
+	            <div class="row">
+	                <div class="column col-xs-24">
+	                    <div class="card">
+	                        <div class="card-content multiselectHolder">
+	                            <a role="button" class="minimize closeModal it-closeModalX"><i class="lrm lrm-close"></i></a>
+	                            <h2>{!$Label.LBL_Send_Message}</h2>
+	                            <p class="list-header"><strong>To</strong></p>
+	                            <div class="multiselect">
+	                                <div class="blockHolder"></div>
+	                                <input class="multiselectInput it-multiSelectInput1" type="text" placeholder="" />
+	                                <div class="menuSelect">
+	                                    <!-- <ul>
+	                                        <li class="selectToggle">
+	                                            <a class="classTitle addItem it-multiSelectItem-<?php echo $optionCounter; ?> option-<?php echo $optionCounter; $optionCounter++; ?>"><strong>Frequently Contacted</strong> (4)</a>
+	                                            <a class="expandedArrow"><span class="icon-ml_011ChevronDown"></span></a>
+	                                            <ul>
+	                                            <?php for ($i = 0; $i < 4 ; $i++): ?>
+	                                                <li class="student addItem it-multiSelectItem-<?php echo $optionCounter; ?> option-<?php echo $optionCounter; $optionCounter++; ?>"><a><?php echo $firstname[array_rand($firstname, 1)] . ' ' . $lastname[array_rand($lastname, 1)]; ?></a></li>
+	                                            <?php endfor; ?>
+	                                            </ul>
+	                                        </li>
+	                                        <li class="selectToggle">
+	                                            <a class="classTitle addItem it-multiSelectItem-<?php echo $optionCounter; ?> option-<?php echo $optionCounter; $optionCounter++; ?>"><strong>Friends</strong> (8)</a>
+	                                            <a class="expandedArrow"><span class="icon-ml_011ChevronDown"></span></a>
+	                                            <ul>
+	                                            <?php for ($i = 0; $i < 8 ; $i++): ?>
+	                                                <li class="student addItem it-multiSelectItem-<?php echo $optionCounter; ?> option-<?php echo $optionCounter; $optionCounter++; ?>"><a><?php echo $firstname[array_rand($firstname, 1)] . ' ' . $lastname[array_rand($lastname, 1)]; ?></a></li>
+	                                            <?php endfor; ?>
+	                                            </ul>
+	                                        </li>
+	                                        <li class="student addItem it-multiSelectItem-<?php echo $optionCounter; ?> option-<?php echo $optionCounter; $optionCounter++; ?>"><a><?php echo $firstname[array_rand($firstname, 1)] . ' ' . $lastname[array_rand($lastname, 1)]; ?></a></li>
+	                                        <li class="student addItem it-multiSelectItem-<?php echo $optionCounter; ?> option-<?php echo $optionCounter; $optionCounter++; ?>"><a><?php echo $firstname[array_rand($firstname, 1)] . ' ' . $lastname[array_rand($lastname, 1)]; ?></a></li>
+	                                        <li class="selectToggle">
+	                                            <a class="classTitle addItem it-multiSelectItem-<?php echo $optionCounter; ?> option-<?php echo $optionCounter; $optionCounter++; ?>"><strong>Professors</strong> (7)</a>
+	                                            <a class="expandedArrow"><span class="icon-ml_011ChevronDown"></span></a>
+	                                            <ul>
+	                                            <?php for ($i = 0; $i < 7 ; $i++): ?>
+	                                                <li class="student addItem it-multiSelectItem-<?php echo $optionCounter; ?> option-<?php echo $optionCounter; $optionCounter++; ?>"><a><?php echo $firstname[array_rand($firstname, 1)] . ' ' . $lastname[array_rand($lastname, 1)]; ?></a></li>
+	                                            <?php endfor; ?>
+	                                            </ul>
+	                                        </li>
+	                                        <li class="student addItem it-multiSelectItem-<?php echo $optionCounter; ?> option-<?php echo $optionCounter; $optionCounter++; ?>"><a><?php echo $firstname[array_rand($firstname, 1)] . ' ' . $lastname[array_rand($lastname, 1)]; ?></a></li>
+	                                    </ul> -->
+	                                </div>
+	                            </div>
+	                            <p class="list-header"><strong>Message</strong></p>
+	                            <textarea rows="4"></textarea>
+	                        </div>
+	                        <div class="blockBtnWrapper">
+	                            <a role="button" class="block-btn-half btn-fill-custom addItem it-sendMessageModal">{!$Label.LBL_Send}</a>
+	                            <a role="button" class="block-btn-half btn-fill-light closeModal it-cancelMessageModal">{!$Label.BTN_Cancel}</a>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	    </section>
+	</div>
+
+	<script>
+		
+		$('#profileImg').load(function() {
+		  	$('#profileImg').width('250px');
+			if($('#profileImg').height() > 250){ $('#profileImg').height('250px'); } 
+			$('#profileImg').show();
+		});
+
+		function dropmenu(elm){
+			$(elm).next('ul').slideToggle();
+		}
+
+		function disableDropMenu(){
+			$('.it-peerProfileDropdownMenu').next('ul').css('pointer-events', 'none').css('opacity', '0.8');
+		}
+		
+		function changeActiveMenu(elm){
+			if(elm.name.indexOf('NI') != -1){
+				$('.navItems li a.active').removeClass('active');
+				$(elm).addClass('active');
+				var tempName = elm.name.replace('NI','DT');
+				$('.droptoggle li a').removeClass('selected');
+				$('.droptoggle a[name="'+tempName+'"]').addClass('selected');
+				$('.mobile-select .droptoggle .toggle-header').html($(elm).text() + ' <i class="lrm lrm-arrow"></i>');
+			}
+			if(elm.name.indexOf('DT') != -1){
+				var tempName = elm.name.replace('DT','NI');
+				$('.navItems li a[name*="NI"]').removeClass('active');
+				$('.navItems li a[name="'+tempName+'"]').addClass('active');
+			}
+
+		}
+	</script>
+</apex:component>

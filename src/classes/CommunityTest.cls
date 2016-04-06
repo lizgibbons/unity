@@ -164,6 +164,8 @@ private class CommunityTest {
 			crc.imgFileName = 'ifn';
 			crc.resource.description__c='description';
 			crc.saveResource();
+			crc.getResourceLink();
+			crc.getIsNoteResource();
 
 			System.assertEquals([SELECT Name,Id From Community_Resource__c Where Name='r' ][0].Name,'r');
 

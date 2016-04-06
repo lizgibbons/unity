@@ -163,7 +163,7 @@ global with sharing class CommunityProfilePageController {
 				}
 			}
 			String pp46 = CommunityUtils.getPackagePrefix();
-			Set<String> profileFields = new Set<String> {'Id', 'Name', pp46 + 'Contact__r.Name', pp46 + 'Contact__c'};
+			Set<String> profileFields = new Set<String> {'Id', 'Name', pp46 + 'Contact__r.Name', pp46 + 'Contact__c', pp46 + 'Contact__r.Primary_Role__c'};
 			for (CommunityFieldLayout fs2 : overviewTab) {
 				profileFields.addAll(fs2.prepareFieldList());
 			}
@@ -187,6 +187,9 @@ global with sharing class CommunityProfilePageController {
 		return currentProfile == NULL ? '' : currentProfile.Contact__r.Name;
 	}
 
+	public String getStudentRole() {
+		return currentProfile == NULL ? '' : currentProfile.Contact__r.Primary_Role__c;
+	}
 	public void initInterests() {
 		Set<Id> activeTags = new Set<Id>();
 		if (!SObjectType.Community_Profile_Tag__c.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.Community_Profile_Tag__c);
