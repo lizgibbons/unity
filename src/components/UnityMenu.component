@@ -112,7 +112,7 @@
 	                    </li>
 	                    <!-- Messages block -->
 						<div class="feedMenuHolder" id="conversations">
-							<apex:form id="unityConversations">
+							<apex:outputPanel id="unityConversations">
 								<apex:repeat value="{!unityConversations}" var="conv" rendered="{!showPrivateMessages}">
 									<li class="{!IF(conv.IsRead, 'feedMenuItem', 'feedMenuItem unread')}">
 										<a href="{!$Page.CommunityProfilePage}?id={!conv.LatestMessage.Sender.MemberId}" class="avatar it-navatar1">
@@ -128,7 +128,7 @@
 										<a class="read it-removeNotification1" role="button" onclick="readNotification(this,'{!JSENCODE(conv.ConversationId)}');" title="{!IF(conv.IsRead, $Label.LBL_UnRead, $Label.LBL_Read)}"></a>
 									</li>
 								</apex:repeat>
-							</apex:form>
+							</apex:outputPanel>
 						</div>
 	                    <!-- END Messages block -->
 	                    <li class="blockBtnWrapper">
@@ -179,7 +179,7 @@
 			<!--</apex:outputPanel>--><!--/navbar-collapse-->
 			<apex:outputPanel id="form"/>
 			<apex:form >
-				<apex:actionFunction action="{!readConversation}" name="readConversation" rerender="form,unityConversations,unreadCountMobileOnly,unreadCount" oncomplete="afterRerenderConversations();">
+				<apex:actionFunction action="{!readConversation}" name="readConversation" rerender="form,unityConversations,unreadCountMobileOnly,unreadCount">
 			        <apex:param name="conversationId" assignTo="{!conversationId}" value="" />
 			        <apex:param name="read" assignTo="{!read}" value="" />
 			    </apex:actionFunction>
@@ -197,12 +197,6 @@
 			}
 			checkPhotoUrl();
 		});
-		function afterRerenderConversations() {
-			var convesatins = $('#conversations form > ul');
-			if (convesatins && convesatins.children()) {
-				convesatins.replaceWith(convesatins.children());
-			}
-		}
 		function readNotification(elem, id){
 			var read = $(elem).parent('.feedMenuItem').hasClass('unread') ? true : false;
 			readConversation(id,read);
