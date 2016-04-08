@@ -29,23 +29,37 @@
 
 public with sharing class CommunityFeed_PeopleController {
 
+	public static String currentUserId { get; set; } 
+
 	public CommunityFeed_PeopleController() {
 	}
+
+	@RemoteAction
+	public static List<UserItem> getUnityPeoples(String usId) {
+		currentUserId = usId;
+		return getPeoples();
+	}
+
 	@RemoteAction
 	public static List<UserItem> getPeoples() {
+		String curUsId = currentUserId != NULL ? currentUserId : UserInfo.getUserId();
 		List<UserItem> peoples = new List<UserItem>();
 		if (!SObjectType.EntitySubscription.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.EntitySubscription);
 		List<EntitySubscription> followings = [
 			SELECT SubscriberId, ParentId, IsDeleted, Id, CreatedDate, CreatedById
-			FROM EntitySubscription WHERE SubscriberId =:Userinfo.getUserId() AND IsDeleted = false
+			FROM EntitySubscription WHERE SubscriberId =:curUsId AND IsDeleted = false
 			LIMIT 1000
 		];
 		Set<Id> followingsIds = new Set<Id>();
 		for (EntitySubscription subscription : followings) { 
 			followingsIds.add(subscription.ParentId); 
 		}
-		
-		List<User> uList = CommunityHelperWithoutSharing.getCommunityUsers(null, 50000, new List<String>{'FirstName', 'LastName', 'SmallPhotoUrl', 'FullPhotoUrl', 'ContactId', 'Contact.Primary_Role__c', 'Community_Contact_ID__c'}, 'Name', true);
+		List<User> uList = new List<User>();
+		if(currentUserId != NULL){
+			uList = CommunityHelperWithoutSharing.getCommunityUsers(currentUserId, 50000, new List<String>{'FirstName', 'LastName', 'SmallPhotoUrl', 'FullPhotoUrl', 'ContactId', 'Contact.Primary_Role__c', 'Community_Contact_ID__c'}, 'Name', true);	
+		}else{
+			uList = CommunityHelperWithoutSharing.getCommunityUsers(null, 50000, new List<String>{'FirstName', 'LastName', 'SmallPhotoUrl', 'FullPhotoUrl', 'ContactId', 'Contact.Primary_Role__c', 'Community_Contact_ID__c'}, 'Name', true);
+		}
 		securityWrapper sw = new securityWrapper();
 		Map<Id,String> contactRoles = sw.prepareRoles(uList);
 		for (User uItem2 : uList) {
@@ -79,7 +93,7 @@ public with sharing class CommunityFeed_PeopleController {
 				if (String.isBlank(this.MemberPhotoUrl)) {
 					this.MemberPhotoUrl = '/profilephoto/005/T';
 				}
-				this.MemberPhotoUrl = this.MemberPhotoUrl.replace(Site.getBaseUrl(), '');
+				this.MemberPhotoUrl = CommunityUtils.getUnity20TemplateUse() ? CommunityUtils.checkUrlForImage(this.MemberPhotoUrl) : this.MemberPhotoUrl.replace(Site.getBaseUrl(), '');
 				return this.MemberPhotoUrl;
 			}
 			set;
@@ -95,7 +109,7 @@ public with sharing class CommunityFeed_PeopleController {
 				}
 			);
 			this.MemberRole = role;
-			this.MemberPhotoUrl = member.SmallPhotoUrl;
+			this.MemberPhotoUrl = CommunityUtils.getUnity20TemplateUse() ? CommunityUtils.checkUrlForImage(member.SmallPhotoUrl) : member.SmallPhotoUrl;
 			this.MemberIsFollowing = isFollowing;
 		}
 	}

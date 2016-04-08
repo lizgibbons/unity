@@ -1,0 +1,267 @@
+<apex:component controller="CommunityFeed_PeopleController">
+	<apex:attribute name="feedPage" type="Boolean" default="false" required="false" description="panel for followers" />
+	<apex:attribute name="following" type="Boolean" default="false" required="false" description="panel for following" />
+	<apex:attribute name="all" type="Boolean" default="false" required="false" description="panel for all peoples" />
+	<apex:attribute name="currentUsId" type="String" required="false" description=""/>
+
+	<div ng-app="PeoplesApp" ng-controller="PeoplesController" id="profileFeedfollow" style="display: none;">
+        
+		<apex:outputPanel layout="none" rendered="{!feedPage}">
+	        <h2 id="h2followers">{!$Label.LBL_Followers} ()</h2>
+	        <div class="row">
+	            <div class="col-md-8 col-sm-4 col-xs-6" ng-repeat="p in allPeople | peopleIFollow:this | limitTo:page.pageSize">
+	                <a href="{!$Page.UnityProfilePage}?id={{ p.MemberId }}" class="avatar-large it-followers">
+	                    <img ng-src="{{ p.MemberPhotoUrl }}" src="/s.gif" alt="" />
+	                </a>
+	            </div>
+	        </div>
+	        <div class="text-center">
+	            <a href="" class="btn-outline-gray it-viewAllFollowers">{!$Label.LBL_View_All}</a>
+	        </div>
+            <hr/>
+	        <h2 id="h2following">{!$Label.BTN_Following} ()</h2>
+	        <div class="row">
+	             <div class="col-md-8 col-sm-4 col-xs-6" ng-repeat="p in allPeople | peopleIFollowing:this | limitTo:page.pageSize">
+	                <a href="{!$Page.UnityProfilePage}?id={{ p.MemberId }}" class="avatar-large it-followers">
+	                    <img ng-src="{{ p.MemberPhotoUrl }}" src="/s.gif" alt="" />
+	                </a>
+	            </div>
+	        </div>
+	        <div class="text-center">
+	            <a href="peer-profile-following.php" class="btn-outline-gray it-viewAllFollowing">{!$Label.LBL_View_All}</a>
+	        </div>
+        </apex:outputPanel>
+
+    </div>
+
+	<script type="text/javascript" src="{!$Resource.CommunityResources}/js/underscore/underscore-min.js" ></script>
+	<script type="text/javascript" src="{!$Resource.CommunityResources}/js/angularjs/angular.min.js" ></script>
+	<script type="text/javascript" src="//code.angularjs.org/1.4.0/angular-sanitize.js"></script> 
+	<script type="text/javascript">
+		
+		var PeoplesApp = angular.module('PeoplesApp', ['ngSanitize']);
+		PeoplesApp.factory('getPeoples', ['$q', '$rootScope', function($q, $rootScope) {
+			return function() {
+				var deferred = $q.defer();
+				if ($rootScope.getDataStatus != 'InProgress') {
+					$rootScope.getDataStatus = 'InProgress';
+					Visualforce.remoting.Manager.invokeAction(
+						'{!$RemoteAction.CommunityFeed_PeopleController.getUnityPeoples}',
+						'{!currentUsId}',
+						function(result, event) {
+							$rootScope.$apply(function() {
+								if (event.status) {
+									deferred.resolve(result);
+									$rootScope.getDataStatus = 'Finished';
+									jQuery("#profileFeedfollow").show();
+								} else {
+									deferred.reject(event);
+									$rootScope.getDataStatus = 'Finished';
+								}
+							})
+						},
+						{ buffer: true, escape: true, timeout: 30000 }
+					);
+				} else {
+					deferred = null;
+					return null;
+				}
+				return deferred.promise;
+			}
+		}]);
+		PeoplesApp.factory('subscriberAction', ['$q', '$rootScope', function($q, $rootScope) {
+			return function(pId, isFollow) {
+				var deferred = $q.defer();
+				if ($rootScope.getDataStatus != 'InProgress') {
+					$rootScope.getDataStatus = 'InProgress';
+					Visualforce.remoting.Manager.invokeAction(
+						'{!$RemoteAction.CommunityFeed_PeopleController.subscriberAction}',
+						pId,
+						isFollow,
+						function(result, event) {
+							$rootScope.$apply(function() {
+								if (event.status) {
+									deferred.resolve(result);
+									$rootScope.getDataStatus = 'Finished';
+									// eneble buttons
+									jQuery('.follow').removeClass('disabled');
+									jQuery('.follow').removeAttr('disabled');
+								} else {
+									deferred.reject(event);
+									$rootScope.getDataStatus = 'Finished';
+								}
+							})
+						},
+						{ buffer: true, escape: true, timeout: 30000 }
+					);
+				} else {
+					deferred = null;
+					return null;
+				}
+				return deferred.promise;
+			}
+		}]);
+		PeoplesApp.filter('startFrom', function() {
+			return function(input, start) {
+				start = +start;
+				return input.slice(start);
+			}
+		});
+		PeoplesApp.filter('quickSearch', function() {
+			return function(input, scope) {
+				var searchWords = scope.quickSearchQuery.match(/(\w|'){2,}/g);
+				//scope.debug.searchBy = searchWords;
+				if (searchWords) {
+					//var re = new RegExp(searchWords.join('|'), "ig");
+					var reText = '';
+					for (var i = 0; i < searchWords.length; i++) {
+						reText += '(?=.*'+searchWords[i]+')';
+					}
+					var re = new RegExp(reText, "ig");
+					var output = [];
+					
+					for (var j = 0; j < input.length; j++) {
+						var mName = input[j].MemberName.replace(/&#39;/g,'\'');
+						if (mName.match(re) != null) {
+							output.push(input[j]);
+						}
+					}
+					input = output;
+				}
+				scope.page.totalRecords = input.length;
+
+				// fix for filter pagination 
+				var round = input.length / (scope.page.pageSize * scope.page.currentPage);
+				if(Math.round(round) < 0.5){
+					var currPage = Math.ceil(input.length / scope.page.pageSize);
+					scope.page.currentPage = currPage<1?1:currPage;
+				}
+
+				return input;
+			}
+		});
+		PeoplesApp.filter('peopleIFollow', function() {
+			return function(input, scope) {
+				var output = [];
+				for (var j = 0; j < input.length; j++) {
+					if (input[j].MemberIsFollowing) {
+						output.push(input[j]);
+					}
+				}
+				input = output;
+				$('#h2followers').html('{!$Label.LBL_Followers} ('+input.length+')');
+				return input;
+			}
+		});
+		PeoplesApp.filter('peopleIFollowing', function() {
+			return function(input, scope) {
+				var output = [];
+				for (var j = 0; j < input.length; j++) {
+					if (!input[j].MemberIsFollowing) {
+						output.push(input[j]);
+					}
+				}
+				input = output;
+				$('#h2following').html('{!$Label.BTN_Following} ('+input.length+')');
+				return input;
+			}
+		});
+		PeoplesApp.controller('PeoplesController', ['$scope', '$filter' ,'getPeoples', 'subscriberAction', function($scope, $filter, getPeoples, subscriberAction) {
+			$scope.quickSearchQuery = '';
+			$scope.page = {
+				pageSize: 6,
+				currentPage: 1,
+				totalRecords: 1,
+				totalPages: function() {
+					return Math.ceil($scope.page.totalRecords/$scope.page.pageSize);
+				},
+				changePageNumber : function () {
+					if($scope.page.currentPage < 1) {
+						$scope.page.currentPage = 1;
+					} else if ($scope.page.currentPage > $scope.page.totalPages()) {
+						$scope.page.currentPage = $scope.page.totalPages();
+					}
+				},
+				nowOnPage: function() {
+					return ($scope.page.currentPage*$scope.page.pageSize + $scope.page.pageSize < $scope.page.totalRecords)
+						? $scope.page.currentPage*$scope.page.pageSize+$scope.page.pageSize 
+						: $scope.page.totalRecords;
+				},
+				goToLast: function() {
+					$scope.page.currentPage = $scope.page.totalPages(); 
+				},
+				goToFirst: function() {
+					$scope.page.currentPage = 1;
+				},
+				goToPrev: function() {
+					if ($scope.page.currentPage > 1) {
+						$scope.page.currentPage = $scope.page.currentPage - 1;
+					}
+				},
+				goToNext: function() {
+					if ($scope.page.currentPage < $scope.page.totalPages()) {
+						$scope.page.currentPage = $scope.page.currentPage + 1;
+					}
+				},
+				startFrom: function() {
+					return $scope.page.currentPage*$scope.page.pageSize-$scope.page.pageSize;
+				}
+			};
+			$scope.followAction = function(p) {
+				p.MemberIsFollowing = true;
+				
+				$scope.followUnfollow(p.MemberId, p.MemberIsFollowing);
+			}
+			$scope.unFollowAction = function(p) {
+				p.MemberIsFollowing = false;
+				$scope.followUnfollow(p.MemberId, p.MemberIsFollowing);
+			}
+			$scope.followUnfollow = function(pId, isFollow) {
+				jQuery('.follow').attr('disabled','disabled');
+				$('.follow').addClass('disabled')
+				var def = subscriberAction(pId, isFollow);
+				if (def != null) {
+					$scope.inProgress = false;
+					def.then(function(result) {
+							if ($scope.inProgress == true) {
+								$scope.followUnfollow();
+							}
+						},
+						function(error){
+							console.log(error);
+						}
+					);
+				} else {
+					$scope.inProgress = true;
+				}
+			};
+			$scope.updatePeopleScope = function () {
+				var def = getPeoples();
+				if (def != null) {
+					$scope.inProgress = false;
+					def.then(function(result) {
+							$scope.allPeople = result;
+							$scope.page.currentPage = 1;
+							$scope.page.totalRecords = result.length;
+							if ($scope.inProgress == true) {
+								$scope.updatePeopleScope();
+							}
+						},
+						function(error){
+							console.log(error);
+							$scope.page.currentPage = 1;
+						}
+					);
+				} else {
+					$scope.inProgress = true;
+				}
+			};
+			$scope.updatePeopleScope();
+
+			$scope.allPeople = [];
+			window.scope = $scope;
+		}]);
+	</script>
+	
+
+</apex:component>
