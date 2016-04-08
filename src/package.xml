@@ -71,6 +71,7 @@
         <members>UnityHomeNotifications</members>
         <members>UnityMenu</members>
         <members>UnityProfileFeedNavigation</members>
+        <members>UnityProfileFollow</members>
         <name>ApexComponent</name>
     </types>
     <types>
