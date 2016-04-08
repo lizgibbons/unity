@@ -113,7 +113,7 @@ public without sharing class CommunityHelperWithoutSharing {
 
 // used for CommunityHomeNotificationController
 	public static List<FeedItem> getFeeds(Set<Id> controlsIds){
-		return [SELECT Id, ParentId, Type, CommentCount, LinkUrl, LastModifiedDate, CreatedById, Visibility 
+		return [SELECT Id, ParentId, Type, CommentCount, LinkUrl, CreatedDate, LastModifiedDate, CreatedById, Visibility 
 				FROM FeedItem
 				WHERE ParentId IN :controlsIds 
 				AND Visibility = 'AllUsers'

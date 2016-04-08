@@ -541,6 +541,8 @@
         <members>LBL_Notifications</members>
         <members>LBL_Notifications_Message</members>
         <members>LBL_Notifications_Post</members>
+        <members>LBL_NotificationType_Comment</members>
+        <members>LBL_NotificationType_Post</members>
         <members>LBL_OldPassword</members>
         <members>LBL_Other</members>
         <members>LBL_Owner</members>

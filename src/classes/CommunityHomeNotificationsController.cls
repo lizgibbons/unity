@@ -203,7 +203,8 @@ global with sharing class CommunityHomeNotificationsController {
 						Label.LBL_Notifications_Post.replace('{0}',gControlGroups.get(feedPosted.ParentId)[1]),
 						gControlGroups.get(feedPosted.ParentId)[1],
 						prepareUrl(Page.CommunityGroupManager.getUrl())+'?gr='+gControlGroups.get(feedPosted.ParentId)[0],
-						feedPosted.LastModifiedDate,
+						feedPosted.CreatedDate,
+						Label.LBL_NotificationType_Post,
 						userPhotoAndName.get(feedPosted.CreatedById)[0],
 						(checkViews.containsKey(feedPosted.ParentId) && checkViews.get(feedPosted.ParentId).contains(feedPosted.Id))));
 		}
@@ -218,12 +219,12 @@ global with sharing class CommunityHomeNotificationsController {
 						gControlGroups.get(commentPosted.ParentId)[1],
 						prepareUrl(Page.CommunityGroupManager.getUrl())+'?gr='+gControlGroups.get(commentPosted.ParentId)[0],
 						commentPosted.CreatedDate,
+						Label.LBL_NotificationType_Comment,
 						userPhotoAndName.get(commentPosted.CreatedById)[0],
 						(checkViews.containsKey(commentPosted.ParentId) && checkViews.get(commentPosted.ParentId).contains(commentPosted.Id))));
 		}
-	   	
-	   	return formNameWithRoles(hpGroupsFeeds, userPhotoAndName.keySet());
-	   	
+
+		return formNameWithRoles(hpGroupsFeeds, userPhotoAndName.keySet());
 	}
 
 	// set Names of users with Roles
@@ -281,7 +282,7 @@ global with sharing class CommunityHomeNotificationsController {
 			this.Image = sPhoto;
 		}
 
-		public NotificationWrapper(String itemId, String parentId, String memberId, String name, String message, String strongMessage, String urlPath, Datetime dateD, String image, Boolean isRead){
+		public NotificationWrapper(String itemId, String parentId, String memberId, String name, String message, String strongMessage, String urlPath, Datetime dateD, String type, String image, Boolean isRead){
 
 			this.ItemId = itemId;
 			this.ParentId = parentId;
@@ -291,7 +292,7 @@ global with sharing class CommunityHomeNotificationsController {
 			this.ParentURL = urlPath;
 			this.SentDate = dateD;
 			this.DateString = CommunityFeedController.convertTimeDiff(dateD);
-			this.Type = 'Person';
+			this.Type = type;
 			this.Image = image;
 			this.StrongMessage = strongMessage;
 			this.IsRead = isRead;
