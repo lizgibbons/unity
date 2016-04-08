@@ -45,13 +45,13 @@
 	            <div class="row">
 	                <div class="col-xs-24">
 	                    <div class="profile-image">
-	                        <img src="{!controllerPhotoUrl}" id="profileImg" style="display: none;"/>
+	                        <img src="{!controllerPhotoUrl}" id="profileImg"/>
 	                        <div class="blockBtnWrapper">
 	                            <apex:outputPanel layout="none" id="btnFollow" rendered="{!!currentUser}">
 		                            <apex:form rendered="{!!isSubscribe}" id="follow">
 		                            	<apex:commandLink styleClass="btn-fill-custom block-btn-full" action="{!subscribeUser}" rerender="btnFollow">{!$Label.BTN_Follow}</apex:commandLink>
 		                            </apex:form>
-		                            <apex:form rendered="{!isSubscribe}" id="folowing">	
+		                            <apex:form rendered="{!isSubscribe}" id="following">	
 			                            <div class="card-status-following">
 			                                <i class="lrm lrm-check"></i>&nbsp;<span>{!$Label.BTN_Following}</span>
 			                                <div class="dropmenu">
@@ -82,18 +82,18 @@
 	        <div class="row">
 	            <div class="col-xs-24">
 	                <ul class="navItems">
-	                    <li><a name="FeedNI" class="active it-peerProfileMenuFeed" href="" onclick="changeActiveMenu(this);">{!$Label.LBL_Feed}</a></li>
-	                    <li><a name="AboutNI" class="it-peerProfileMenuAbout" href="" onclick="changeActiveMenu(this);">{!$Label.LBL_About}</a></li>
+	                    <li><a role="button" class="{!IF(OR(ISBLANK($CurrentPage.parameters.tab), $CurrentPage.parameters.tab == '1'), 'active','')} it-peerProfileMenuFeed" onclick="addParameterToURL(this,1);">{!$Label.LBL_Feed}</a></li>
+		                <li><a role="button" class="{!IF($CurrentPage.parameters.tab == '2','active','')} it-peerProfileMenuAbout" onclick="addParameterToURL(this,2);">{!$Label.LBL_About}</a></li>
 	                    <apex:outputPanel layout="none" rendered="{!!currentUser}">
 	                    	<li>
-			            		<a name="GroupsNI" class="it-peerProfileMenuGroups" href="" onclick="changeActiveMenu(this);">{!$Label.LBL_Groups}</a>
+				           		<a role="button" class="{!IF($CurrentPage.parameters.tab == '3','active','')} it-peerProfileMenuGroups" onclick="addParameterToURL(this,3);">{!$Label.LBL_Groups}</a>
 			            	</li>
 			            </apex:outputPanel>
-	                    <li><a name="FollowersNI" class="it-peerProfileMenuFollowers" href="" onclick="changeActiveMenu(this);">{!$Label.LBL_Followers}</a></li>
-	                    <li><a name="FollowingNI" class="it-peerProfileMenuFollowing" href="" onclick="changeActiveMenu(this);">{!$Label.BTN_Following}</a></li>
+		                <li><a role="button" class="{!IF($CurrentPage.parameters.tab == '4','active','')} it-peerProfileMenuFollowers" onclick="addParameterToURL(this,4);">{!$Label.LBL_Followers}</a></li>
+		                <li><a role="button" class="{!IF($CurrentPage.parameters.tab == '5','active','')} it-peerProfileMenuFollowing" onclick="addParameterToURL(this,5);">{!$Label.BTN_Following}</a></li>
 	                    <apex:outputPanel layout="none" rendered="{!currentUser}">
 	                    	<li>
-			            		<a name="BookmarkedNI" class="it-profileNavBookmarked" href="" onclick="changeActiveMenu(this);">{!$Label.LBL_Bookmarked}</a>
+				           		<a role="button" class="{!IF($CurrentPage.parameters.tab == '6','active','')} it-profileNavBookmarked" onclick="addParameterToURL(this,6);">{!$Label.LBL_Bookmarked}</a>
 			            	</li>
 			            </apex:outputPanel>
 	                </ul>
@@ -106,18 +106,18 @@
 	    <div class="droptoggle">
 	        <a role="button" class="toggle-header it-mobileFeedDropdown">{!$Label.LBL_Feed}&nbsp;<i class="lrm lrm-arrow"></i></a>
 	        <ul>
-	            <li><a name="FeedDT" role="button" class="selected it-peerProfileMenuFeed" href="" onclick="changeActiveMenu(this);">{!$Label.LBL_Feed}</a></li>
-	            <li><a name="AboutDT" role="button" class="it-peerProfileMenuAbout" href="" onclick="changeActiveMenu(this);">{!$Label.LBL_About}</a></li>
+	            <li><a role="button" class="{!IF($CurrentPage.parameters.tab == '1','selected','')} it-peerProfileMenuFeed" onclick="addParameterToURL(this,1);">{!$Label.LBL_Feed}</a></li>
+	            <li><a role="button" class="{!IF($CurrentPage.parameters.tab == '2','selected','')} it-peerProfileMenuAbout" onclick="addParameterToURL(this,2);">{!$Label.LBL_About}</a></li>
 	            <apex:outputPanel layout="none" rendered="{!!currentUser}">
 		            <li>
-		            	<a name="GroupsDT" role="button" class="it-peerProfileMenuGroups" href="" onclick="changeActiveMenu(this);">{!$Label.LBL_Groups}</a>
+		            	<a role="button" class="{!IF($CurrentPage.parameters.tab == '3','selected','')} it-peerProfileMenuGroups" onclick="addParameterToURL(this,3);">{!$Label.LBL_Groups}</a>
 		            </li>
 	            </apex:outputPanel>
-	            <li><a name="FollowersDT" role="button" class="it-peerProfileMenuFollowers" href="" onclick="changeActiveMenu(this);">{!$Label.LBL_Followers}</a></li>
-	            <li><a name="FollowingDT" role="button" class="it-peerProfileMenuFollowing" href="" onclick="changeActiveMenu(this);">{!$Label.BTN_Following}</a></li>
+	            <li><a role="button" class="{!IF($CurrentPage.parameters.tab == '4','selected','')} it-peerProfileMenuFollowers" onclick="addParameterToURL(this,4);">{!$Label.LBL_Followers}</a></li>
+	            <li><a role="button" class="{!IF($CurrentPage.parameters.tab == '5','selected','')} it-peerProfileMenuFollowing" onclick="addParameterToURL(this,5);">{!$Label.BTN_Following}</a></li>
 	            <apex:outputPanel layout="none" rendered="{!currentUser}">
 		            <li>
-		            	<a name="BookmarkedDT" role="button" class="it-peerProfileMenuGroups" href="" onclick="changeActiveMenu(this);">{!$Label.LBL_Bookmarked}</a>
+		            	<a role="button" class="{!IF($CurrentPage.parameters.tab == '6','selected','')} it-peerProfileMenuGroups" onclick="addParameterToURL(this,6);">{!$Label.LBL_Bookmarked}</a>
 		            </li>
 	            </apex:outputPanel>
 	        </ul>
@@ -133,7 +133,7 @@
 	                        <div class="card-content multiselectHolder">
 	                            <a role="button" class="minimize closeModal it-closeModalX"><i class="lrm lrm-close"></i></a>
 	                            <h2>{!$Label.LBL_Send_Message}</h2>
-	                            <p class="list-header"><strong>To</strong></p>
+	                            <p class="list-header"><strong>{!$Label.LBL_To}</strong></p>
 	                            <div class="multiselect">
 	                                <div class="blockHolder"></div>
 	                                <input class="multiselectInput it-multiSelectInput1" type="text" placeholder="" />
@@ -172,7 +172,7 @@
 	                                    </ul> -->
 	                                </div>
 	                            </div>
-	                            <p class="list-header"><strong>Message</strong></p>
+	                            <p class="list-header"><strong>{!$Label.LBL_Message}</strong></p>
 	                            <textarea rows="4"></textarea>
 	                        </div>
 	                        <div class="blockBtnWrapper">
@@ -188,11 +188,38 @@
 
 	<script>
 		
+		$(document).ready(function(){
+	 		$('.droptoggle a.toggle-header').html($('.droptoggle a.selected').text() + ' <i class="lrm lrm-arrow"></i>');
+	 	});
+
+		var profileOriginalImgHeight;
 		$('#profileImg').load(function() {
 		  	$('#profileImg').width('250px');
 			if($('#profileImg').height() > 250){ $('#profileImg').height('250px'); } 
-			$('#profileImg').show();
+			profileOriginalImgHeight =  $('#profileImg').height();
 		});
+
+		 $(window).on('scroll resize', function(){
+	        coverNav = $('nav.cover-nav');
+	        if (coverNav.length) {
+	            var windowTop = $(window).scrollTop();
+	            var navBottom = 340;
+	            if (coverNav.hasClass('navOnly')) {
+	                navBottom = 150;
+	            }
+	            if (windowTop > navBottom) {
+	                $('#profileImg').width('45px');
+	                if($('#profileImg').height() > 45){ $('#profileImg').height('45px'); } 
+	            } else {
+	                $('#profileImg').width('250px');
+	                if(profileOriginalImgHeight > 250){ 
+	                	$('#profileImg').height('250px'); 
+	                }else{
+	                	$('#profileImg').height(profileOriginalImgHeight); 
+	                } 
+	            }
+	        }
+	    });
 
 		function dropmenu(elm){
 			$(elm).next('ul').slideToggle();
@@ -202,21 +229,15 @@
 			$('.it-peerProfileDropdownMenu').next('ul').css('pointer-events', 'none').css('opacity', '0.8');
 		}
 		
-		function changeActiveMenu(elm){
-			if(elm.name.indexOf('NI') != -1){
-				$('.navItems li a.active').removeClass('active');
-				$(elm).addClass('active');
-				var tempName = elm.name.replace('NI','DT');
-				$('.droptoggle li a').removeClass('selected');
-				$('.droptoggle a[name="'+tempName+'"]').addClass('selected');
-				$('.mobile-select .droptoggle .toggle-header').html($(elm).text() + ' <i class="lrm lrm-arrow"></i>');
+		function addParameterToURL(elm, param){
+		    url = location.href;
+		    if(url.indexOf('tab') != -1){
+		    	var tab = url.substring(url.indexOf('tab'),url.indexOf('tab')+5);
+		    	url = url.replace(tab,'tab='+param);
+		    }else{
+		    	url += (url.split('?')[1] ? '&':'?') + 'tab='+param;
 			}
-			if(elm.name.indexOf('DT') != -1){
-				var tempName = elm.name.replace('DT','NI');
-				$('.navItems li a[name*="NI"]').removeClass('active');
-				$('.navItems li a[name="'+tempName+'"]').addClass('active');
-			}
-
+		    elm.href = url;
 		}
 	</script>
 </apex:component>

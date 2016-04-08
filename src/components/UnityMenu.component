@@ -33,7 +33,6 @@
 <apex:outputPanel rendered="{!Registration == 'true'}">
 	<script type="text/javascript">
 		(function() {
-			console.log('Registration = true');
 			window.location.href = '{!$Page.CommunityRegTerms}';
 			jQuery('body').hide();
 		})();
@@ -191,7 +190,7 @@
 	<script>
 		$(document).ready(function() {
 			if({!showPrivateMessages}) {
-				$('#recentMessages').show();
+				$('#recentMessages').css('display','inline-block');
 				var countEmail = parseInt($('.emails .number').first().text(), 10); 
 				if(countEmail > 0) $('.emails .number').show();
 			}
