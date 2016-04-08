@@ -34,7 +34,22 @@
 	<c:UnityProfileFeedNavigation current="{!current}" photoUrl="{!FullPhotoUrl}" stName="{!StudentName}" stRole="{!StudentRole}" isSubscr="{!IsSubscribe}" currentUsId="{!currentUserId}"/>
 	<!--=== Profile ===-->	
 	<section id="mainContent" class="mainContent">
-
+		<div class="inner">
+                <div class="row">
+                    <!-- Unity Profile feed -->
+                    <apex:outputPanel layout="none" rendered="{!IF(OR(ISBLANK($CurrentPage.parameters.tab), $CurrentPage.parameters.tab == '1'), true, false)}">
+	                    <apex:variable var="pfe" value="{!IF(ISBLANK($CurrentPage.parameters.fromEmail),false, true)}"/>
+						<apex:variable var="pffe" value="{!IF(ISBLANK($CurrentPage.parameters.fId),'',JSENCODE($CurrentPage.parameters.fId))}"/>
+	                    <div class="col-md-16">
+	                        <c:UnityFeed pid="{!currentUserId}" fe="{!pfe}" ffe="{!pffe}" tf="true"/>
+	                    </div>
+	                    <div class="col-md-8 col-lg-6 col-lg-offset-2">
+	                   		<c:UnityProfileFollow feedPage="true" currentUsId="{!currentUserId}"/>
+	                   	</div>
+                    </apex:outputPanel>
+                    <!-- Unity Profile feed -->
+                </div>
+            </div>
 	</section>
 
 </apex:define>
