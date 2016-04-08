@@ -50,6 +50,12 @@ global with sharing class CommunityProfilePageController {
 		return !nmList.isEmpty();
 	}
 
+	public String getPrimary(){
+		if (currentProfile == null) return '';
+		if (currentProfile.Primary__c == false) return '';
+		return '('+Label.LBL_Primary+')';
+	}
+
 	public CommunityProfilePageController() {
 		try {
 			String tempContactId = CommunityUtils.validateId(ApexPages.currentPage().getParameters().get('cid'));
@@ -163,7 +169,7 @@ global with sharing class CommunityProfilePageController {
 				}
 			}
 			String pp46 = CommunityUtils.getPackagePrefix();
-			Set<String> profileFields = new Set<String> {'Id', 'Name', pp46 + 'Contact__r.Name', pp46 + 'Contact__c', pp46 + 'Contact__r.Primary_Role__c'};
+			Set<String> profileFields = new Set<String> {'Id', 'Name', pp46 + 'Contact__r.Name', pp46 + 'Contact__c', pp46 + 'Contact__r.Primary_Role__c', pp46 + 'Primary__c'};
 			for (CommunityFieldLayout fs2 : overviewTab) {
 				profileFields.addAll(fs2.prepareFieldList());
 			}

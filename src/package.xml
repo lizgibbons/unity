@@ -65,11 +65,13 @@
         <members>UnityFeed</members>
         <members>UnityFootResource</members>
         <members>UnityFooter</members>
+        <members>UnityGroups</members>
         <members>UnityHeadResource</members>
         <members>UnityHomeEvents</members>
         <members>UnityHomeNews</members>
         <members>UnityHomeNotifications</members>
         <members>UnityMenu</members>
+        <members>UnityProfileAbout</members>
         <members>UnityProfileFeedNavigation</members>
         <members>UnityProfileFollow</members>
         <name>ApexComponent</name>
@@ -483,6 +485,7 @@
         <members>LBL_Groups</members>
         <members>LBL_Help</members>
         <members>LBL_Home</members>
+        <members>LBL_Information</members>
         <members>LBL_Interests</members>
         <members>LBL_Last</members>
         <members>LBL_Latest_Tweets</members>
@@ -521,6 +524,7 @@
         <members>LBL_MyGroups</members>
         <members>LBL_My_Account</members>
         <members>LBL_My_Discussions</members>
+        <members>LBL_My_Groups</members>
         <members>LBL_My_News</members>
         <members>LBL_My_Profile</members>
         <members>LBL_Name</members>
@@ -560,6 +564,7 @@
         <members>LBL_Posted</members>
         <members>LBL_PostsLikes_Title</members>
         <members>LBL_Previous</members>
+        <members>LBL_Primary</members>
         <members>LBL_PrivateGroup</members>
         <members>LBL_Profile</members>
         <members>LBL_ProfilePosts</members>
