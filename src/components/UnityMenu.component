@@ -33,7 +33,6 @@
 <apex:outputPanel rendered="{!Registration == 'true'}">
 	<script type="text/javascript">
 		(function() {
-			console.log('Registration = true');
 			window.location.href = '{!$Page.CommunityRegTerms}';
 			jQuery('body').hide();
 		})();
