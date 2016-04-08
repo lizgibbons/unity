@@ -48,6 +48,34 @@
 	                   	</div>
                     </apex:outputPanel>
                     <!-- Unity Profile feed -->
+                    <!-- Unity Profile About -->
+                    <apex:outputPanel layout="none" rendered="{!IF($CurrentPage.parameters.tab == '2', true, false)}">
+                    	<div class="col-md-16">
+					    	<h2>{!$Label.LBL_About_Me}</h2>
+					        <article>
+					            <div class="card">
+					                <div class="card-toggle-content disabled">
+					                    <a class="it-interestsToggleContent1" role="button">
+					                        <h3 class="sectionH3">{!studentRole} {!$Label.LBL_Information} {!primary}</h3>
+					                        <i class="lrm lrm-chevrondown"></i>
+					                    </a>
+					                </div>
+			                    	<apex:repeat value="{!fieldsets}" var="ffi">
+			                    		<c:UnityProfileAbout so="{!currentProfile}" fsc="{!fsMap[ffi[0]]}" son="Community_Profile__c"/>
+			                    	</apex:repeat>
+		                    	</div>
+					        </article>
+					    </div>
+                    	<div class="col-md-8 col-lg-6 col-lg-offset-2">
+                    		<c:UnityGroups profileAboutGroups="true" myGroups="my_groups"/>
+                    	</div>	
+                    </apex:outputPanel>
+                    <!-- Unity Profile About -->
+                    <!-- Unity Profile Groups -->
+                    <!-- <apex:outputPanel layout="none" rendered="{!IF($CurrentPage.parameters.tab == '3', true, false)}">
+                    	<c:UnityGroups />
+                    </apex:outputPanel> -->
+                    <!-- Unity Profile Groups -->
                 </div>
             </div>
 	</section>

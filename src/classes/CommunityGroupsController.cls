@@ -31,10 +31,12 @@ public with sharing class CommunityGroupsController {
 
 	public String currentFilter {
 		get {
-			return ApexPages.currentPage().getParameters().get('f');
+			return unityFilter != NULL ? unityFilter : ApexPages.currentPage().getParameters().get('f');
 		}
 		private set;
 	}
+
+	public String unityFilter { get; set; }
 
 	private final String CurrentCommunityId = Network.getNetworkId();
 
@@ -123,6 +125,9 @@ public with sharing class CommunityGroupsController {
 				groupDetail.GroupId = Item.Chatter_Group_ID__c;
 				if (collaborationGroupMap.get(Item.Chatter_Group_ID__c).SmallPhotoUrl != NULL) {
 					groupDetail.GroupPhotoUrl = collaborationGroupMap.get(Item.Chatter_Group_ID__c).SmallPhotoUrl;
+				}
+				if (collaborationGroupMap.get(Item.Chatter_Group_ID__c).FullPhotoUrl != NULL && CommunityUtils.getUnity20TemplateUse()) {
+					groupDetail.GroupPhotoUrl = collaborationGroupMap.get(Item.Chatter_Group_ID__c).FullPhotoUrl;
 				}
 				groupDetail.GroupLastActivityDate = collaborationGroupMap.get(Item.Chatter_Group_ID__c).LastFeedModifiedDate;
 				if (collaborationGroupMap.get(Item.Chatter_Group_ID__c).Owner.Id == UserInfo.getUserId()) {
