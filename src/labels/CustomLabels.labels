@@ -1612,6 +1612,20 @@
         <value>commented in the {0} manager feed.</value>
     </labels>
     <labels>
+        <fullName>LBL_NotificationType_Comment</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL NotificationType Comment</shortDescription>
+        <value>Comment</value>
+    </labels>
+    <labels>
+        <fullName>LBL_NotificationType_Post</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Notifications Post</shortDescription>
+        <value>Post</value>
+    </labels>
+    <labels>
         <fullName>LBL_OldPassword</fullName>
         <language>en_US</language>
         <protected>true</protected>
