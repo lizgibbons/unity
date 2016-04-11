@@ -9,7 +9,7 @@
 		<apex:outputPanel layout="none" rendered="{!feedPage}">
 	        <h2 id="h2followers">{!$Label.LBL_Followers} ()</h2>
 	        <div class="row">
-	            <div class="col-md-8 col-sm-4 col-xs-6" ng-repeat="p in allPeople | peopleIFollow:this | limitTo:page.pageSize">
+	            <div class="col-md-8 col-sm-4 col-xs-6" ng-repeat="p in allPeople | peopleFollowMe:this | limitTo:page.pageSize">
 	                <a href="{!$Page.UnityProfilePage}?id={{ p.MemberId }}" class="avatar-large it-followers">
 	                    <img ng-src="{{ p.MemberPhotoUrl }}" src="/s.gif" alt="" />
 	                </a>
@@ -140,11 +140,11 @@
 				return input;
 			}
 		});
-		PeoplesApp.filter('peopleIFollow', function() {
+		PeoplesApp.filter('peopleFollowMe', function() {
 			return function(input, scope) {
 				var output = [];
 				for (var j = 0; j < input.length; j++) {
-					if (input[j].MemberIsFollowing) {
+					if (input[j].MemberIsFollowers) {
 						output.push(input[j]);
 					}
 				}
@@ -157,7 +157,7 @@
 			return function(input, scope) {
 				var output = [];
 				for (var j = 0; j < input.length; j++) {
-					if (!input[j].MemberIsFollowing) {
+					if (input[j].MemberIsFollowing) {
 						output.push(input[j]);
 					}
 				}
