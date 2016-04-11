@@ -193,8 +193,8 @@
 	 	});
 
 		var profileOriginalImgHeight;
-		$('#profileImg').load(function() {
-		  	$('#profileImg').width('250px');
+		$('.profile-image img').load(function() {
+			$('#profileImg').width('250px');
 			if($('#profileImg').height() > 250){ $('#profileImg').height('250px'); } 
 			profileOriginalImgHeight =  $('#profileImg').height();
 		});
