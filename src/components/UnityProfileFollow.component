@@ -9,13 +9,13 @@
 		<apex:outputPanel layout="none" rendered="{!feedPage}">
 	        <h2 id="h2followers">{!$Label.LBL_Followers} ()</h2>
 	        <div class="row">
-	            <div class="col-md-8 col-sm-4 col-xs-6" ng-repeat="p in allPeople | peopleIFollow:this | limitTo:page.pageSize">
+	            <div class="col-md-8 col-sm-4 col-xs-6" ng-repeat="p in allPeople | peopleFollowMe:this | limitTo:page.pageSize">
 	                <a href="{!$Page.UnityProfilePage}?id={{ p.MemberId }}" class="avatar-large it-followers">
 	                    <img ng-src="{{ p.MemberPhotoUrl }}" src="/s.gif" alt="" />
 	                </a>
 	            </div>
 	        </div>
-	        <div class="text-center">
+	        <div class="text-center" id="viewAllFollowers">
 	            <a href="" class="btn-outline-gray it-viewAllFollowers">{!$Label.LBL_View_All}</a>
 	        </div>
             <hr/>
@@ -27,8 +27,8 @@
 	                </a>
 	            </div>
 	        </div>
-	        <div class="text-center">
-	            <a href="peer-profile-following.php" class="btn-outline-gray it-viewAllFollowing">{!$Label.LBL_View_All}</a>
+	        <div class="text-center" id="viewAllFollowing">
+	            <a href="" class="btn-outline-gray it-viewAllFollowing">{!$Label.LBL_View_All}</a>
 	        </div>
         </apex:outputPanel>
 
@@ -53,6 +53,7 @@
 								if (event.status) {
 									deferred.resolve(result);
 									$rootScope.getDataStatus = 'Finished';
+									
 									jQuery("#profileFeedfollow").show();
 								} else {
 									deferred.reject(event);
@@ -140,7 +141,26 @@
 				return input;
 			}
 		});
-		PeoplesApp.filter('peopleIFollow', function() {
+		PeoplesApp.filter('peopleFollowMe', function() {
+			return function(input, scope) {
+				var output = [];
+				for (var j = 0; j < input.length; j++) {
+					if (input[j].MemberIsFollowers) {
+						output.push(input[j]);
+					}
+				}
+				input = output;
+				$('#h2followers').html('{!$Label.LBL_Followers} ('+input.length+')');
+				if(!input.length){
+					$('#viewAllFollowers').hide();
+				}else{
+					addCssToImage();
+					$('#viewAllFollowers').show();
+				}
+				return input;
+			}
+		});
+		PeoplesApp.filter('peopleIFollowing', function() {
 			return function(input, scope) {
 				var output = [];
 				for (var j = 0; j < input.length; j++) {
@@ -149,20 +169,13 @@
 					}
 				}
 				input = output;
-				$('#h2followers').html('{!$Label.LBL_Followers} ('+input.length+')');
-				return input;
-			}
-		});
-		PeoplesApp.filter('peopleIFollowing', function() {
-			return function(input, scope) {
-				var output = [];
-				for (var j = 0; j < input.length; j++) {
-					if (!input[j].MemberIsFollowing) {
-						output.push(input[j]);
-					}
-				}
-				input = output;
 				$('#h2following').html('{!$Label.BTN_Following} ('+input.length+')');
+				if(!input.length){
+					$('#viewAllFollowing').hide();
+				}else{
+					addCssToImage();
+					$('#viewAllFollowing').show();
+				}
 				return input;
 			}
 		});
@@ -262,6 +275,10 @@
 			window.scope = $scope;
 		}]);
 	</script>
-	
+	<script>
+		function addCssToImage(){
+			$('#profileFeedfollow .avatar-large img').css('width','77px').css('height','77px');
+		}
+	</script>
 
 </apex:component>

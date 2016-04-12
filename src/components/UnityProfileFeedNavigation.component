@@ -188,16 +188,14 @@
 
 	<script>
 		
+		var profileOriginalImgHeight;
+		
 		$(document).ready(function(){
 	 		$('.droptoggle a.toggle-header').html($('.droptoggle a.selected').text() + ' <i class="lrm lrm-arrow"></i>');
-	 	});
-
-		var profileOriginalImgHeight;
-		$('#profileImg').load(function() {
-		  	$('#profileImg').width('250px');
-			if($('#profileImg').height() > 250){ $('#profileImg').height('250px'); } 
+	 		$('#profileImg').css('width','250px');
+			if($('#profileImg').height() > 250){ $('#profileImg').css('height','250px'); } 
 			profileOriginalImgHeight =  $('#profileImg').height();
-		});
+	 	});
 
 		 $(window).on('scroll resize', function(){
 	        coverNav = $('nav.cover-nav');

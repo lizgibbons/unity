@@ -267,13 +267,14 @@ public with sharing class CommunityUtils {
 		return inUrl;
 	}
 
-	public static String checkUrlForImage(String inUrl) {
+	public static String checkUrlForImage(String inUrl, String imgSize) {
 		List<String> url = inUrl.split('/');
 		String imgUrl = inUrl;
+		String imagePath = imgSize.equals('medium') ? 'default-male-medium.jpg' : 'default-male.jpg';
 		if(url[url.size()-2].length() == 3){
 			String ns = getPackagePrefix();
 			List<StaticResource> srList = [SELECT SystemModstamp FROM StaticResource WHERE Name = 'assets2' AND NamespacePrefix = :ns.replace('__','')];
-			imgUrl = (srList.size() == 0) ? imgUrl : ('/resource/' + srList[0].SystemModstamp.getTime() +'/' + ns + 'assets2/images/home/default-male.jpg');
+			imgUrl = (srList.size() == 0) ? imgUrl : ('/resource/' + srList[0].SystemModstamp.getTime() +'/' + ns + 'assets2/images/home/'+imagePath);
 			
 			if (String.isNotBlank(Site.getPathPrefix()) && !imgUrl.startsWith(Site.getPathPrefix())) {
 				imgUrl = Site.getPathPrefix() + imgUrl;
