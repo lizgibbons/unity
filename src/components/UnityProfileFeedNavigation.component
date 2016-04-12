@@ -106,7 +106,7 @@
 	    <div class="droptoggle">
 	        <a role="button" class="toggle-header it-mobileFeedDropdown">{!$Label.LBL_Feed}&nbsp;<i class="lrm lrm-arrow"></i></a>
 	        <ul>
-	            <li><a role="button" class="{!IF($CurrentPage.parameters.tab == '1','selected','')} it-peerProfileMenuFeed" onclick="addParameterToURL(this,1);">{!$Label.LBL_Feed}</a></li>
+	            <li><a role="button" class="{!IF(OR(ISBLANK($CurrentPage.parameters.tab), $CurrentPage.parameters.tab == '1'),'selected','')} it-peerProfileMenuFeed" onclick="addParameterToURL(this,1);">{!$Label.LBL_Feed}</a></li>
 	            <li><a role="button" class="{!IF($CurrentPage.parameters.tab == '2','selected','')} it-peerProfileMenuAbout" onclick="addParameterToURL(this,2);">{!$Label.LBL_About}</a></li>
 	            <apex:outputPanel layout="none" rendered="{!!currentUser}">
 		            <li>
@@ -211,6 +211,8 @@
 	            } else {
 	                $('#profileImg').width('250px');
 	                if(profileOriginalImgHeight > 250){ 
+	                	$('#profileImg').height('250px'); 
+	                }else if(profileOriginalImgHeight < 100){
 	                	$('#profileImg').height('250px'); 
 	                }else{
 	                	$('#profileImg').height(profileOriginalImgHeight); 

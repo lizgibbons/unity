@@ -37,6 +37,7 @@ public with sharing class CommunityGroupsController {
 	}
 
 	public String unityFilter { get; set; }
+	public String profileUserId { get; set; }
 
 	private final String CurrentCommunityId = Network.getNetworkId();
 
@@ -250,9 +251,10 @@ public with sharing class CommunityGroupsController {
 		}
 
 		if (currentTab == 'my_groups') {
+			String usId = profileUserId != NULL ? profileUserId : UserInfo.getUserId();
 			for (CollaborationGroupMember cgmItem : [
 					SELECT CollaborationGroupId FROM CollaborationGroupMember
-					WHERE CollaborationGroup.NetworkId = :Network.getNetworkId() AND MemberId = :UserInfo.getUserId() AND CollaborationGroup.IsArchived = false
+					WHERE CollaborationGroup.NetworkId = :Network.getNetworkId() AND MemberId = :usId AND CollaborationGroup.IsArchived = false
 						]) {
 				filtredChatterGroupIds.add(cgmItem.CollaborationGroupId);
 			}
