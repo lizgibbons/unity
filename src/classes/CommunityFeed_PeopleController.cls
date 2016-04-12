@@ -32,6 +32,8 @@ public with sharing class CommunityFeed_PeopleController {
 	public CommunityFeed_PeopleController() {
 	}
 
+	public Boolean isUnityTemplate { get { return CommunityUtils.getUnity20TemplateUse(); } }
+
 	@RemoteAction
 	public static List<UserItem> getUnityPeoples(String usId) {
 		List<UserItem> peoples = new List<UserItem>();
@@ -111,7 +113,7 @@ public with sharing class CommunityFeed_PeopleController {
 				if (String.isBlank(this.MemberPhotoUrl)) {
 					this.MemberPhotoUrl = '/profilephoto/005/T';
 				}
-				this.MemberPhotoUrl = CommunityUtils.getUnity20TemplateUse() ? CommunityUtils.checkUrlForImage(this.MemberPhotoUrl) : this.MemberPhotoUrl.replace(Site.getBaseUrl(), '');
+				this.MemberPhotoUrl = CommunityUtils.getUnity20TemplateUse() ? CommunityUtils.checkUrlForImage(this.MemberPhotoUrl, 'medium') : this.MemberPhotoUrl.replace(Site.getBaseUrl(), '');
 				return this.MemberPhotoUrl;
 			}
 			set;
@@ -128,7 +130,7 @@ public with sharing class CommunityFeed_PeopleController {
 				}
 			);
 			this.MemberRole = role;
-			this.MemberPhotoUrl = CommunityUtils.getUnity20TemplateUse() ? CommunityUtils.checkUrlForImage(member.SmallPhotoUrl) : member.SmallPhotoUrl;
+			this.MemberPhotoUrl = CommunityUtils.getUnity20TemplateUse() ? CommunityUtils.checkUrlForImage(member.FullPhotoUrl, 'medium') : member.SmallPhotoUrl;
 			this.MemberIsFollowing = isFollowing;
 			this.MemberIsFollowers = isFollowers;
 		}
