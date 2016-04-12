@@ -130,7 +130,7 @@ public with sharing class CommunityFeed_PeopleController {
 				}
 			);
 			this.MemberRole = role;
-			this.MemberPhotoUrl = CommunityUtils.getUnity20TemplateUse() ? CommunityUtils.checkUrlForImage(member.FullPhotoUrl, 'medium') : member.SmallPhotoUrl;
+			this.MemberPhotoUrl = CommunityUtils.getUnity20TemplateUse() ? CommunityUtils.checkUrlForImage(member.SmallPhotoUrl, 'medium') : member.SmallPhotoUrl;
 			this.MemberIsFollowing = isFollowing;
 			this.MemberIsFollowers = isFollowers;
 		}

@@ -31,10 +31,14 @@
 <apex:composition template="Unity2SiteTemplate">
 <apex:define name="title">{!$Label.LBL_Page_Title}</apex:define>
 <apex:define name="body">
+    <apex:outputPanel layout="none" rendered="{!isCommunityUser}">
 	<c:UnityProfileFeedNavigation current="{!current}" photoUrl="{!FullPhotoUrl}" stName="{!StudentName}" stRole="{!StudentRole}" isSubscr="{!IsSubscribe}" currentUsId="{!currentUserId}"/>
+    </apex:outputPanel>
 	<!--=== Profile ===-->	
+   
 	<section id="mainContent" class="mainContent">
 		<div class="inner">
+            <apex:outputpanel rendered="{!isCommunityUser}" layout="block">  
                 <div class="row">
                     <!-- Unity Profile feed -->
                     <apex:outputPanel layout="none" rendered="{!IF(OR(ISBLANK($CurrentPage.parameters.tab), $CurrentPage.parameters.tab == '1'), true, false)}">
@@ -54,20 +58,14 @@
 					    	<h2>{!$Label.LBL_About_Me}</h2>
 					        <article>
 					            <div class="card">
-					                <div class="card-toggle-content disabled">
-					                    <a class="it-interestsToggleContent1" role="button">
-					                        <h3 class="sectionH3">{!studentRole} {!$Label.LBL_Information} {!primary}</h3>
-					                        <i class="lrm lrm-chevrondown"></i>
-					                    </a>
-					                </div>
 			                    	<apex:repeat value="{!fieldsets}" var="ffi">
-			                    		<c:UnityProfileAbout so="{!currentProfile}" fsc="{!fsMap[ffi[0]]}" son="Community_Profile__c"/>
+                                        <c:UnityProfileAbout so="{!currentProfile}" fsc="{!fsMap[ffi[0]]}" son="Community_Profile__c" profile="{!ffi[2]}" primary="{!ffi[3]}"/>
 			                    	</apex:repeat>
 		                    	</div>
 					        </article>
 					    </div>
                     	<div class="col-md-8 col-lg-6 col-lg-offset-2">
-                    		<c:UnityGroups profileAboutGroups="true" myGroups="my_groups"/>
+                            <c:UnityGroups profileAboutGroups="true" myGroups="my_groups" userId="{!currentUserId}"/>
                     	</div>	
                     </apex:outputPanel>
                     <!-- Unity Profile About -->
@@ -77,6 +75,18 @@
                     </apex:outputPanel> -->
                     <!-- Unity Profile Groups -->
                 </div>
+            </apex:outputpanel>
+             <apex:outputpanel rendered="{!!isCommunityUser}" layout="block">
+                <div class="row">
+                    <div class="col-xs-24">
+                        <div class="alert error">
+                            <p>
+                                {!$Label.ERR_You_do_not_have_access_to_this_user}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </apex:outputpanel>
             </div>
 	</section>
 

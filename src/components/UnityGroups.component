@@ -1,21 +1,30 @@
 <apex:component controller="CommunityGroupsController">
 	<apex:attribute name="profileAboutGroups" type="Boolean" default="false" required="false" description="groups in About Profile page" />
 	<apex:attribute name="myGroups" type="String" required="false" assignTo="{!unityFilter}" description=""/>
+	<apex:attribute name="userId" type="String" required="false" assignTo="{!profileUserId}" description=""/>
 
 	<apex:outputPanel layout="none" rendered="{!profileAboutGroups}">
         <h2>{!$Label.LBL_My_Groups} ({!Groups.totalRecords})</h2>
             <div class="row">
             <apex:repeat value="{!Groups.Groups}" var="g">
-                <div class="col-md-8 col-xs-6">
+                <div class="col-md-8 col-xs-6" id="profileFeedGroup">
                     <a href="{!$Page.CommunityGroupDetailPage}?gr={!g.GroupId}" class="avatar-large group-avatar it-groupAvatar">
                         <img src="{!g.GroupPhotoUrl}" />
                     </a>
                 </div>
             </apex:repeat>
     	    </div>
+        <apex:outputPanel layout="none" rendered="{!IF(Groups.Groups.size > 0, true, false)}">    
         <div class="text-center">
             <a href="" class="btn-outline-gray it-viewAllGroups">{!$Label.LBL_View_All}</a>
         </div>
     </apex:outputPanel>
+    </apex:outputPanel>
+
+    <script>
+        $(document).ready(function(){
+            $('#profileFeedGroup .avatar-large.group-avatar img').css('width','77px').css('height','77px');
+        });
+    </script>
 
 </apex:component>

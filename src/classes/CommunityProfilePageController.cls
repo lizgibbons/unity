@@ -50,11 +50,18 @@ global with sharing class CommunityProfilePageController {
 		return !nmList.isEmpty();
 	}
 
-	public String getPrimary(){
-		if (currentProfile == null) return '';
-		if (currentProfile.Primary__c == false) return '';
+    public String getPrimary(Community_Profile__c cp){
+        if (cp.Primary__c == null) return '';
+        if (cp.Primary__c == false) return '';
 		return '('+Label.LBL_Primary+')';
 	}
+
+    public Boolean checkUnityPage(String url){
+    	List<String> urls = url.split('/'); 
+		String pageName = urls[urls.size()-1];
+		if(pageName.startsWithIgnoreCase('UnityProfilePage')) return true;
+		return false;
+    }
 
 	public CommunityProfilePageController() {
 		try {
@@ -124,15 +131,24 @@ global with sharing class CommunityProfilePageController {
 			}
 			// initialize profile tab
 			profiles = new List<ProfileTab>();
+            Map<String, String> profileNameAndPrimary = new Map<String, String>();
 			for (Community_Profile__c lpItem : localProfiles) {
 				profiles.add(new ProfileTab(lpItem, (lpItem.Id == currentProfile.Id)));
+                profileNameAndPrimary.put(lpItem.RecordType.Name, getPrimary(lpItem));
 			}
 			//handle add to package dynamic section labels
 			String section1 = Label.LBL_About_me;
 			String section2 = Label.LBL_Contact;
 			// select contact with field from fieldset
 			overviewTab = new List<CommunityFieldLayout>();
-			String rtName = currentProfile.RecordType.Name.replace('/','');
+            Set<String> rtName = new Set<String>();
+            if(CommunityUtils.getUnity20TemplateUse() && checkUnityPage(ApexPages.CurrentPage().getUrl())){
+                for(ProfileTab profile : profiles){
+                    rtName.add(profile.name);
+                }
+            }else{
+                rtName.add(currentProfile.RecordType.Name.replace('/',''));
+            }
 			Map<String, CommunityFieldLayout> tabMap = new Map<String, CommunityFieldLayout>();
 			Schema.DescribeSObjectResult dsorProfile = SObjectType.Community_Profile__c;
 			fieldsets = new List<List<String>>();
@@ -144,8 +160,8 @@ global with sharing class CommunityProfilePageController {
 				String fsLabel = fsItem.getLabel();
 				if (fsLabel.contains(':')) {
 					String[] parts = fsLabel.split(':');
-					if (parts.size() == 3 && parts[0] == rtName && parts[2].isNumeric()) {
-						fieldsets.add(new List<String> {sfName, parts[1]});
+                    if (parts.size() == 3 && rtName.contains(parts[0]) && parts[2].isNumeric()) {
+                        fieldsets.add(new List<String> {sfName, parts[1], parts[0], profileNameAndPrimary.get(parts[0])});
 						Integer sNum = Integer.valueOf(parts[2]);
 						Boolean notAdded = true;
 						CommunityFieldLayout cflTemp =  new CommunityFieldLayout(
