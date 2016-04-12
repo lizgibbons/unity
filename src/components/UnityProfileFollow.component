@@ -154,6 +154,7 @@
 				if(!input.length){
 					$('#viewAllFollowers').hide();
 				}else{
+					addCssToImage();
 					$('#viewAllFollowers').show();
 				}
 				return input;
@@ -172,6 +173,7 @@
 				if(!input.length){
 					$('#viewAllFollowing').hide();
 				}else{
+					addCssToImage();
 					$('#viewAllFollowing').show();
 				}
 				return input;
@@ -273,6 +275,10 @@
 			window.scope = $scope;
 		}]);
 	</script>
-	
+	<script>
+		function addCssToImage(){
+			$('#profileFeedfollow .avatar-large img').css('width','77px').css('height','77px');
+		}
+	</script>
 
 </apex:component>
