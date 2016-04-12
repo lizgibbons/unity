@@ -15,7 +15,7 @@
 	                </a>
 	            </div>
 	        </div>
-	        <div class="text-center">
+	        <div class="text-center" id="viewAllFollowers">
 	            <a href="" class="btn-outline-gray it-viewAllFollowers">{!$Label.LBL_View_All}</a>
 	        </div>
             <hr/>
@@ -27,8 +27,8 @@
 	                </a>
 	            </div>
 	        </div>
-	        <div class="text-center">
-	            <a href="peer-profile-following.php" class="btn-outline-gray it-viewAllFollowing">{!$Label.LBL_View_All}</a>
+	        <div class="text-center" id="viewAllFollowing">
+	            <a href="" class="btn-outline-gray it-viewAllFollowing">{!$Label.LBL_View_All}</a>
 	        </div>
         </apex:outputPanel>
 
@@ -53,6 +53,7 @@
 								if (event.status) {
 									deferred.resolve(result);
 									$rootScope.getDataStatus = 'Finished';
+									
 									jQuery("#profileFeedfollow").show();
 								} else {
 									deferred.reject(event);
@@ -150,6 +151,11 @@
 				}
 				input = output;
 				$('#h2followers').html('{!$Label.LBL_Followers} ('+input.length+')');
+				if(!input.length){
+					$('#viewAllFollowers').hide();
+				}else{
+					$('#viewAllFollowers').show();
+				}
 				return input;
 			}
 		});
@@ -163,6 +169,11 @@
 				}
 				input = output;
 				$('#h2following').html('{!$Label.BTN_Following} ('+input.length+')');
+				if(!input.length){
+					$('#viewAllFollowing').hide();
+				}else{
+					$('#viewAllFollowing').show();
+				}
 				return input;
 			}
 		});

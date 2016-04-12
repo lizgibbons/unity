@@ -67,7 +67,7 @@ global with sharing class CommunityProfilePageController {
 				String queryCurrentUserId =CommunityUtils.validateId(currentUserId);
 				User currentUserLocal2 = [SELECT ContactId, Community_Contact_ID__c, FullPhotoUrl FROM User WHERE Id = :queryCurrentUserId];
 				contactId = currentUserLocal2.ContactId != NULL ? currentUserLocal2.ContactId : currentUserLocal2.Community_Contact_ID__c;
-				FullPhotoUrl = CommunityUtils.getUnity20TemplateUse() ? CommunityUtils.checkUrlForImage(currentUserLocal2.FullPhotoUrl) : currentUserLocal2.FullPhotoUrl;
+				FullPhotoUrl = CommunityUtils.getUnity20TemplateUse() ? CommunityUtils.checkUrlForImage(currentUserLocal2.FullPhotoUrl,'') : currentUserLocal2.FullPhotoUrl;
 			}
 			allOk = contactId != NULL;
 			current = (String.isNotBlank(currentUserId) && currentUserId == UserInfo.getUserId());

@@ -59,6 +59,8 @@ public with sharing class CommunityFeedNavigationController {
 		return [SELECT FullPhotoUrl FROM User WHERE Id = :UserInfo.getUserId()].FullPhotoUrl;
 	}
 	
+	public Boolean isUnityTemplate { get { return CommunityUtils.getUnity20TemplateUse(); } }
+	
 	
 	public String controllerPhotoUrl {
 		get {
