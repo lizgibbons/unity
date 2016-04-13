@@ -59,7 +59,7 @@
 					        <article>
 					            <div class="card">
 			                    	<apex:repeat value="{!fieldsets}" var="ffi">
-                                        <c:UnityProfileAbout so="{!currentProfile}" fsc="{!fsMap[ffi[0]]}" son="Community_Profile__c" profile="{!ffi[2]}" primary="{!ffi[3]}"/>
+                                        <c:UnityProfileAbout so="{!currentProfiles[ffi[2]]}" fsc="{!fsMap[ffi[0]]}" son="Community_Profile__c" profile="{!ffi[2]}" primary="{!ffi[3]}"/>
 			                    	</apex:repeat>
 		                    	</div>
 					        </article>
