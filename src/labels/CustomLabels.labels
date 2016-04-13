@@ -1227,6 +1227,13 @@
         <value>Home</value>
     </labels>
     <labels>
+        <fullName>LBL_Information</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Information</shortDescription>
+        <value>Information</value>
+    </labels>
+    <labels>
         <fullName>LBL_Interests</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -1395,6 +1402,20 @@
         <value>Manage Group Managers</value>
     </labels>
     <labels>
+        <fullName>LBL_Mark_As_Read</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Mark As Read</shortDescription>
+        <value>Mark As Read</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Mark_As_Unread</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Mark As Unread</shortDescription>
+        <value>Mark As Unread</value>
+    </labels>
+    <labels>
         <fullName>LBL_Member</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -1472,6 +1493,13 @@
         <value>Mute</value>
 	</labels>
 	<labels>
+        <fullName>LBL_MyFavorites</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL My Favorites</shortDescription>
+        <value>My Favorites</value>
+    </labels>
+    <labels>
         <fullName>LBL_MyGroups</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -1493,11 +1521,11 @@
         <value>My Discussions</value>
     </labels>
     <labels>
-        <fullName>LBL_MyFavorites</fullName>
+        <fullName>LBL_My_Groups</fullName>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>LBL My Favorites</shortDescription>
-        <value>My Favorites</value>
+        <shortDescription>LBL My Groups</shortDescription>
+        <value>My Groups</value>
     </labels>
     <labels>
         <fullName>LBL_My_News</fullName>
@@ -1631,6 +1659,20 @@
         <protected>true</protected>
         <shortDescription>LBL Notifications Post</shortDescription>
         <value>commented in the {0} manager feed.</value>
+    </labels>
+    <labels>
+        <fullName>LBL_NotificationType_Comment</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL NotificationType Comment</shortDescription>
+        <value>Comment</value>
+    </labels>
+    <labels>
+        <fullName>LBL_NotificationType_Post</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Notifications Post</shortDescription>
+        <value>Post</value>
     </labels>
     <labels>
         <fullName>LBL_OldPassword</fullName>
@@ -1778,6 +1820,13 @@
         <protected>true</protected>
         <shortDescription>LBL Previous</shortDescription>
         <value>Previous</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Primary</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Primary</shortDescription>
+        <value>Primary</value>
     </labels>
     <labels>
         <fullName>LBL_PrivateGroup</fullName>

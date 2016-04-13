@@ -33,6 +33,7 @@ global with sharing class CommunityProfilePageController {
 	public Boolean current { get;set; }
 	public String currentProfileId { get;set; }
 	public Community_Profile__c currentProfile { get;set; }
+    public Map<String, Community_Profile__c> currentProfiles { get;set; }
 	public List<CommunityFieldLayout> overviewTab { get;set; }
 	public Id currentUserId { get;set; }
 	public List<ProfileTab> profiles { get;set; }
@@ -49,6 +50,19 @@ global with sharing class CommunityProfilePageController {
 		List<NetworkMember> nmList = [SELECT Id FROM NetworkMember WHERE MemberId = :currentUserId AND Member.isActive = true AND NetworkId = :Network.getNetworkId()];
 		return !nmList.isEmpty();
 	}
+
+    public String getPrimary(Community_Profile__c cp){
+        if (cp.Primary__c == null) return '';
+        if (cp.Primary__c == false) return '';
+		return '('+Label.LBL_Primary+')';
+	}
+
+    public Boolean checkUnityPage(String url){
+    	List<String> urls = url.split('/'); 
+		String pageName = urls[urls.size()-1];
+		if(pageName.startsWithIgnoreCase('UnityProfilePage')) return true;
+		return false;
+    }
 
 	public CommunityProfilePageController() {
 		try {
@@ -83,6 +97,7 @@ global with sharing class CommunityProfilePageController {
 
 	public void init() {
 		try {
+            currentProfiles = new Map<String, Community_Profile__c>();
 			// select available profiles for current user
 			if (!SObjectType.Community_Profile__c.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.Community_Profile__c);
 			String queryContactId = CommunityUtils.validateId(contactId);
@@ -92,6 +107,7 @@ global with sharing class CommunityProfilePageController {
 			for (Community_Profile__c cpItem1 : localProfiles) {
 				primaryCp = (cpItem1.Primary__c == true && primaryCp == NULL) ? cpItem1 : primaryCp;
 				cpMap.put(cpItem1.Id, cpItem1);
+                currentProfiles.put(cpItem1.RecordType.Name, cpItem1);
 			}
 			// select current profile
 			if (String.isNotBlank(currentProfileId) && cpMap.containsKey(currentProfileId)) {
@@ -118,15 +134,24 @@ global with sharing class CommunityProfilePageController {
 			}
 			// initialize profile tab
 			profiles = new List<ProfileTab>();
+            Map<String, String> profileNameAndPrimary = new Map<String, String>();
 			for (Community_Profile__c lpItem : localProfiles) {
 				profiles.add(new ProfileTab(lpItem, (lpItem.Id == currentProfile.Id)));
+                profileNameAndPrimary.put(lpItem.RecordType.Name.replace('/',''), getPrimary(lpItem));
 			}
 			//handle add to package dynamic section labels
 			String section1 = Label.LBL_About_me;
 			String section2 = Label.LBL_Contact;
 			// select contact with field from fieldset
 			overviewTab = new List<CommunityFieldLayout>();
-			String rtName = currentProfile.RecordType.Name.replace('/','');
+            Map<String,String> rtName = new Map<String,String>();
+            if(CommunityUtils.getUnity20TemplateUse() && checkUnityPage(ApexPages.CurrentPage().getUrl())){
+                for(ProfileTab profile : profiles){
+                    rtName.put(profile.name.replace('/',''), profile.name);
+                }
+            }else{
+                rtName.put(currentProfile.RecordType.Name.replace('/',''), currentProfile.RecordType.Name);
+            }
 			Map<String, CommunityFieldLayout> tabMap = new Map<String, CommunityFieldLayout>();
 			Schema.DescribeSObjectResult dsorProfile = SObjectType.Community_Profile__c;
 			fieldsets = new List<List<String>>();
@@ -138,8 +163,8 @@ global with sharing class CommunityProfilePageController {
 				String fsLabel = fsItem.getLabel();
 				if (fsLabel.contains(':')) {
 					String[] parts = fsLabel.split(':');
-					if (parts.size() == 3 && parts[0] == rtName && parts[2].isNumeric()) {
-						fieldsets.add(new List<String> {sfName, parts[1]});
+                    if (parts.size() == 3 && rtName.keySet().contains(parts[0]) && parts[2].isNumeric()) {
+                        fieldsets.add(new List<String> {sfName, parts[1], rtName.get(parts[0]), profileNameAndPrimary.get(parts[0])});
 						Integer sNum = Integer.valueOf(parts[2]);
 						Boolean notAdded = true;
 						CommunityFieldLayout cflTemp =  new CommunityFieldLayout(
@@ -163,7 +188,7 @@ global with sharing class CommunityProfilePageController {
 				}
 			}
 			String pp46 = CommunityUtils.getPackagePrefix();
-			Set<String> profileFields = new Set<String> {'Id', 'Name', pp46 + 'Contact__r.Name', pp46 + 'Contact__c', pp46 + 'Contact__r.Primary_Role__c'};
+            Set<String> profileFields = new Set<String> {'Id', 'Name', 'RecordType.Name', pp46 + 'Contact__r.Name', pp46 + 'Contact__c', pp46 + 'Contact__r.Primary_Role__c', pp46 + 'Primary__c'};
 			for (CommunityFieldLayout fs2 : overviewTab) {
 				profileFields.addAll(fs2.prepareFieldList());
 			}
@@ -171,9 +196,30 @@ global with sharing class CommunityProfilePageController {
 			fieldList.addAll(profileFields);
 			SecurityWrapper sw = new SecurityWrapper();
 			if (!SObjectType.Community_Profile__c.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.Community_Profile__c);
-			List<sObject> tempList = sw.databaseQuery('SELECT ' + String.join(fieldList, ', ') + ' FROM Community_Profile__c WHERE Id =\'' + String.escapeSingleQuotes(currentProfile.Id) + '\'');
+            List<sObject> tempList = new List<sObject>();
+            if(!currentProfiles.isEmpty() && CommunityUtils.getUnity20TemplateUse() && checkUnityPage(ApexPages.CurrentPage().getUrl())){
+                Community_Profile__c tPrimaryProfile;
+                List<String> currentProfilesId = new List<String>();
+                for(String key : currentProfiles.keySet()){
+                    currentProfilesId.add(currentProfiles.get(key).Id);
+                }
+                SecurityWrapper swu = new SecurityWrapper(currentProfilesId);
+                List<Community_Profile__c> tempProfiles = new List<Community_Profile__c>();
+                tempList = swu.databaseQuery('SELECT ' + String.join(fieldList, ', ') + ' FROM Community_Profile__c WHERE Id IN :currentProfilesId');    
+                for(sObject tList : tempList){
+                    tempProfiles.add((Community_Profile__c)tList);
+                }
+                for(Community_Profile__c tProfiles : tempProfiles){
+                    currentProfiles.put(tProfiles.RecordType.Name, tProfiles);
+                    if(tProfiles.Primary__c == true) tPrimaryProfile = tProfiles;
+                }
+                currentProfile = tPrimaryProfile != NULL ? tPrimaryProfile : tempProfiles[0];
+
+            }else{
+                tempList = sw.databaseQuery('SELECT ' + String.join(fieldList, ', ') + ' FROM Community_Profile__c WHERE Id =\'' + String.escapeSingleQuotes(currentProfile.Id) + '\'');
 			currentProfile = (Community_Profile__c)tempList[0];
 		}
+        }
 		catch (Exception e) {
 			allOk = false;
 		}
@@ -586,6 +632,12 @@ global with sharing class CommunityProfilePageController {
 	
 
 	private without sharing class SecurityWrapper {
+        public List<String> currentProfilesId;
+        public SecurityWrapper(){}
+        public SecurityWrapper(List<String> ids){
+            this.currentProfilesId = ids;
+        }
+
 		public List<SObject> databaseQuery(String inQueryStr) {
 			return Database.query(inQueryStr);
 		}
