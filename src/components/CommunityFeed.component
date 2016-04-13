@@ -90,8 +90,8 @@
 				<% _.each(rc.elements, function(p){ %>
 				<div class="comment media-body">
 					<img src="<%- p.actor.photo.smallPhotoUrl %>" alt="<%- p.actor.displayName %>"/>
-					<div class="overflow-h" onclick="window.location.href = '<%- p.parentLink !== null ? ''+p.parentLink : (p.parentId == '{!$User.Id}' ? '{!$Page.CommunityFeed_MyFeed}' : '{!$Page.CommunityProfilePage}?id='+p.parentId+'&f=2') %>';">
-						<div class="profilename"><strong><a href="<%- p.actor.id == '{!$User.Id}' ? '{!$Page.CommunityFeed_MyFeed}' : '{!$Page.CommunityProfilePage}?id='+p.actor.id+'&f=2' %>" alt="<%- p.actor.displayName %>"><%- p.actor.displayName %> <%- p.actor.role !== null ?  '(' + p.actor.role + ')': '' %> <small class="pull-right"><%- p.dateStr %></small></a></strong></div>
+					<div class="overflow-h" onclick="window.location.href = '<%- p.parentLink !== null ? ''+p.parentLink : (p.parentId == '{!$User.Id}' ? '{!IF(isUnityTemplate,$Page.UnityHome,$Page.CommunityFeed_MyFeed)}' : '{!IF(isUnityTemplate,$Page.UnityProfilePage,$Page.CommunityProfilePage)}?id='+p.parentId+'&f=2') %>';">
+						<div class="profilename"><strong><a href="<%- p.actor.id == '{!$User.Id}' ? '{!IF(isUnityTemplate,$Page.UnityHome,$Page.CommunityFeed_MyFeed)}' : '{!IF(isUnityTemplate,$Page.UnityProfilePage,$Page.CommunityProfilePage)}?id='+p.actor.id+'&f=2' %>" alt="<%- p.actor.displayName %>"><%- p.actor.displayName %> <%- p.actor.role !== null ?  '(' + p.actor.role + ')': '' %> <small class="pull-right"><%- p.dateStr %></small></a></strong></div>
 						<% if(p.parentType != null && {!tf}){ %>
 							<p><strong><a class="<%- p.parentIcon %> font-weight-bold" href="<%- p.parentLink %>"> <%- p.parentType %> - <%- p.parentName %> <% if(p.parentAcssesType != null){ %> (<%- p.parentAcssesType %>) <% } %></a>
 							</strong></p>
@@ -183,16 +183,16 @@
 						<% }else if(p2.parentId == "{!currentUserId}"){%>
 							<p><a class="font-weight-bold" href="{!$Page.CommunityFeed_MyFeed}">{!$Label.LBL_All_Updates}</a> ) {!$Label.LBL_This_Update}</p>
 						<% }else {%>
-							<p><a class="font-weight-bold" href="{!$Page.CommunityProfilePage}?id=<%- p2.parentId %>&f=2">{!$Label.LBL_All_Updates}</a> ) {!$Label.LBL_This_Update}</p>
+							<p><a class="font-weight-bold" href="{!IF(isUnityTemplate,$Page.UnityProfilePage,$Page.CommunityProfilePage)}?id=<%- p2.parentId %>&f=2">{!$Label.LBL_All_Updates}</a> ) {!$Label.LBL_This_Update}</p>
 						<%}%>
 					<% } %>	
 				<div class="media media-v2" id="m<%- p2.id %>">
-					<a class="pull-left" href="{!$Page.CommunityProfilePage}?id=<%- p2.actor.id %>">
+					<a class="pull-left" href="{!IF(isUnityTemplate,$Page.UnityProfilePage,$Page.CommunityProfilePage)}?id=<%- p2.actor.id %>">
 						<img class="media-object rounded-x" src="<%- p2.actor.photo.smallPhotoUrl %>" alt=""/>
 					</a>
 					<div class="media-body">
 						<h4 class="media-heading">
-							<strong><a href="{!$Page.CommunityProfilePage}?id=<%- p2.actor.id %>"><%- p2.actor.displayName %> <%- p2.actor.role !== null ?  '(' + p2.actor.role + ')': '' %></a></strong>
+							<strong><a href="{!IF(isUnityTemplate,$Page.UnityProfilePage,$Page.CommunityProfilePage)}?id=<%- p2.actor.id %>"><%- p2.actor.displayName %> <%- p2.actor.role !== null ?  '(' + p2.actor.role + ')': '' %></a></strong>
 							<% if(p2.capabilities.edit.editedDate) {%>
 								<small><a href="javascript:void(0);">{!$Label.LBL_Edited} <span><%- p2.capabilities.edit.editedDate %></span></a></small>
 							<% }else{ %>
@@ -388,12 +388,12 @@
 			</script>
 			<script id="ttp2" type="text/template">
 								<span id="m<%- c2.id %>">
-								<a class="pull-left" href="{!$Page.CommunityProfilePage}?id=<%- c2.user.id %>">
+								<a class="pull-left" href="{!IF(isUnityTemplate,$Page.UnityProfilePage,$Page.CommunityProfilePage)}?id=<%- c2.user.id %>">
 									<img class="media-object rounded-x" src="<%- c2.user.photo.smallPhotoUrl %>" alt=""/>
 								</a>
 								<div class="media-body">
 									<h4 class="media-heading">
-										<strong><a href="{!$Page.CommunityProfilePage}?id=<%- c2.user.id %>"><%- c2.user.displayName %> <%- c2.user.role !== null ?  '(' + c2.user.role + ')': '' %></a></strong>
+										<strong><a href="{!IF(isUnityTemplate,$Page.UnityProfilePage,$Page.CommunityProfilePage)}?id=<%- c2.user.id %>"><%- c2.user.displayName %> <%- c2.user.role !== null ?  '(' + c2.user.role + ')': '' %></a></strong>
 										<% if(c2.capabilities.edit.editedDate) {%>
 											<small><a href="javascript:void(0);">{!$Label.LBL_Edited} <span><%- c2.capabilities.edit.editedDate %></span></a></small>
 										<% }else{ %>
@@ -1574,7 +1574,7 @@
 			_.each(o.messageSegments,function(item){
 				if(item.record != null){
 					if(item.record.id.indexOf("005") == 0){
-						outString += '<a href="{!$Page.CommunityProfilePage}?id='+item.record.id+'">@'+item.name+'</a>';
+						outString += '<a href="{!IF(isUnityTemplate,$Page.UnityProfilePage,$Page.CommunityProfilePage)}?id='+item.record.id+'">@'+item.name+'</a>';
 					}else{
 						outString += '<a href="{!$Page.CommunityGroupDetailPage}?gr='+item.record.id+'">@'+item.name+'</a>';
 					}

@@ -30,6 +30,9 @@
 public with sharing class CommunityFeedNavigationController {
 
 	public Integer MessageUnreadCount { get; set; }
+	public String studentName { get; set; }
+	public String studentRole { get; set; }
+	public Boolean isSubscribe { get; set; }
 	public Boolean showMessages {
 		get {
 			Boolean result = true;
@@ -56,6 +59,8 @@ public with sharing class CommunityFeedNavigationController {
 		return [SELECT FullPhotoUrl FROM User WHERE Id = :UserInfo.getUserId()].FullPhotoUrl;
 	}
 	
+	public Boolean isUnityTemplate { get { return CommunityUtils.getUnity20TemplateUse(); } }
+	
 	
 	public String controllerPhotoUrl {
 		get {
@@ -75,6 +80,7 @@ public with sharing class CommunityFeedNavigationController {
 	public String photoName { get; set; }
 	public String photoContentType { get; set; }
 	public Boolean currentUser { get; set; }
+	public String currentUserId { get; set; }
 	
 
 	// photo positions vars
@@ -213,6 +219,11 @@ public with sharing class CommunityFeedNavigationController {
 			aList.add(new alertWrapper(cNews));
 		}
 		return aList;
+	}
+
+	public void subscribeUser(){ 
+		CommunityUtils.subscriberUser(currentUserId,!isSubscribe);
+		isSubscribe = !isSubscribe;
 	}
 
 	public class AlertWrapper{
