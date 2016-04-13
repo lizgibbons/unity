@@ -47,7 +47,6 @@ global with sharing class CommunityProfilePageController {
 	public Boolean getIsCommunityUser() {
 		if (currentUserId == UserInfo.getUserId()) return true;
 		if (currentProfile == null) return false;
-        if (currentProfiles == null) return false;
 		List<NetworkMember> nmList = [SELECT Id FROM NetworkMember WHERE MemberId = :currentUserId AND Member.isActive = true AND NetworkId = :Network.getNetworkId()];
 		return !nmList.isEmpty();
 	}
