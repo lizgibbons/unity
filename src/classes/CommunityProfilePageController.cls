@@ -134,20 +134,20 @@ global with sharing class CommunityProfilePageController {
             Map<String, String> profileNameAndPrimary = new Map<String, String>();
 			for (Community_Profile__c lpItem : localProfiles) {
 				profiles.add(new ProfileTab(lpItem, (lpItem.Id == currentProfile.Id)));
-                profileNameAndPrimary.put(lpItem.RecordType.Name, getPrimary(lpItem));
+                profileNameAndPrimary.put(lpItem.RecordType.Name.replace('/',''), getPrimary(lpItem));
 			}
 			//handle add to package dynamic section labels
 			String section1 = Label.LBL_About_me;
 			String section2 = Label.LBL_Contact;
 			// select contact with field from fieldset
 			overviewTab = new List<CommunityFieldLayout>();
-            Set<String> rtName = new Set<String>();
+            Map<String,String> rtName = new Map<String,String>();
             if(CommunityUtils.getUnity20TemplateUse() && checkUnityPage(ApexPages.CurrentPage().getUrl())){
                 for(ProfileTab profile : profiles){
-                    rtName.add(profile.name);
+                    rtName.put(profile.name.replace('/',''), profile.name);
                 }
             }else{
-                rtName.add(currentProfile.RecordType.Name.replace('/',''));
+                rtName.put(currentProfile.RecordType.Name.replace('/',''), currentProfile.RecordType.Name);
             }
 			Map<String, CommunityFieldLayout> tabMap = new Map<String, CommunityFieldLayout>();
 			Schema.DescribeSObjectResult dsorProfile = SObjectType.Community_Profile__c;
@@ -160,8 +160,8 @@ global with sharing class CommunityProfilePageController {
 				String fsLabel = fsItem.getLabel();
 				if (fsLabel.contains(':')) {
 					String[] parts = fsLabel.split(':');
-                    if (parts.size() == 3 && rtName.contains(parts[0]) && parts[2].isNumeric()) {
-                        fieldsets.add(new List<String> {sfName, parts[1], parts[0], profileNameAndPrimary.get(parts[0])});
+                    if (parts.size() == 3 && rtName.keySet().contains(parts[0]) && parts[2].isNumeric()) {
+                        fieldsets.add(new List<String> {sfName, parts[1], rtName.get(parts[0]), profileNameAndPrimary.get(parts[0])});
 						Integer sNum = Integer.valueOf(parts[2]);
 						Boolean notAdded = true;
 						CommunityFieldLayout cflTemp =  new CommunityFieldLayout(
