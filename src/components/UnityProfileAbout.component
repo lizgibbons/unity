@@ -1,0 +1,28 @@
+<apex:component >
+	<apex:attribute name="so" type="SObject" required="true" description="sobject with fields to display"/>
+	<apex:attribute name="fsc" type="Schema.FieldSet" required="true" description="field set"/>
+	<apex:attribute name="son" type="String" required="false" description="name of the object"/>
+    <apex:attribute name="profile" type="String" required="false" description=""/>
+    <apex:attribute name="primary" type="String" required="false" description=""/>
+	
+
+    <div class="card-toggle-content disabled">
+        <a class="it-interestsToggleContent1" role="button">
+            <h3 class="sectionH3">{!profile} {!$Label.LBL_Information} {!primary}</h3>
+            <i class="lrm lrm-chevrondown"></i>
+        </a>
+    </div>
+    <div class="card-content">
+        <div class="clearfix">
+            <dl>
+            	<apex:repeat value="{!fsc.fields}" var="fs">
+					<apex:outputPanel layout="none" rendered="{!ISBLANK(son) || $ObjectType[son].fields[fs.fieldPath].Accessible}">
+						<dt class="margin-bottom-10"><strong>{!fs.label}</strong></dt>
+						<dd><apex:outputField value="{!so[fs.fieldPath]}"/></dd>
+					</apex:outputPanel>
+				</apex:repeat>
+            </dl>
+        </div>
+    </div>
+            
+</apex:component>
