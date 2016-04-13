@@ -36,7 +36,7 @@
 	<script id="nPanel" type="text/template">
 		<% _.each(rc, function(n){ %>
 			<li class="<%= (n.IsRead) ? 'feedMenuItem' : 'feedMenuItem unread' %>">
-				<a href="{!$Page.CommunityProfilePage}?id=<%- n.MemberId %>" class="avatar it-navatar6"><img src="<%- printPhotoUrl(n.Image) %>"/></a>
+				<a href="{!$Page.UnityProfilePage}?id=<%- n.MemberId %>" class="avatar it-navatar6"><img src="<%- printPhotoUrl(n.Image) %>"/></a>
 				<p>
 					<strong><%- n.Name %></strong> <%
 						if(n.StrongMessage != null){

@@ -120,7 +120,7 @@
                     <ul class="list-unstyled blog-photos">
                         <apex:repeat value="{!members.users}" var="member">
                             <li>
-                                <a href="{!$Page.CommunityProfilePage}?id={!member.id}">
+                                <a href="{!IF(isUnityTemplate,$Page.UnityProfilePage,$Page.CommunityProfilePage)}?id={!member.id}">
                                     <img class="hover-effect" src="{!member.photourl}" title="{!member.name}{!IF(ISBLANK(member.role),'', ' (' + member.role + ')')}"/>
                                 </a>
                             </li>
@@ -215,13 +215,13 @@
                             <apex:repeat value="{!members.users}" var="mmbr" id="membermodal">
                                 <tr>
                                     <td width="50px">
-                                        <a href="{!$Page.CommunityProfilePage}?id={!mmbr.id}">
+                                        <a href="{!IF(isUnityTemplate,$Page.UnityProfilePage,$Page.CommunityProfilePage)}?id={!mmbr.id}">
                                             <apex:image styleClass="rounded-x margin-top-0 margin-bottom-0" url="{!mmbr.photourl}" width="50px" height="50px"/>
                                         </a>
                                     </td>
                                     <td>
                                         <div class="name-location">
-                                            <a href="{!$Page.CommunityProfilePage}?id={!mmbr.id}">
+                                            <a href="{!IF(isUnityTemplate,$Page.UnityProfilePage,$Page.CommunityProfilePage)}?id={!mmbr.id}">
                                                 <strong>{!mmbr.name}</strong>
                                             </a><br/>
                                             <span>{!mmbr.role}</span>
