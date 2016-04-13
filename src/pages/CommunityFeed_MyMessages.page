@@ -256,7 +256,7 @@
 																</div>
 																<div class="media-body">
 																	<h4 class="media-heading">
-																		<strong><a href="{!$Page.CommunityProfilePage}?id={!message.Sender.MemberId}" title="{!message.Sender.MemberName}">{!message.Sender.MemberName} {!message.Sender.MemberRole} {!message.Sender.MemberContactRole}</a></strong>
+																		<strong><a href="{!IF(isUnityTemplate,$Page.UnityProfilePage,$Page.CommunityProfilePage)}?id={!message.Sender.MemberId}" title="{!message.Sender.MemberName}">{!message.Sender.MemberName} {!message.Sender.MemberRole} {!message.Sender.MemberContactRole}</a></strong>
 																		<small><apex:outputText value="{!message.SentDateFormatted}" /></small>
 																	</h4>
 																	<p>{!message.MessageBody.Text}</p>
@@ -359,7 +359,7 @@
 					</div>
 					<div class="messageContent">
 						<div class="messageSender">
-							<a href="{!$Page.CommunityProfilePage}?id=<%- message.Sender.MemberId %>" title="<%- message.Sender.MemberName %>"><%- message.Sender.MemberName %></a>
+							<a href="{!IF(isUnityTemplate,$Page.UnityProfilePage,$Page.CommunityProfilePage)}?id=<%- message.Sender.MemberId %>" title="<%- message.Sender.MemberName %>"><%- message.Sender.MemberName %></a>
 						</div>
 						<div class="messageBody"><%- message.MessageBody.Text %></div>
 					</div>
