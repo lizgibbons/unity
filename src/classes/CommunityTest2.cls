@@ -669,16 +669,37 @@ private class CommunityTest2 {
 				Body = 'testBody'
 			);
 			insert testFeedItem;
+
+			FeedComment testFeedComment = new FeedComment(
+				FeedItemId = testFeedItem.Id,
+				CommentBody = 'testBody'
+			);
+			insert testFeedComment;
 			Community_Group_Manager__c cgm = new Community_Group_Manager__c(Group_Control__c = cgc.Id, Group_Manager_User__c = df.communityUser.Id);
 			insert cgm;
 			CommunityHomeNotificationsController chnc = new CommunityHomeNotificationsController();
 			String result = CommunityHomeNotificationsController.notifications();
+
 			String message = 'test message';
 			ConnectApi.ChatterMessage cm = ConnectApi.ChatterMessages.sendMessage(Network.getNetworkId(), message, df.secondCommunityUser.Id);
 		}
 
 		System.runAs(df.secondCommunityUser) {
+			List<CommunityHomeNotificationsController.NotificationWrapper> privateHPMessages = CommunityHomeNotificationsController.privateHPMessages();
+			List<CommunityHomeNotificationsController.NotificationWrapper> gmNotifications = CommunityHomeNotificationsController.getGroupManagerFeeds();
+			CommunityHomeNotificationsController notifyCtrl = new CommunityHomeNotificationsController();
+			if (!gmNotifications.isEmpty()) {
+				notifyCtrl.ParentIdParam = gmNotifications[0].ParentId;
+				notifyCtrl.ItemIdParam = gmNotifications[0].ItemId;
+				notifyCtrl.IsReadParam = true;
+				notifyCtrl.markNotification();
+				notifyCtrl.IsReadParam = false;
+				notifyCtrl.markNotification();
+				notifyCtrl.IsReadParam = true;
+				notifyCtrl.markNotification();
+			}
 			String result1 = CommunityHomeNotificationsController.notifications();
+
 			System.Assert(result1.length()>0);
 			
 		}

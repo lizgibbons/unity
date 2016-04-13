@@ -65,11 +65,15 @@
         <members>UnityFeed</members>
         <members>UnityFootResource</members>
         <members>UnityFooter</members>
+        <members>UnityGroups</members>
         <members>UnityHeadResource</members>
         <members>UnityHomeEvents</members>
         <members>UnityHomeNews</members>
         <members>UnityHomeNotifications</members>
         <members>UnityMenu</members>
+        <members>UnityProfileAbout</members>
+        <members>UnityProfileFeedNavigation</members>
+        <members>UnityProfileFollow</members>
         <name>ApexComponent</name>
     </types>
     <types>
@@ -102,6 +106,7 @@
         <members>Unity2SiteTemplate</members>
         <members>UnityAdmin</members>
         <members>UnityHome</members>
+        <members>UnityProfilePage</members>
         <members>UnitySiteTemplate</members>
         <name>ApexPage</name>
     </types>
@@ -308,6 +313,7 @@
         <members>BTN_Edit_Event</members>
         <members>BTN_Edit_News</members>
         <members>BTN_Edit_Resource</members>
+        <members>BTN_Follow</members>
         <members>BTN_Following</members>
         <members>BTN_GoogleCal</members>
         <members>BTN_ICS</members>
@@ -364,6 +370,7 @@
         <members>ERR_Choice_To_Long</members>
         <members>ERR_Post_Too_Large</members>
         <members>Feed_Nav_People</members>
+        <members>LBL_About</members>
         <members>LBL_About_Me</members>
         <members>LBL_About_this_group</members>
         <members>LBL_Account_Settings</members>
@@ -383,6 +390,7 @@
         <members>LBL_Back_to_CRM</members>
         <members>LBL_Banner_Caption</members>
         <members>LBL_Banner_Text</members>
+        <members>LBL_Bookmarked</members>
         <members>LBL_Campus_Updates</members>
         <members>LBL_CancelRequest_Message</members>
         <members>LBL_ChangePassword</members>
@@ -427,6 +435,7 @@
         <members>LBL_EditProfile</members>
         <members>LBL_Edit_Details</members>
         <members>LBL_Edit_Group</members>
+        <members>LBL_Edit_Photo</members>
         <members>LBL_Edited</members>
         <members>LBL_EmailNotifications</members>
         <members>LBL_Event_Group</members>
@@ -476,6 +485,7 @@
         <members>LBL_Groups</members>
         <members>LBL_Help</members>
         <members>LBL_Home</members>
+        <members>LBL_Information</members>
         <members>LBL_Interests</members>
         <members>LBL_Last</members>
         <members>LBL_Latest_Tweets</members>
@@ -500,11 +510,14 @@
         <members>LBL_ManagerFeed</members>
         <members>LBL_ManagerGroupMembers</members>
         <members>LBL_MangeGroupManagers</members>
+        <members>LBL_Mark_As_Read</members>
+        <members>LBL_Mark_As_Unread</members>
         <members>LBL_Member</members>
         <members>LBL_Members</members>
         <members>LBL_MentionsMeComment</members>
         <members>LBL_MentionsMePost</members>
         <members>LBL_Mentions_Title</members>
+        <members>LBL_Message</members>
         <members>LBL_Message_only_one_tag</members>
         <members>LBL_Message_select_resource</members>
         <members>LBL_Messages</members>
@@ -513,6 +526,7 @@
         <members>LBL_MyGroups</members>
         <members>LBL_My_Account</members>
         <members>LBL_My_Discussions</members>
+        <members>LBL_My_Groups</members>
         <members>LBL_My_News</members>
         <members>LBL_My_Profile</members>
         <members>LBL_Name</members>
@@ -532,6 +546,8 @@
         <members>LBL_Notifications</members>
         <members>LBL_Notifications_Message</members>
         <members>LBL_Notifications_Post</members>
+        <members>LBL_NotificationType_Comment</members>
+        <members>LBL_NotificationType_Post</members>
         <members>LBL_OldPassword</members>
         <members>LBL_Other</members>
         <members>LBL_Owner</members>
@@ -552,6 +568,7 @@
         <members>LBL_Posted</members>
         <members>LBL_PostsLikes_Title</members>
         <members>LBL_Previous</members>
+        <members>LBL_Primary</members>
         <members>LBL_PrivateGroup</members>
         <members>LBL_Profile</members>
         <members>LBL_ProfilePosts</members>
@@ -585,6 +602,8 @@
         <members>LBL_Select_Image</members>
         <members>LBL_Select_Prim_Tags</members>
         <members>LBL_Select_Tags</members>
+        <members>LBL_Send</members>
+        <members>LBL_Send_Message</members>
         <members>LBL_Settings</members>
         <members>LBL_Share</members>
         <members>LBL_Share_AddGroup</members>
@@ -604,9 +623,11 @@
         <members>LBL_TermsAndConditions</members>
         <members>LBL_Thumbnail</members>
         <members>LBL_Thumbnail_Use</members>
+        <members>LBL_To</members>
         <members>LBL_Today_is</members>
         <members>LBL_Topic</members>
         <members>LBL_Topics</members>
+        <members>LBL_Unfollow</members>
         <members>LBL_Unity_Post</members>
 		<members>LBL_UnRead</members>
         <members>LBL_Unmute_Feed</members>

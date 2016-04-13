@@ -39,6 +39,7 @@ global with sharing class CommunityFeedController {
 	public static Boolean fromEmail { get; set; }
 	public static String feedfromEmailId { get; set; }
 	public static Map<String, String> parentManagerId { get; set;}
+	public Boolean isUnityTemplate { get { return CommunityUtils.getUnity20TemplateUse(); } }
 	public static Boolean unity20_Template_Use { 
 		get{
 			Community_Template_Settings__c cts = Community_Template_Settings__c.getOrgDefaults();
@@ -117,7 +118,7 @@ global with sharing class CommunityFeedController {
 	public String currentUserPhoto {
 		get {
 			String imgPhoto =  ConnectApi.UserProfiles.getPhoto(Network.getNetworkId(),'me').smallPhotoUrl;
-			return unity20_Template_Use ? CommunityUtils.checkUrlForImage(imgPhoto) : imgPhoto;
+			return unity20_Template_Use ? CommunityUtils.checkUrlForImage(imgPhoto,'') : imgPhoto;
             //return ConnectApi.UserProfiles.getPhoto(Network.getNetworkId(),'me').smallPhotoUrl;
 		}
 	}
