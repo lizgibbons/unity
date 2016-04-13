@@ -185,12 +185,12 @@
 												<apex:repeat value="{!members.users}" var="mms">
 													<tr class="{!IF(mms.available == false,'unavailable','')}">
 														<td>
-															<a href="{!$Page.CommunityProfilePage}?id={!mms.id}">
+															<a href="{!IF(isUnityTemplate, $Page.UnityProfilePage ,$Page.CommunityProfilePage)}?id={!mms.id}">
 																<apex:image styleClass="rounded-x margin-top-0 margin-bottom-0" url="{!mms.photourl}" width="50px" height="50px"/>
 															</a>
 														</td>
 														<td>
-															<div onclick="window.open('{!$Page.CommunityProfilePage}?id={!mms.id}','_self');" class="cursor-pointer">
+															<div onclick="window.open('{!IF(isUnityTemplate,$Page.UnityProfilePage ,$Page.CommunityProfilePage)}?id={!mms.id}','_self');" class="cursor-pointer">
 																<div><strong>{!mms.name}{!IF(mms.available == false,' ('+$Label.LBL_User_Not_Available+')','')}</strong></div>
 																<apex:outputPanel layout="block" rendered="{!!ISBLANK(mms.city) || !ISBLANK(mms.country)}">
 																	<i class="fa fa-map-marker"></i>&nbsp;{!mms.city}{!IF(mms.city!=null && mms.country!=null, ', ' ,'')}{!mms.country}
@@ -265,12 +265,12 @@
 												<apex:repeat value="{!managers.users}" var="mms">
 													<tr class="{!IF(mms.available == false,'unavailable','')}">
 														<td>
-															<a href="{!$Page.CommunityProfilePage}?id={!mms.id}">
+															<a href="{!IF(isUnityTemplate,$Page.UnityProfilePage ,$Page.CommunityProfilePage)}?id={!mms.id}">
 																<apex:image styleClass="rounded-x margin-top-0 margin-bottom-0" url="{!mms.photourl}" width="50px" height="50px"/>
 															</a>
 														</td>
 														<td>
-															<div onclick="window.open('{!$Page.CommunityProfilePage}?id={!mms.id}','_self');" class="cursor-pointer">
+															<div onclick="window.open('{!IF(isUnityTemplate,$Page.UnityProfilePage ,$Page.CommunityProfilePage)}?id={!mms.id}','_self');" class="cursor-pointer">
 																<div><strong>{!mms.name}{!IF(mms.available == false,' ('+$Label.LBL_User_Not_Available+')','')}</strong></div>
 																<apex:outputPanel layout="block" rendered="{!!ISBLANK(mms.city) || !ISBLANK(mms.country)}">
 																	<i class="fa fa-map-marker"></i>&nbsp;{!mms.city}{!IF(mms.city!=null && mms.country!=null, ', ' ,'')}{!mms.country}
@@ -382,10 +382,10 @@
 								<table class="table table-hover" id="groupmembertable">
 									<apex:repeat value="{!allusers.users}" var="us">
 										<tr class="{!IF(us.available == false,'unavailable','')}">
-											<td onclick="window.open('{!$Page.CommunityProfilePage}?id={!us.id}','_self');" class="cursor-pointer width-80">
+											<td onclick="window.open('{!IF(isUnityTemplate,$Page.UnityProfilePage ,$Page.CommunityProfilePage)}?id={!us.id}','_self');" class="cursor-pointer width-80">
 												<apex:image styleClass="media-object rounded-x" url="{!us.photourl}"/>
 											</td>
-											<td onclick="window.open('{!$Page.CommunityProfilePage}?id={!us.id}','_self');" class="cursor-pointer">
+											<td onclick="window.open('{!IF(isUnityTemplate,$Page.UnityProfilePage ,$Page.CommunityProfilePage)}?id={!us.id}','_self');" class="cursor-pointer">
 												<div><strong>{!us.name}{!IF(us.available == false,' ('+$Label.LBL_User_Not_Available+')','')}</strong></div>
 												<div>{!us.role}</div>
 											</td>

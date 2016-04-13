@@ -42,6 +42,12 @@ public without sharing class CommunityHelperWithoutSharing {
 		String sortCol = String.isNotBlank(sortColumn) ? 'Name' : String.escapeSingleQuotes(sortColumn);
 		String sortDir = isAscDirect ? 'ASC' : 'DESC';
 		List<User> uList = new List<User>();
+		// if Unity 2.0 Template querySearch is used as user Id (uses for Profilefeed page)
+		String unityUserId;
+		if(querySearch != NULL && querySearch instanceof Id){
+			unityUserId = querySearch;
+			querySearch = NULL;
+		}
 		try {
 			querySearch = String.isNotBlank(querySearch) ? String.escapeSingleQuotes(querySearch) + '%' : '%%';
 			String fieldsSting = '';
@@ -51,7 +57,7 @@ public without sharing class CommunityHelperWithoutSharing {
 				}
 			}
 			String currentNetworkId = Network.getNetworkId();
-			String currentUserId = UserInfo.getUserId();
+			String currentUserId = (CommunityUtils.getUnity20TemplateUse() && unityUserId != NULL) ? unityUserId : UserInfo.getUserId();
 			String queryNetworkMembers = 'SELECT Id, Member.Id, Member.Name' + fieldsSting + ' FROM NetworkMember'
 					+ ' WHERE Member.isActive = true AND NetworkId = :currentNetworkId AND MemberId != :currentUserId'
 					+ ' AND (Member.Name LIKE \'' + querySearch + '\' OR Member.LastName LIKE \''+querySearch+ '\' OR Member.FirstName LIKE \''+querySearch+ '\')'
@@ -112,13 +118,21 @@ public without sharing class CommunityHelperWithoutSharing {
 	}
 
 // used for CommunityHomeNotificationController
-	public static List<FeedItem> getFeeds(Set<Id> controlsIds, String userId){
-		String queryUserId = CommunityUtils.validateId(userId);
-		return [SELECT Id, ParentId, Type, CommentCount, LinkUrl, LastModifiedDate, CreatedById, Visibility 
+	public static List<FeedItem> getFeeds(Set<Id> controlsIds){
+		return [SELECT Id, ParentId, Type, CommentCount, LinkUrl, CreatedDate, LastModifiedDate, CreatedById, Visibility 
 				FROM FeedItem
 				WHERE ParentId IN :controlsIds 
-				AND CreatedById != :queryUserId
 				AND Visibility = 'AllUsers'
+				LIMIT 10000];
+		}
+
+// used for CommunityHomeNotificationController
+	public static List<FeedComment> getComments(Set<Id> feedItemsIds, String userId){
+		String queryUserId = CommunityUtils.validateId(userId);
+		return [SELECT Id, ParentId, FeedItemId, CreatedById, CreatedDate
+				FROM FeedComment
+				WHERE FeedItemId IN :feedItemsIds
+				AND CreatedById != :queryUserId
 				LIMIT 10000];
 		}
 
