@@ -268,6 +268,7 @@ private class CommunityTest {
 			insert cth;
 			Community_Tag__c ct = new Community_Tag__c(Name='t',Community_Theme__c=cth.Id);
 			insert ct;
+			Test.setCurrentPage(Page.CommunityProfilePage);
 			ApexPages.currentPage().getParameters().put('id',df.communityUser.Id);
 			CommunityProfilePageController cppc = new CommunityProfilePageController();
 			//cppc.overviewTab[0].getShowSection();

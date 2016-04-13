@@ -46,6 +46,7 @@ public with sharing class CommunityGroupFilesController {
     public Boolean allOk { get; set; }
     public static Boolean fromEmail { get; set; }
     public Boolean enableShare { get; set; }
+    public Boolean isUnityTemplate { get { return CommunityUtils.getUnity20TemplateUse(); } }
 
     public String parentId { get; set; }
     public ParentWrapper parent { get; set; }
@@ -130,7 +131,8 @@ public with sharing class CommunityGroupFilesController {
             else if (parentObjectType.equalsIgnoreCase('User') || parentObjectType.equalsIgnoreCase('Contact')) {
                 if (!SObjectType.User.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.User);
                 List<User> uList = [SELECT Id, Name, FullPhotoUrl FROM User WHERE Id = :queryParentId OR ContactId = :queryParentId];
-                parent = new ParentWrapper(uList[0].Id, uList[0].Name, Label.LBL_People, prepareUrl(Page.CommunityFeed_People.getUrl()), prepareUrl(Page.CommunityProfilePage.getUrl())+'?id='+uList[0].Id, uList[0].FullPhotoUrl);
+                String urlForPrepare = CommunityUtils.getUnity20TemplateUse() ? Page.UnityProfilePage.getUrl() : Page.CommunityProfilePage.getUrl();
+                parent = new ParentWrapper(uList[0].Id, uList[0].Name, Label.LBL_People, prepareUrl(Page.CommunityFeed_People.getUrl()), prepareUrl(urlForPrepare)+'?id='+uList[0].Id, uList[0].FullPhotoUrl);
             }
         }
         if (allOk) {
