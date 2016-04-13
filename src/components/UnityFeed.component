@@ -116,9 +116,9 @@
 						<% if(p2.parentLink){%>
 							<p><a class="font-weight-bold" href="<%- p2.parentLink %>">{!$Label.LBL_All_Updates}</a> ) {!$Label.LBL_This_Update} </p>
 						<% }else if(p2.parentId == "{!currentUserId}"){%>
-							<p><a class="font-weight-bold" href="{!$Page.CommunityFeed_MyFeed}">{!$Label.LBL_All_Updates}</a> ) {!$Label.LBL_This_Update}</p>
+							<p><a class="font-weight-bold" href="{!$Page.UnityHome}">{!$Label.LBL_All_Updates}</a> ) {!$Label.LBL_This_Update}</p>
 						<% }else {%>
-							<p><a class="font-weight-bold" href="{!$Page.CommunityProfilePage}?id=<%- p2.parentId %>&f=2">{!$Label.LBL_All_Updates}</a> ) {!$Label.LBL_This_Update}</p>
+							<p><a class="font-weight-bold" href="{!$Page.UnityProfilePage}?id=<%- p2.parentId %>&f=2">{!$Label.LBL_All_Updates}</a> ) {!$Label.LBL_This_Update}</p>
 						<%}%>
 					<% } %>	
 				<% if (p2.showLink){ %><div class="card post-link" id="m<%- p2.id %>">
@@ -127,10 +127,10 @@
 				<% }else{ %><div class="card post-comment" id="m<%- p2.id %>">
 				<% } %>
 					<div class="card-header">
-						<a class="avatar it-avatar1" href="{!$Page.CommunityProfilePage}?id=<%- p2.actor.id %>">
+						<a class="avatar it-avatar1" href="{!$Page.UnityProfilePage}?id=<%- p2.actor.id %>">
 							<img src="<%- printPhotoUrl(p2.actor.photo.smallPhotoUrl) %>" alt=""/>
 						</a>
-						<h3><a class="it-userName1" href="{!$Page.CommunityProfilePage}?id=<%- p2.actor.id %>"><%- p2.actor.displayName %></a>
+						<h3><a class="it-userName1" href="{!$Page.UnityProfilePage}?id=<%- p2.actor.id %>"><%- p2.actor.displayName %></a>
 							<span class="post-type"> posted a <strong>
 							<% if (p2.showLink){ %>{!$Label.LBL_Link}</strong>
 							<% }else if(p2.showContent){ %>{!$Label.LBL_File}</strong>
@@ -308,11 +308,11 @@
 			</script>
 			<script id="ttp2" type="text/template">
 								<div class="comment" id="m<%- c2.id %>">
-									<a class="avatar it-avatar4" href="{!$Page.CommunityProfilePage}?id=<%- c2.user.id %>">
+									<a class="avatar it-avatar4" href="{!$Page.UnityProfilePage}?id=<%- c2.user.id %>">
 										<img src="<%- printPhotoUrl(c2.user.photo.smallPhotoUrl) %>" alt=""/>
 									</a>
 									<div class="comment-holder">
-											<p><strong><a href="{!$Page.CommunityProfilePage}?id=<%- c2.user.id %>" class="it-userCommentAvatar1"><%- c2.user.displayName %></a></strong>
+											<p><strong><a href="{!$Page.UnityProfilePage}?id=<%- c2.user.id %>" class="it-userCommentAvatar1"><%- c2.user.displayName %></a></strong>
 												<% var p2p = parseFeedBody(c2.body,c2.topicsUser);
 												print(wrapnl(p2p)); %>
 											</p>
@@ -350,7 +350,7 @@
 			
 			<script id="atp" type="text/template">
 				<form name="postform">
-					<a class="avatar" href="{!$Page.CommunityProfilePage}?id=<%- rc.user.Id %>">
+					<a class="avatar" href="{!$Page.UnityProfilePage}?id=<%- rc.user.Id %>">
 						<img src="<%- printPhotoUrl(rc.user.SmallPhotoUrl) %>" alt=""/>
 					</a>
 					<textarea id="post-area" name="message" class="validate-textarea" onFocus="checkmi(this);"  onclick="checkmi(this);" placeholder="<%- rc.unPlaceholder %>" data-field-for-post></textarea>
@@ -1489,7 +1489,7 @@
 			_.each(o.messageSegments,function(item){
 				if(item.record != null){
 					if(item.record.id.indexOf("005") == 0){
-						outString += '<a href="{!$Page.CommunityProfilePage}?id='+item.record.id+'">@'+item.name+'</a>';
+						outString += '<a href="{!$Page.UnityProfilePage}?id='+item.record.id+'">@'+item.name+'</a>';
 					}else{
 						outString += '<a href="{!$Page.CommunityGroupDetailPage}?gr='+item.record.id+'">@'+item.name+'</a>';
 					}
