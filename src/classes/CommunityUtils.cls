@@ -267,13 +267,14 @@ public with sharing class CommunityUtils {
 		return inUrl;
 	}
 
-	public static String checkUrlForImage(String inUrl) {
+	public static String checkUrlForImage(String inUrl, String imgSize) {
 		List<String> url = inUrl.split('/');
 		String imgUrl = inUrl;
+		String imagePath = imgSize.equals('medium') ? 'default-male-medium.jpg' : 'default-male.jpg';
 		if(url[url.size()-2].length() == 3){
 			String ns = getPackagePrefix();
 			List<StaticResource> srList = [SELECT SystemModstamp FROM StaticResource WHERE Name = 'assets2' AND NamespacePrefix = :ns.replace('__','')];
-			imgUrl = (srList.size() == 0) ? imgUrl : ('/resource/' + srList[0].SystemModstamp.getTime() +'/' + ns + 'assets2/images/home/default-male.jpg');
+			imgUrl = (srList.size() == 0) ? imgUrl : ('/resource/' + srList[0].SystemModstamp.getTime() +'/' + ns + 'assets2/images/home/'+imagePath);
 			
 			if (String.isNotBlank(Site.getPathPrefix()) && !imgUrl.startsWith(Site.getPathPrefix())) {
 				imgUrl = Site.getPathPrefix() + imgUrl;
@@ -463,6 +464,36 @@ public with sharing class CommunityUtils {
 	public static Boolean checkAPIEnable (){
 
 		return [SELECT ID, PermissionsApiEnabled FROM Profile WHERE ID = :Userinfo.getProfileId() LIMIT 1].PermissionsApiEnabled; 
+	}
+
+
+	public static void insertNotificationViewedTask(Id inWhatId, Id itemId, Id inWhoId) {
+
+		insert new Task(
+			WhatId = inWhatId,
+			WhoId = inWhoId,
+			Subject = 'Feed Notification Viewed',
+			IsVisibleInSelfService = true,
+			Status = 'Completed',
+			ActivityDate = Date.today(),
+			Description = itemId
+		);
+	}
+
+	public static void removeNotificationViewedTask(Id inWhatId, Id itemId, Id inWhoId) {
+
+		List<Task> notifacationViews = [
+			SELECT Id, Description
+			FROM Task
+			WHERE WhatId = :inWhatId
+				AND WhoId = :inWhoId
+				AND Subject = 'Feed Notification Viewed'
+		];
+		List<Task> viewsForDelete = new List<Task>();
+		for (Task view : notifacationViews) {
+			if (view.Description == itemId) viewsForDelete.add(view);
+		}
+		delete viewsForDelete;
 	}
 
 	public static Map<String,Boolean> checkCRUDforObject (String objName){

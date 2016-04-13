@@ -31,26 +31,60 @@ public with sharing class CommunityFeed_PeopleController {
 
 	public CommunityFeed_PeopleController() {
 	}
+
+	public Boolean isUnityTemplate { get { return CommunityUtils.getUnity20TemplateUse(); } }
+
 	@RemoteAction
-	public static List<UserItem> getPeoples() {
+	public static List<UserItem> getUnityPeoples(String usId) {
 		List<UserItem> peoples = new List<UserItem>();
 		if (!SObjectType.EntitySubscription.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.EntitySubscription);
 		List<EntitySubscription> followings = [
 			SELECT SubscriberId, ParentId, IsDeleted, Id, CreatedDate, CreatedById
-			FROM EntitySubscription WHERE SubscriberId =:Userinfo.getUserId() AND IsDeleted = false
+			FROM EntitySubscription WHERE SubscriberId =:usId AND IsDeleted = false
 			LIMIT 1000
 		];
 		Set<Id> followingsIds = new Set<Id>();
 		for (EntitySubscription subscription : followings) { 
 			followingsIds.add(subscription.ParentId); 
 		}
-		
+		List<EntitySubscription> followers = [
+			SELECT SubscriberId, ParentId, IsDeleted, Id, CreatedDate, CreatedById
+			FROM EntitySubscription WHERE ParentId =:usId AND IsDeleted = false
+			LIMIT 1000
+		];
+		Set<Id> followersIds = new Set<Id>();
+		for (EntitySubscription subscription : followers) { 
+			followersIds.add(subscription.SubscriberId); 
+		}
+		List<User> uList = CommunityHelperWithoutSharing.getCommunityUsers(usId, 50000, new List<String>{'FirstName', 'LastName', 'SmallPhotoUrl', 'FullPhotoUrl', 'ContactId', 'Contact.Primary_Role__c', 'Community_Contact_ID__c'}, 'Name', true);
+		securityWrapper sw = new securityWrapper();
+		Map<Id,String> contactRoles = sw.prepareRoles(uList);
+		for (User uItem2 : uList) {
+			Id cId2 = getId(uItem2);
+			peoples.add(new UserItem(uItem2, followingsIds.contains(uItem2.Id), followersIds.contains(uItem2.Id), cId2 == NULL ? '' : contactRoles.get(cId2)));
+		}
+		return peoples;
+	}
+
+	@RemoteAction
+	public static List<UserItem> getPeoples() {
+		List<UserItem> peoples = new List<UserItem>();
+		if (!SObjectType.EntitySubscription.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.EntitySubscription);
+		List<EntitySubscription> followings = [
+			SELECT SubscriberId, ParentId, IsDeleted, Id, CreatedDate, CreatedById
+			FROM EntitySubscription WHERE SubscriberId =:UserInfo.getUserId() AND IsDeleted = false
+			LIMIT 1000
+		];
+		Set<Id> followingsIds = new Set<Id>();
+		for (EntitySubscription subscription : followings) { 
+			followingsIds.add(subscription.ParentId); 
+		}
 		List<User> uList = CommunityHelperWithoutSharing.getCommunityUsers(null, 50000, new List<String>{'FirstName', 'LastName', 'SmallPhotoUrl', 'FullPhotoUrl', 'ContactId', 'Contact.Primary_Role__c', 'Community_Contact_ID__c'}, 'Name', true);
 		securityWrapper sw = new securityWrapper();
 		Map<Id,String> contactRoles = sw.prepareRoles(uList);
 		for (User uItem2 : uList) {
 			Id cId2 = getId(uItem2);
-			peoples.add(new UserItem(uItem2, followingsIds.contains(uItem2.Id), cId2 == NULL ? '' : contactRoles.get(cId2)));
+			peoples.add(new UserItem(uItem2, followingsIds.contains(uItem2.Id), false,  cId2 == NULL ? '' : contactRoles.get(cId2)));
 		}
 		return peoples;
 	}
@@ -79,14 +113,15 @@ public with sharing class CommunityFeed_PeopleController {
 				if (String.isBlank(this.MemberPhotoUrl)) {
 					this.MemberPhotoUrl = '/profilephoto/005/T';
 				}
-				this.MemberPhotoUrl = this.MemberPhotoUrl.replace(Site.getBaseUrl(), '');
+				this.MemberPhotoUrl = CommunityUtils.getUnity20TemplateUse() ? CommunityUtils.checkUrlForImage(this.MemberPhotoUrl, 'medium') : this.MemberPhotoUrl.replace(Site.getBaseUrl(), '');
 				return this.MemberPhotoUrl;
 			}
 			set;
 		}
 		public Boolean MemberIsFollowing { get; set; }
+		public Boolean MemberIsFollowers { get; set; }
 
-		public UserItem(User member, Boolean isFollowing, String role) {
+		public UserItem(User member, Boolean isFollowing, Boolean isFollowers, String role) {
 			this.MemberId = member.Id;
 			this.MemberName = String.format('{0}{1}',
 				new List<String> {
@@ -95,8 +130,9 @@ public with sharing class CommunityFeed_PeopleController {
 				}
 			);
 			this.MemberRole = role;
-			this.MemberPhotoUrl = member.SmallPhotoUrl;
+			this.MemberPhotoUrl = CommunityUtils.getUnity20TemplateUse() ? CommunityUtils.checkUrlForImage(member.SmallPhotoUrl, 'medium') : member.SmallPhotoUrl;
 			this.MemberIsFollowing = isFollowing;
+			this.MemberIsFollowers = isFollowers;
 		}
 	}
 
