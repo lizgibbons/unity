@@ -69,7 +69,7 @@ global without sharing class CommunityUrlRewriter implements Site.UrlRewriter {
 
 		}
 		else if (url.contains(STANDARD_USER_DETAIL_PAGE)) {
-			redirect = Page.CommunityProfilePage;
+			redirect = isUnity2Template ? Page.UnityProfilePage : Page.CommunityProfilePage;
 			String uId = '';
 			Pattern myP = Pattern.compile('[\\?&]u=([^&]*)');
 			Matcher myM = myP.matcher(url);
@@ -121,7 +121,7 @@ global without sharing class CommunityUrlRewriter implements Site.UrlRewriter {
 			String currentId = myFriendlyUrl.getParameters().get('s1uid');
 						
 			if(myFriendlyUrl.getParameters().get('id') == NULL && parentId != NULL && parentId.substring(0, currentId.length()) != currentId){
-				redirect = Page.CommunityProfilePage;
+				redirect = isUnity2Template ? Page.UnityProfilePage : Page.CommunityProfilePage;
 				redirect.getparameters().put('oid',myFriendlyUrl.getParameters().get('u'));
 				redirect.getparameters().put('id',myFriendlyUrl.getParameters().get('u'));
 				redirect.getparameters().put('f','2');
@@ -148,7 +148,7 @@ global without sharing class CommunityUrlRewriter implements Site.UrlRewriter {
 					redirect.getParameters().put('fromEmail','1');
 				}
 				else {
-					redirect = Page.CommunityProfilePage;
+					redirect = isUnity2Template ? Page.UnityProfilePage : Page.CommunityProfilePage;
 					redirect.getparameters().put('oid',parentId);
 					redirect.getParameters().put('fid',myFriendlyUrl.getParameters().get('fid'));
 					redirect.getParameters().put('fromEmail','1');
