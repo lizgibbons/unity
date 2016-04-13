@@ -62,7 +62,7 @@ public with sharing class CommunityFeed_MyMessagesController {
 	}
 	public String SearchQuery { get; set; }
 
-	
+	public Boolean isUnityTemplate { get { return CommunityUtils.getUnity20TemplateUse(); } }
 
 	public CommunityFeed_MyMessagesController() {
 		//ApexPages.currentPage().getHeaders().put('X-Frame-Options', 'GOFORIT');
