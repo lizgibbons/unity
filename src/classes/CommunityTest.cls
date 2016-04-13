@@ -164,6 +164,8 @@ private class CommunityTest {
 			crc.imgFileName = 'ifn';
 			crc.resource.description__c='description';
 			crc.saveResource();
+			crc.getResourceLink();
+			crc.getIsNoteResource();
 
 			System.assertEquals([SELECT Name,Id From Community_Resource__c Where Name='r' ][0].Name,'r');
 
@@ -266,6 +268,7 @@ private class CommunityTest {
 			insert cth;
 			Community_Tag__c ct = new Community_Tag__c(Name='t',Community_Theme__c=cth.Id);
 			insert ct;
+			Test.setCurrentPage(Page.CommunityProfilePage);
 			ApexPages.currentPage().getParameters().put('id',df.communityUser.Id);
 			CommunityProfilePageController cppc = new CommunityProfilePageController();
 			//cppc.overviewTab[0].getShowSection();
