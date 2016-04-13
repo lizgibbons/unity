@@ -38,6 +38,7 @@ public with sharing class CommunityGroupManageController {
 	public Integer pageSize { get { return PAGE_SIZE; } }
 
 	public Boolean editMode { get { return editMode == NULL ? false : editMode; } set; }
+	public Boolean isUnityTemplate { get { return CommunityUtils.getUnity20TemplateUse(); } }
 
 	public CommunityGroupManageController() {
 		init();
