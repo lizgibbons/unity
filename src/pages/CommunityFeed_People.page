@@ -71,7 +71,7 @@
 												<div class="tab-pane active" id="all_people_tab">
 													<div class="col-md-12">
 														<div class="media media-v2" ng-repeat="p in allPeople | quickSearch:this | startFrom:page.startFrom() | limitTo:page.pageSize">
-															<a class="pull-left" href="{!$Page.CommunityProfilePage}?id={{ p.MemberId }}">
+															<a class="pull-left" href="{!IF(isUnityTemplate,$Page.UnityProfilePage,$Page.CommunityProfilePage)}?id={{ p.MemberId }}">
 																<img class="media-object rounded-x" ng-src="{{ p.MemberPhotoUrl }}" src="/s.gif" alt="" />
 															</a>
 															<div class="pull-right">
@@ -80,7 +80,7 @@
 															</div>
 															<div class="media-body">
 																<h4 class="media-heading">
-																	<strong><a href="{!$Page.CommunityProfilePage}?id={{ p.MemberId }}"><div ng-bind-html="p.MemberName"></div></a></strong>
+																	<strong><a href="{!IF(isUnityTemplate,$Page.UnityProfilePage,$Page.CommunityProfilePage)}?id={{ p.MemberId }}"><div ng-bind-html="p.MemberName"></div></a></strong>
 																	<!--<small>5 hours ago</small>-->
 																</h4>
 																<p>
@@ -116,7 +116,7 @@
 												<div class="tab-pane active" id="people_i_follow_tab">
 													<div class="col-md-12">
 														<div class="media media-v2" ng-repeat="p in allPeople | peopleIFollow:this | quickSearch:this | startFrom:page.startFrom() | limitTo:page.pageSize">
-															<a class="pull-left" href="{!$Page.CommunityProfilePage}?id={{ p.MemberId }}">
+															<a class="pull-left" href="{!IF(isUnityTemplate,$Page.UnityProfilePage,$Page.CommunityProfilePage)}?id={{ p.MemberId }}">
 																<img class="media-object rounded-x" ng-src="{{ p.MemberPhotoUrl }}" src="/s.gif" alt="" />
 															</a>
 															<div class="pull-right">
@@ -125,7 +125,7 @@
 															</div>
 															<div class="media-body">
 																<h4 class="media-heading">
-																	<strong><a href="{!$Page.CommunityProfilePage}?id={{ p.MemberId }}"><div ng-bind-html="p.MemberName"></div></a></strong>
+																	<strong><a href="{!IF(isUnityTemplate,$Page.UnityProfilePage,$Page.CommunityProfilePage)}?id={{ p.MemberId }}"><div ng-bind-html="p.MemberName"></div></a></strong>
 																</h4>
 																<p>
 																	<div ng-bind-html="p.MemberRole"></div>
