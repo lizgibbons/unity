@@ -49,7 +49,7 @@
 				</li>
 			</apex:outputPanel>
 			<li class="list-group-item{!IF(pn=='3',' active',' menu-item-link')}">
-				<a href="{!$Page.CommunityProfilePage}">
+				<a href="{!IF(isUnityTemplate,$Page.UnityProfilePage,$Page.CommunityProfilePage)}">
 					<i class="fa fa-gear"></i>{!$Label.LBL_Profile}
 				</a>
 			</li>

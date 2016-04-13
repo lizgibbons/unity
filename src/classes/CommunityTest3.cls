@@ -205,6 +205,8 @@ public class CommunityTest3 {
 			);
 			insert newUser;
 			System.assert( [SELECT Id,Name FROM USER WHERE username = 'newUser@yahoo.com' LIMIT 10].size()>0 );
+			con.Primary_Role__c = NULL;
+			update con;
 		}
 	}
 
