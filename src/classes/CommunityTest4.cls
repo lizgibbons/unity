@@ -87,7 +87,9 @@ private class CommunityTest4 {
 			insert cgmem;
 
 			System.assertNotEquals(null, CommunityHelperWithoutSharing.getCommunityGroupControl(cg.Id));
-			CommunityHelperWithoutSharing.getFeeds(new Set<Id>(), null);
+			CommunityHelperWithoutSharing.getFeeds(new Set<Id>());
+			CommunityHelperWithoutSharing.getComments(new Set<Id>(), null);
+
 			Community_News__c testNews = new Community_News__c();
 			testNews.Title__c = 'Test Title';
 			insert testNews;
