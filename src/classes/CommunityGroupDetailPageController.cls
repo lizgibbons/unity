@@ -31,6 +31,7 @@ public with sharing class CommunityGroupDetailPageController {
 
 	public Community_Group_Control__c control { get; set; }
 	public CollaborationGroup chatterGroup { get; set; }
+	public Boolean isUnityTemplate { get { return CommunityUtils.getUnity20TemplateUse(); } }
 
 	public ConnectApi.GroupMembershipType groupRole { get; set; }
 	private String initialRequestMember;

@@ -113,6 +113,13 @@
         <value>Edit Resource</value>
     </labels>
     <labels>
+        <fullName>BTN_Follow</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Follow button/action</shortDescription>
+        <value>Follow</value>
+    </labels>
+    <labels>
         <fullName>BTN_Following</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -478,6 +485,13 @@
         <value>People</value>
     </labels>
     <labels>
+        <fullName>LBL_About</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL About</shortDescription>
+        <value>About</value>
+    </labels>
+    <labels>
         <fullName>LBL_About_Me</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -602,6 +616,13 @@
         <protected>true</protected>
         <shortDescription>Banner Image Text</shortDescription>
         <value>Welcome back &lt;br/&gt; Have a great semester</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Bookmarked</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Bookmarked</shortDescription>
+        <value>Bookmarked</value>
     </labels>
     <labels>
         <fullName>LBL_Campus_Updates</fullName>
@@ -889,6 +910,13 @@
         <protected>true</protected>
         <shortDescription>LBL Edit Group</shortDescription>
         <value>Edit Group</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Edit_Photo</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Edit Photo</shortDescription>
+        <value>Edit Photo</value>
     </labels>
     <labels>
         <fullName>LBL_Edited</fullName>
@@ -1199,6 +1227,13 @@
         <value>Home</value>
     </labels>
     <labels>
+        <fullName>LBL_Information</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Information</shortDescription>
+        <value>Information</value>
+    </labels>
+    <labels>
         <fullName>LBL_Interests</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -1415,6 +1450,13 @@
         <shortDescription>Label Mentions Title</shortDescription>
         <value>Mentions or Messages</value>
     </labels>
+	<labels>
+        <fullName>LBL_Message</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Message</shortDescription>
+        <value>Message</value>
+    </labels>
     <labels>
         <fullName>LBL_Message_only_one_tag</fullName>
         <language>en_US</language>
@@ -1451,6 +1493,13 @@
         <value>Mute</value>
 	</labels>
 	<labels>
+        <fullName>LBL_MyFavorites</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL My Favorites</shortDescription>
+        <value>My Favorites</value>
+    </labels>
+    <labels>
         <fullName>LBL_MyGroups</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -1472,11 +1521,11 @@
         <value>My Discussions</value>
     </labels>
     <labels>
-        <fullName>LBL_MyFavorites</fullName>
+        <fullName>LBL_My_Groups</fullName>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>LBL My Favorites</shortDescription>
-        <value>My Favorites</value>
+        <shortDescription>LBL My Groups</shortDescription>
+        <value>My Groups</value>
     </labels>
     <labels>
         <fullName>LBL_My_News</fullName>
@@ -1773,6 +1822,13 @@
         <value>Previous</value>
     </labels>
     <labels>
+        <fullName>LBL_Primary</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Primary</shortDescription>
+        <value>Primary</value>
+    </labels>
+    <labels>
         <fullName>LBL_PrivateGroup</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -2010,6 +2066,20 @@
         <value>Select Tags</value>
     </labels>
     <labels>
+        <fullName>LBL_Send</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Send</shortDescription>
+        <value>Send</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Send_Message</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Send Message</shortDescription>
+        <value>Send Message</value>
+    </labels>
+    <labels>
         <fullName>LBL_Settings</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -2172,6 +2242,13 @@
         <value>We will use variations of this thumbnail image around the application.</value>
     </labels>
     <labels>
+        <fullName>LBL_To</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL To</shortDescription>
+        <value>To</value>
+    </labels>
+    <labels>
         <fullName>LBL_Today_is</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -2205,6 +2282,13 @@
         <protected>true</protected>
         <shortDescription>LBL UnRead</shortDescription>
         <value>Unread</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Unfollow</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Unfollow</shortDescription>
+        <value>Unfollow</value>
     </labels>
     <labels>
         <fullName>LBL_Unity_Post</fullName>
