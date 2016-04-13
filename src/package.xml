@@ -510,6 +510,8 @@
         <members>LBL_ManagerFeed</members>
         <members>LBL_ManagerGroupMembers</members>
         <members>LBL_MangeGroupManagers</members>
+        <members>LBL_Mark_As_Read</members>
+        <members>LBL_Mark_As_Unread</members>
         <members>LBL_Member</members>
         <members>LBL_Members</members>
         <members>LBL_MentionsMeComment</members>
@@ -544,6 +546,8 @@
         <members>LBL_Notifications</members>
         <members>LBL_Notifications_Message</members>
         <members>LBL_Notifications_Post</members>
+        <members>LBL_NotificationType_Comment</members>
+        <members>LBL_NotificationType_Post</members>
         <members>LBL_OldPassword</members>
         <members>LBL_Other</members>
         <members>LBL_Owner</members>

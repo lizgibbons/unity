@@ -466,6 +466,36 @@ public with sharing class CommunityUtils {
 		return [SELECT ID, PermissionsApiEnabled FROM Profile WHERE ID = :Userinfo.getProfileId() LIMIT 1].PermissionsApiEnabled; 
 	}
 
+
+	public static void insertNotificationViewedTask(Id inWhatId, Id itemId, Id inWhoId) {
+
+		insert new Task(
+			WhatId = inWhatId,
+			WhoId = inWhoId,
+			Subject = 'Feed Notification Viewed',
+			IsVisibleInSelfService = true,
+			Status = 'Completed',
+			ActivityDate = Date.today(),
+			Description = itemId
+		);
+	}
+
+	public static void removeNotificationViewedTask(Id inWhatId, Id itemId, Id inWhoId) {
+
+		List<Task> notifacationViews = [
+			SELECT Id, Description
+			FROM Task
+			WHERE WhatId = :inWhatId
+				AND WhoId = :inWhoId
+				AND Subject = 'Feed Notification Viewed'
+		];
+		List<Task> viewsForDelete = new List<Task>();
+		for (Task view : notifacationViews) {
+			if (view.Description == itemId) viewsForDelete.add(view);
+		}
+		delete viewsForDelete;
+	}
+
 	public static Map<String,Boolean> checkCRUDforObject (String objName){
 		Map<String, Boolean> result = new Map<String, Boolean>();
 		Schema.DescribeSObjectResult obj = Schema.getGlobalDescribe().get(objName).getDescribe();
