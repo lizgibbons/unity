@@ -125,7 +125,7 @@
 												<apex:outputPanel onclick="delfg('{!JSENCODE(fs2.versionId)}');" rendered="{!fs2.modifiable}"><i id="df{!JSENCODE(fs2.versionId)}" class="fa fa-trash" title="{!$Label.LBL_Delete}"></i></apex:outputPanel>
 											</td>
 											<td><i class="fa {!fs2.aicon}"></i>&nbsp;<a href="{!$Page.CommunityGroupFiles}?f={!fs2.documentId}&p={!parent.id}">{!fs2.name}</a></td>
-											<td class="hidden-sm"><a href="{!$Page.CommunityProfilePage}?id={!fs2.ownerId}">{!fs2.ownerName}</a></td>
+											<td class="hidden-sm"><a href="{!IF(isUnityTemplate,$Page.UnityProfilePage,$Page.CommunityProfilePage)}?id={!fs2.ownerId}">{!fs2.ownerName}</a></td>
 											<td class="hidden-sm">{!fs2.lastModified}</td>
 										</tr></apex:repeat>
 									</tbody>

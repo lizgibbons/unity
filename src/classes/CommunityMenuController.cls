@@ -33,6 +33,7 @@ public with sharing class CommunityMenuController {
 	public String currentUserRole { get{ return CommunityFeedController.getUserRoles(new List<String>{UserInfo.getUserId()}).get(UserInfo.getUserId());} }
 	public String conversationId { get; set; }
 	public Boolean read { get; set; }
+	public Boolean isUnityTemplate { get { return CommunityUtils.getUnity20TemplateUse(); } }
 
 	public List<ChatterConversation> getUnityConversations(){
 		UnityMessage umn = new UnityMessage();
