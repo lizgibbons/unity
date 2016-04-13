@@ -27,7 +27,7 @@
  * unity@motivislearning.com
 -->
 
-<apex:component controller="CommunityHomeNotificationsController">
+<apex:component controller="CommunityHomeNotificationsController" allowDml="true">
 	
 	<script src="{!$Resource.assets}/plugins/scrollbar/src/perfect-scrollbar.js"></script>
 
@@ -35,25 +35,34 @@
 
 	<script id="nPanel" type="text/template">
 		<% _.each(rc, function(n){ %>
-			<li class="feedMenuItem">
-				<a href="{!$Page.CommunityProfilePage}?id=<%- n.MemberId%>" class="avatar it-navatar6"><img src="<%- printPhotoUrl(n.Image) %>"/></a>
+			<li class="<%= (n.IsRead) ? 'feedMenuItem' : 'feedMenuItem unread' %>">
+				<a href="{!$Page.CommunityProfilePage}?id=<%- n.MemberId %>" class="avatar it-navatar6"><img src="<%- printPhotoUrl(n.Image) %>"/></a>
 				<p>
-					<strong><%- n.Name%></strong> <%
+					<strong><%- n.Name %></strong> <%
 						if(n.StrongMessage != null){
 							var message = n.Message.split(n.StrongMessage);
-							print(message[0])%><strong><%- n.StrongMessage %></strong><%print(message[1])
+							print(message[0]) %><strong><%- n.StrongMessage %></strong><%print(message[1])
 						}else{
 							print(n.Message);
-						}%>
-					<small><%- n.DateString%>&nbsp;&nbsp;|&nbsp;&nbsp;<%- n.Type%></small>
+						} %>
+					<small><%- n.DateString %>&nbsp;&nbsp;|&nbsp;&nbsp;<%- n.Type %></small>
 				</p>
-				<a class="remove it-removeNotification6" role="button" onclick="deleteNotification(this);"><i class="lrm lrm-remove"></i></a>
+				<a class="read it-removeNotification6" title="<%= (n.IsRead) ? '{!$Label.LBL_Mark_As_Unread}' : '{!$Label.LBL_Mark_As_Read}' %>" role="button" onclick="readAlert(this);" data-parent-id="<%- n.ParentId %>" data-item-id="<%- n.ItemId %>"></a>
 			</li>
 		<% }); %>
 		<li class="blockBtnWrapper">
-            <a href="#" class="block-btn-full it-showAllNotifications">{!$Label.LBL_Show_All}</a>
-        </li>
+			<a href="#" class="block-btn-full it-showAllNotifications">{!$Label.LBL_Show_All}</a>
+		</li>
 	</script>
+	
+	<apex:outputPanel id="form"/>
+	<apex:form >
+		<apex:actionFunction action="{!markNotification}" name="markNotification" rerender="form">
+			<apex:param name="parentId" assignTo="{!ParentIdParam}" value="" />
+			<apex:param name="id" assignTo="{!ItemIdParam}" value="" />
+			<apex:param name="isRead" assignTo="{!IsReadParam}" value="" />
+		</apex:actionFunction>
+	</apex:form>
 
 	<script type="text/javascript">
 		$(document).ready(function() {
@@ -76,8 +85,11 @@
 						notifications = jsonObj(result);
 						var notificationsCopy = notifications.slice(0,limitSize);
 						$('#notif-panel').prepend(template(notificationsCopy));
-						if(notificationsCopy.length){
-						$('a.alerts span.number').text(notificationsCopy.length);
+						var notViewed = notificationsCopy.filter(function(notification) {
+							return !notification.hasOwnProperty('IsRead') || !notification.IsRead;
+						});
+						if(notViewed.length){
+							$('a.alerts span.number').text(notViewed.length);
 							$('a.alerts span.number').show();
 						}
 					}
@@ -91,6 +103,25 @@
 				return '{!$Resource.assets2}/images/home/default-male.jpg';
 			}
 			return photoUrl;
+		}
+
+		function readAlert(elem){
+			var read = $(elem).parent('.feedMenuItem').hasClass('unread');
+
+			markNotification($(elem).attr('data-parent-id'), $(elem).attr('data-item-id'), read);
+
+			function success() {
+				if(read) $(elem).parent('.feedMenuItem').removeClass('unread');
+				if(!read) $(elem).parent('.feedMenuItem').addClass('unread');
+				$(elem).attr('title', (read ? '{!$Label.LBL_Mark_As_Unread}' : '{!$Label.LBL_Mark_As_Read}'));
+				var alertCounterEl = $('.alerts .number');
+				var countAlerts = parseInt(alertCounterEl.first().text(), 10);
+				if(!read && (countAlerts+1) > 0) alertCounterEl.show();
+				if(read && (countAlerts-1) <= 0) alertCounterEl.hide();
+				alertCounterEl.text(countAlerts + (read ? -1 : 1));
+			};
+
+			success();
 		}
 
 	</script>

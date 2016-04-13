@@ -1367,6 +1367,20 @@
         <value>Manage Group Managers</value>
     </labels>
     <labels>
+        <fullName>LBL_Mark_As_Read</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Mark As Read</shortDescription>
+        <value>Mark As Read</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Mark_As_Unread</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Mark As Unread</shortDescription>
+        <value>Mark As Unread</value>
+    </labels>
+    <labels>
         <fullName>LBL_Member</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -1598,6 +1612,20 @@
         <value>commented in the {0} manager feed.</value>
     </labels>
     <labels>
+        <fullName>LBL_NotificationType_Comment</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL NotificationType Comment</shortDescription>
+        <value>Comment</value>
+    </labels>
+    <labels>
+        <fullName>LBL_NotificationType_Post</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Notifications Post</shortDescription>
+        <value>Post</value>
+    </labels>
+    <labels>
         <fullName>LBL_OldPassword</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -1764,6 +1792,13 @@
         <protected>true</protected>
         <shortDescription>Label Posts on my Profile</shortDescription>
         <value>Posts on my Profile</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Read</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Read</shortDescription>
+        <value>Read</value>
     </labels>
     <labels>
         <fullName>LBL_Read_More</fullName>
@@ -2163,6 +2198,13 @@
         <protected>true</protected>
         <shortDescription>LBL Topics I Use</shortDescription>
         <value>Topics I Use</value>
+    </labels>
+	<labels>
+        <fullName>LBL_UnRead</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL UnRead</shortDescription>
+        <value>Unread</value>
     </labels>
     <labels>
         <fullName>LBL_Unity_Post</fullName>

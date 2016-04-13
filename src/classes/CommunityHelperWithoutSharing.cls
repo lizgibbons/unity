@@ -112,13 +112,21 @@ public without sharing class CommunityHelperWithoutSharing {
 	}
 
 // used for CommunityHomeNotificationController
-	public static List<FeedItem> getFeeds(Set<Id> controlsIds, String userId){
-		String queryUserId = CommunityUtils.validateId(userId);
-		return [SELECT Id, ParentId, Type, CommentCount, LinkUrl, LastModifiedDate, CreatedById, Visibility 
+	public static List<FeedItem> getFeeds(Set<Id> controlsIds){
+		return [SELECT Id, ParentId, Type, CommentCount, LinkUrl, CreatedDate, LastModifiedDate, CreatedById, Visibility 
 				FROM FeedItem
 				WHERE ParentId IN :controlsIds 
-				AND CreatedById != :queryUserId
 				AND Visibility = 'AllUsers'
+				LIMIT 10000];
+		}
+
+// used for CommunityHomeNotificationController
+	public static List<FeedComment> getComments(Set<Id> feedItemsIds, String userId){
+		String queryUserId = CommunityUtils.validateId(userId);
+		return [SELECT Id, ParentId, FeedItemId, CreatedById, CreatedDate
+				FROM FeedComment
+				WHERE FeedItemId IN :feedItemsIds
+				AND CreatedById != :queryUserId
 				LIMIT 10000];
 		}
 

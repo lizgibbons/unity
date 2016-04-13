@@ -42,6 +42,11 @@ public with sharing class CommunityUtils {
 		return Result;
 	}
 	
+	public static Boolean getUnity20TemplateUse(){
+		Community_Template_Settings__c cts = Community_Template_Settings__c.getOrgDefaults();
+		return cts.Enable_Unity2_0_Template__c; 
+	}
+	
  public static Boolean isModerateChatterAndModerateNetworkFeeds() {
 		Profile prof = [SELECT PermissionsModerateChatter, PermissionsModerateNetworkFeeds, Name, Id FROM Profile WHERE Id =: UserInfo.getProfileId()];
 		Boolean Result = false;
@@ -458,6 +463,36 @@ public with sharing class CommunityUtils {
 	public static Boolean checkAPIEnable (){
 
 		return [SELECT ID, PermissionsApiEnabled FROM Profile WHERE ID = :Userinfo.getProfileId() LIMIT 1].PermissionsApiEnabled; 
+	}
+
+
+	public static void insertNotificationViewedTask(Id inWhatId, Id itemId, Id inWhoId) {
+
+		insert new Task(
+			WhatId = inWhatId,
+			WhoId = inWhoId,
+			Subject = 'Feed Notification Viewed',
+			IsVisibleInSelfService = true,
+			Status = 'Completed',
+			ActivityDate = Date.today(),
+			Description = itemId
+		);
+	}
+
+	public static void removeNotificationViewedTask(Id inWhatId, Id itemId, Id inWhoId) {
+
+		List<Task> notifacationViews = [
+			SELECT Id, Description
+			FROM Task
+			WHERE WhatId = :inWhatId
+				AND WhoId = :inWhoId
+				AND Subject = 'Feed Notification Viewed'
+		];
+		List<Task> viewsForDelete = new List<Task>();
+		for (Task view : notifacationViews) {
+			if (view.Description == itemId) viewsForDelete.add(view);
+		}
+		delete viewsForDelete;
 	}
 
 	public static Map<String,Boolean> checkCRUDforObject (String objName){
