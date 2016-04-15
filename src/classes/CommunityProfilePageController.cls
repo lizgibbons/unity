@@ -60,7 +60,7 @@ global with sharing class CommunityProfilePageController {
     public Boolean checkUnityPage(String url){
     	List<String> urls = url.split('/'); 
 		String pageName = urls[urls.size()-1];
-		if(pageName.startsWithIgnoreCase('UnityProfilePage')) return true;
+		if(pageName.startsWithIgnoreCase(CommunityUtils.getPackagePrefix()+'UnityProfilePage')) return true;
 		return false;
     }
 
