@@ -45,8 +45,8 @@ global with sharing class CommunityProfilePageController {
 	private static Map<String, Schema.SObjectField> CP_FIELDS = SObjectType.Community_Profile__c.fields.getMap();
 	
 	public Boolean getIsCommunityUser() {
+        if (currentProfile == null) return false;
 		if (currentUserId == UserInfo.getUserId()) return true;
-		if (currentProfile == null) return false;
 		List<NetworkMember> nmList = [SELECT Id FROM NetworkMember WHERE MemberId = :currentUserId AND Member.isActive = true AND NetworkId = :Network.getNetworkId()];
 		return !nmList.isEmpty();
 	}
@@ -218,6 +218,7 @@ global with sharing class CommunityProfilePageController {
             }else{
                 tempList = sw.databaseQuery('SELECT ' + String.join(fieldList, ', ') + ' FROM Community_Profile__c WHERE Id =\'' + String.escapeSingleQuotes(currentProfile.Id) + '\'');
 			currentProfile = (Community_Profile__c)tempList[0];
+                currentProfiles.put(currentProfile.RecordType.Name,currentProfile);
 		}
         }
 		catch (Exception e) {
