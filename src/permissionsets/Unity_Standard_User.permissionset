@@ -1010,7 +1010,7 @@
     </pageAccesses>
     <pageAccesses>
         <apexPage>Unity2SiteTemplate</apexPage>
-        <enabled>false</enabled>
+        <enabled>true</enabled>
     </pageAccesses>
 	<pageAccesses>
         <apexPage>UnityAdmin</apexPage>
@@ -1018,11 +1018,15 @@
     </pageAccesses>
     <pageAccesses>
         <apexPage>UnityHome</apexPage>
-        <enabled>false</enabled>
+        <enabled>true</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>UnityProfilePage</apexPage>
+        <enabled>true</enabled>
     </pageAccesses>
     <pageAccesses>
         <apexPage>UnitySiteTemplate</apexPage>
-        <enabled>false</enabled>
+        <enabled>true</enabled>
     </pageAccesses>
     <recordTypeVisibilities>
         <recordType>Community_Admins__c.Community_Terms</recordType>
