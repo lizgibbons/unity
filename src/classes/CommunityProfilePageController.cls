@@ -58,10 +58,8 @@ global with sharing class CommunityProfilePageController {
 	}
 
     public Boolean checkUnityPage(String url){
-        System.debug(url);
     	List<String> urls = url.split('/'); 
 		String pageName = urls[urls.size()-1];
-        System.debug(pageName.startsWithIgnoreCase(CommunityUtils.getPackagePrefix()+'UnityProfilePage'));
 		if(pageName.startsWithIgnoreCase(CommunityUtils.getPackagePrefix()+'UnityProfilePage')) return true;
 		return false;
     }
@@ -199,8 +197,6 @@ global with sharing class CommunityProfilePageController {
 			SecurityWrapper sw = new SecurityWrapper();
 			if (!SObjectType.Community_Profile__c.isAccessible()) CommunityAccess.ThrowAccessException(SObjectType.Community_Profile__c);
             List<sObject> tempList = new List<sObject>();
-            System.debug(currentProfiles);
-            System.debug(CommunityUtils.getUnity20TemplateUse());
             if(!currentProfiles.isEmpty() && CommunityUtils.getUnity20TemplateUse() && checkUnityPage(ApexPages.CurrentPage().getUrl())){
                 Community_Profile__c tPrimaryProfile;
                 List<String> currentProfilesId = new List<String>();
