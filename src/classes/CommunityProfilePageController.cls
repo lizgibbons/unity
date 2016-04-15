@@ -45,8 +45,8 @@ global with sharing class CommunityProfilePageController {
 	private static Map<String, Schema.SObjectField> CP_FIELDS = SObjectType.Community_Profile__c.fields.getMap();
 	
 	public Boolean getIsCommunityUser() {
+        if (currentProfile == null) return false;
 		if (currentUserId == UserInfo.getUserId()) return true;
-		if (currentProfile == null) return false;
 		List<NetworkMember> nmList = [SELECT Id FROM NetworkMember WHERE MemberId = :currentUserId AND Member.isActive = true AND NetworkId = :Network.getNetworkId()];
 		return !nmList.isEmpty();
 	}
