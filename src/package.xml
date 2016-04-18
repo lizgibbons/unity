@@ -386,6 +386,7 @@
         <members>LBL_AllGroups</members>
         <members>LBL_All_Updates</members>
         <members>LBL_Archive_90_days</members>
+        <members>LBL_Archive_Group</members>
         <members>LBL_Assign_New_Owner</members>
         <members>LBL_Back_to_CRM</members>
         <members>LBL_Banner_Caption</members>
@@ -393,6 +394,7 @@
         <members>LBL_Bookmarked</members>
         <members>LBL_Campus_Updates</members>
         <members>LBL_CancelRequest_Message</members>
+        <members>LBL_Cancel_Request</members>
         <members>LBL_ChangePassword</members>
         <members>LBL_ChangePassword_Title</members>
         <members>LBL_Change_Owner</members>
@@ -640,6 +642,7 @@
         <members>LBL_Username</members>
         <members>LBL_VerifyNewPassword</members>
         <members>LBL_View_All</members>
+        <members>LBL_View_Group</members>
         <members>LBL_View_Previous_Comments</members>
         <members>LBL_When</members>
         <members>LBL_Write_A_Comment</members>

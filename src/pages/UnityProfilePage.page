@@ -65,16 +65,17 @@
 					        </article>
 					    </div>
                     	<div class="col-md-8 col-lg-6 col-lg-offset-2">
-                            <c:UnityGroups profileAboutGroups="true" myGroups="my_groups" userId="{!currentUserId}"/>
+                            <c:UnityGroups profileAboutGroups="true" myGroups="my_groups" userId="{!currentUserId}" groupsCount="6"/>
                     	</div>	
                     </apex:outputPanel>
                     <!-- Unity Profile About -->
+                </div>    
                     <!-- Unity Profile Groups -->
-                    <!-- <apex:outputPanel layout="none" rendered="{!IF($CurrentPage.parameters.tab == '3', true, false)}">
-                    	<c:UnityGroups />
-                    </apex:outputPanel> -->
+                <apex:outputPanel layout="none" rendered="{!IF($CurrentPage.parameters.tab == '3', true, false)}">
+                    <c:UnityGroups myGroups="my_groups" userId="{!currentUserId}" profileGroups="true" groupsCount="8"/>
+                </apex:outputPanel>
                     <!-- Unity Profile Groups -->
-                </div>
+                
             </apex:outputpanel>
              <apex:outputpanel rendered="{!!isCommunityUser}" layout="block">
                 <div class="row">

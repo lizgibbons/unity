@@ -1,7 +1,9 @@
 <apex:component controller="CommunityGroupsController">
 	<apex:attribute name="profileAboutGroups" type="Boolean" default="false" required="false" description="groups in About Profile page" />
+    <apex:attribute name="profileGroups" type="Boolean" default="false" required="false" description="groups in Profile page" />
 	<apex:attribute name="myGroups" type="String" required="false" assignTo="{!unityFilter}" description=""/>
 	<apex:attribute name="userId" type="String" required="false" assignTo="{!profileUserId}" description=""/>
+    <apex:attribute name="groupsCount" type="Integer" required="false" assignTo="{!countLimitGroups}" description=""/>
 
 	<apex:outputPanel layout="none" rendered="{!profileAboutGroups}">
         <h2>{!$Label.LBL_My_Groups} ({!Groups.totalRecords})</h2>
@@ -21,9 +23,261 @@
     </apex:outputPanel>
     </apex:outputPanel>
 
+    <apex:outputPanel layout="none" rendered="{!profileGroups}">
+        <div class="row">
+            <div class="col-xs-24">
+                <h2>{!$Label.LBL_Groups} ({!Groups.totalRecords})</h2>
+            </div>
+        </div>
+        <div class="row"><div class="col-xs-24"><div class="row" id="groupPanel"></div></div></div>     
+
+
+        <apex:outputPanel id="snmbtn">
+            <apex:outputPanel layout="block" rendered="{!Groups.hasMore}" styleClass="row">
+                <button id="showMore" style="display:none;" onclick="makeshm({!startFrom + limitSize}); return false;" />
+            </apex:outputPanel>
+            <apex:outputPanel layout="block" rendered="{!Groups.totalRecords == 0}">
+                 <div class="row">
+                    <div class="col-xs-24">
+                        <div class="alert error">
+                            <p>
+                                {!$Label.LBL_NoGroupsFound}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </apex:outputPanel>
+        </apex:outputPanel>
+        <apex:form >
+            <apex:actionFunction name="showmoreaction" rerender="snmbtn, groupPanelHidden" oncomplete="appendGroups();">
+                <apex:param name="sf" assignTo="{!startFrom}" value=""/>
+            </apex:actionFunction>
+        </apex:form>
+        <div class="loader" style="display:none;">
+                <div class="ispinner gray animating">
+                    <div class="ispinner-blade"></div>
+                    <div class="ispinner-blade"></div>
+                    <div class="ispinner-blade"></div>
+                    <div class="ispinner-blade"></div>
+                    <div class="ispinner-blade"></div>
+                    <div class="ispinner-blade"></div>
+                    <div class="ispinner-blade"></div>
+                    <div class="ispinner-blade"></div>
+                    <div class="ispinner-blade"></div>
+                    <div class="ispinner-blade"></div>
+                    <div class="ispinner-blade"></div>
+                    <div class="ispinner-blade"></div>
+                </div>
+            </div>
+
+        <apex:outputPanel layout="block" id="groupPanelHidden" style="display: none;">
+            <apex:repeat value="{!Groups.Groups}" var="g">
+                <div class="col-xs-B-6 col-xs-24 col-sm-8 col-lg-6" id="{!g.GroupId}">
+                    <div class="card vertical-tiny">
+                        <div class="card-cover-photo full-width">
+                            <img src="{!g.GroupPhotoUrl}" />
+                        </div>
+                        <div class="card-content">
+                            <h2 class="limit-1-line"><a href="{!$Page.CommunityGroupDetailPage}?gr={!g.GroupId}" class="it-groupName">{!g.GroupName}</a></h2>
+                            <p class="limit-2-lines"><span class="limit-content">{!g.GroupDescription}</span></p>
+                            <small><span id="memCount{!g.GroupId}">{!g.GroupMembersCount}</span> {!$Label.LBL_Members} | {!g.GroupType}</small>
+                        </div>
+                        <div class="blockBtnWrapper thinBtns" id="blockBtnWrapperGroup{!g.GroupId}">
+                            <apex:outputPanel layout="none" rendered="{!g.CurrentMemberRole == 'Owner'}">
+                                <div class="card-status-owner">
+                                    <i class="lrm lrm-owner-group"></i>&nbsp;<span>{!$Label.LBL_Owner}</span>
+                                    <div class="dropmenu">
+                                        <a role="button" class="it-memberMenu" onclick="dropmenu(this);"><i class="lrm lrm-more"></i></a>
+                                        <ul>
+                                            <li><a role="button" href="{!$Page.CommunityGroupDetailPage}?gr={!g.GroupId}" class="it-memberMenuView">{!$Label.LBL_View_Group}</a></li>
+                                            <li><a role="button" class="it-memberMenuArchive" onclick="archGroup('{!g.GroupId}');">{!$Label.LBL_Archive_Group}</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                            <apex:outputPanel layout="none" rendered="{!g.CurrentMemberRole == 'Standard'}">
+                                <div class="card-status-member">
+                                    <i class="lrm lrm-member-group"></i>&nbsp;<span>{!$Label.LBL_Member}</span>
+                                    <div class="dropmenu">
+                                        <a role="button" class="it-memberMenu" onclick="dropmenu(this);"><i class="lrm lrm-more"></i></a>
+                                        <ul>
+                                            <li><a role="button" href="{!$Page.CommunityGroupDetailPage}?gr={!g.GroupId}" class="it-memberMenuView">{!$Label.LBL_View_Group}</a></li>
+                                            <li><a role="button" class="it-memberMenuLeave" onclick="chckabtn('2','{!g.GroupId}');">{!$Label.LBL_Leave_Group}</a></li>
+                                            <apex:outputPanel layout="none" rendered="{!isModifyAllData}">
+                                                <li><a role="button" class="it-memberMenuArchive" onclick="archGroup('{!g.GroupId}');">{!$Label.LBL_Archive_Group}</a></li>
+                                            </apex:outputPanel>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                            <apex:outputPanel layout="none" rendered="{!g.CurrentMemberRole == 'Admin'}">
+                                <div class="card-status-manager">
+                                    <i class="lrm lrm-manager-groups"></i>&nbsp;<span>{!$Label.LBL_Manager}</span>
+                                    <div class="dropmenu">
+                                        <a role="button" class="it-memberMenu" onclick="dropmenu(this);"><i class="lrm lrm-more"></i></a>
+                                        <ul>
+                                            <li><a role="button" href="{!$Page.CommunityGroupDetailPage}?gr={!g.GroupId}" class="it-memberMenuView">{!$Label.LBL_View_Group}</a></li>
+                                            <li><a role="button" class="it-memberMenuLeave" onclick="chckabtn('2','{!g.GroupId}');">{!$Label.LBL_Leave_Group}</a></li>
+                                            <li><a role="button" class="it-memberMenuArchive" onclick="archGroup('{!g.GroupId}');">{!$Label.LBL_Archive_Group}</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                            <apex:outputPanel layout="none" rendered="{!g.CurrentMemberRole == 'NotAMember' && g.NotAMemberStatus == 'Join'}">
+                                <a href="javascript:;" onclick="chckabtn('1','{!g.GroupId}');" role="button" class="btn-fill-custom block-btn-full it-joinClub">{!$Label.BTN_Join}</a>
+                            </apex:outputPanel>
+                            <apex:outputPanel layout="none" rendered="{!g.CurrentMemberRole == 'NotAMember' && g.NotAMemberStatus == 'Requested'}">
+                                <div class="card-status-requested">
+                                    <i class="lrm lrm-request-groups"></i>&nbsp;<span>{!$Label.LBL_Requested}</span>
+                                    <div class="dropmenu">
+                                        <a role="button" class="it-memberMenu" onclick="dropmenu(this);"><i class="lrm lrm-more"></i></a>
+                                        <ul>
+                                            <li><a href="{!$Page.CommunityGroupDetailPage}?gr={!g.GroupId}" role="button" class="it-memberMenuView">{!$Label.LBL_View_Group}</a></li>
+                                            <li><a role="button" class="it-memberMenuLeave" onclick="chckabtn('6','{!g.GroupId}');">{!$Label.LBL_Cancel_Request}</a></li>
+                                            <apex:outputPanel layout="none" rendered="{!isModifyAllData}">
+                                                <li><a role="button" class="it-memberMenuArchive" onclick="archGroup('{!g.GroupId}');">{!$Label.LBL_Archive_Group}</a></li>
+                                            </apex:outputPanel>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                            <apex:outputPanel layout="none" rendered="{!g.CurrentMemberRole == 'NotAMember' && g.NotAMemberStatus == 'RequestToJoin'}">
+                                <a href="javascript:;" onclick="chckabtn('5','{!g.GroupId}');" role="button" class="btn-fill-custom block-btn-full it-requestJoin">{!$Label.LBL_RequestToJoin}</a>
+                            </apex:outputPanel>
+                        </div>
+                    </div>
+                </div>
+            </apex:repeat>
+        </apex:outputPanel>
+           
+    </apex:outputPanel>
+
+    <script id="BWrapperGroup" type="text/template">
+        <% if(rc.btnLabel == 'Member'){ %>
+            <div class="card-status-member">
+                <i class="lrm lrm-member-group"></i>&nbsp;<span>{!$Label.LBL_Member}</span>
+                <div class="dropmenu">
+                    <a role="button" class="it-memberMenu" onclick="dropmenu(this);"><i class="lrm lrm-more"></i></a>
+                    <ul>
+                        <li><a role="button" href="{!$Page.CommunityGroupDetailPage}?gr=<%- rc.groupId %>" class="it-memberMenuView">{!$Label.LBL_View_Group}</a></li>
+                        <li><a role="button" class="it-memberMenuLeave" onclick="chckabtn('2','<%- rc.groupId %>');">{!$Label.LBL_Leave_Group}</a></li>
+                    </ul>
+                </div>
+            </div>    
+        <%}else if(rc.btnLabel == 'Requested'){ %>
+             <div class="card-status-requested">
+                <i class="lrm lrm-request-groups"></i>&nbsp;<span>{!$Label.LBL_Requested}</span>
+                <div class="dropmenu">
+                    <a role="button" class="it-memberMenu" onclick="dropmenu(this);"><i class="lrm lrm-more"></i></a>
+                    <ul>
+                        <li><a href="{!$Page.CommunityGroupDetailPage}?gr=<%- rc.groupId %>" role="button" class="it-memberMenuView">{!$Label.LBL_View_Group}</a></li>
+                        <li><a role="button" class="it-memberMenuLeave" onclick="chckabtn('6','<%- rc.groupId %>');">{!$Label.LBL_Leave_Group}</a></li>
+                    </ul>
+                </div>
+            </div>
+        <%}else if(rc.btnLabel == 'Join'){ %>        
+             <a href="javascript:;" onclick="chckabtn('1','<%- rc.groupId %>');" role="button" class="btn-fill-custom block-btn-full it-joinClub">{!$Label.BTN_Join}</a>
+        <%}else if(rc.btnLabel == 'Request to Join'){ %>    
+             <a href="javascript:;" onclick="chckabtn('5','<%- rc.groupId %>');" role="button" class="btn-fill-custom block-btn-full it-requestJoin">{!$Label.LBL_RequestToJoin}</a>
+        <% } %>
+
+    </script>
+
     <script>
         $(document).ready(function(){
             $('#profileFeedGroup .avatar-large.group-avatar img').css('width','77px').css('height','77px');
+            resizeImage();
+        });
+
+        function resizeImage(){
+            $('.card-cover-photo.full-width img').css('width','100%');
+            $('.card-cover-photo.full-width img').css('height',$('.card-cover-photo.full-width img').width());
+        }
+
+        $(window).on('resize', function(){
+            resizeImage();
+        })
+
+        function dropmenu(elm){
+            $(elm).next('ul').slideToggle();
+        }
+
+        function archGroup(grID){
+            $('#'+grID).find('ul').slideToggle();
+            var params = {'grId' : grID};
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.CommunityGroupsController.archiveGroup}',
+                params,
+                function(result, event){
+                    if (event.result) {
+                        if(result.indexOf('Success') != -1){
+                            $('#'+grID).remove();
+                        }else{
+                            console.log(result);
+                        }
+                    }else {
+                        console.log(event.message);
+                    }
+                }
+            );
+        }
+
+        function chckabtn(a,gid) {
+            if (a != '0') {
+                var fa = true;
+                if (a == '2' || a == '4') {
+                    fa = confirm('{!$Label.LBL_LeaveGroup_Message}');
+                }
+                else if (a == '6') {
+                    fa = confirm('{!$Label.LBL_CancelRequest_Message}');
+                }
+                if (fa) {
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.CommunityGroupsController.membershipGroup}',
+                        $('#memCount' + gid).text(),
+                        gid,
+                        a,
+                        function(result, event) {
+                           if (event.result) {
+                                _.templateSettings.variable = 'rc';
+                                var template = _.template($('#BWrapperGroup').html());
+                                $('#blockBtnWrapperGroup'+gid).html(template(result));
+                                $('#memCount' + gid).text(result.memberCount);
+                            }
+                            else {
+                                console.log(event.message);
+                            }
+                        }
+                    );
+                }
+            }
+        }
+        var showMoreBusy = true;
+        appendGroups();
+        function appendGroups() {
+            var gPanel = $('#groupPanel');
+            var gPanelHidden = $('[id$="groupPanelHidden"]');
+            gPanel.append(gPanelHidden.children().clone());
+            gPanelHidden.children().remove();
+            resizeImage();
+            $('.loader').hide();
+            showMoreBusy = false;
+        }
+        
+        function makeshm(v) {
+            if (!showMoreBusy) {
+                $('.loader').show();
+                showMoreBusy = true;
+                showmoreaction(v);
+            }
+        }
+
+        $(document).ready(function(){
+            $(window).scroll(function() {
+                if($(window).scrollTop() == $(document).height() - $(window).height()) {
+                    $('#showMore').click();
+                }
+            });
         });
     </script>
 

@@ -36,8 +36,11 @@ public with sharing class CommunityGroupsController {
 		private set;
 	}
 
+	public Boolean isModifyAllData { get { return CommunityUtils.isModifyAllData(); } }
+
 	public String unityFilter { get; set; }
 	public String profileUserId { get; set; }
+	public static Integer countLimitGroups { get; set; }
 
 	private final String CurrentCommunityId = Network.getNetworkId();
 
@@ -191,7 +194,7 @@ public with sharing class CommunityGroupsController {
 
 	private static Integer PAGE_SIZE = 6;
 	public Integer startFrom { get { return startFrom == NULL ? 0 : startFrom; } set; }
-	public Integer limitSize { get { return PAGE_SIZE; } }
+	public Integer limitSize { get { return countLimitGroups != NULL ? countLimitGroups : PAGE_SIZE; } }
 	public String searchQuery { get; set; }
 
 	public DiscoverResultClass getGroups() {
@@ -296,6 +299,19 @@ public with sharing class CommunityGroupsController {
 		return CommunitySearchController.membershipGroup(mc, grId, action);
 	}
 
+	@RemoteAction
+	public static String archiveGroup(Map<String ,String> params) {
+		String grId = params.get('grId');
+		try{
+			CollaborationGroup cg = [select Id, IsArchived from CollaborationGroup where Id =: grId];
+			cg.IsArchived = true; 
+			update cg;
+		}catch(Exception ex){
+			return 'ERR '+ex.getMessage();
+		}
+		return 'Success';
+	}
+
 	public class DiscoverResultClass {
 		public Integer totalRecords { get { return totalRecords == NULL ? 0 : totalRecords; } set; }
 		public List<ChatterGroupDetail> Groups { get; set; }
@@ -314,6 +330,7 @@ public with sharing class CommunityGroupsController {
 		public Id GroupControlId { get;set; }
 		public String GroupName { get; set; }
 		public String GroupDescription { get; set; }
+		public String GroupType { get; set; }
 		public String GroupPhotoUrl {
 			get {
 				return String.isBlank(GroupPhotoUrl) ? '/profilephoto/0F9/F' : GroupPhotoUrl.replace(Site.getBaseUrl(), '');
@@ -335,6 +352,7 @@ public with sharing class CommunityGroupsController {
 			this.GroupControlId = groupDetail.Id;
 			this.GroupName = groupDetail.Name;
 			this.GroupDescription = groupDetail.Description__c;
+			this.GroupType = groupDetail.Type__c;
 		}
 	}
 }
