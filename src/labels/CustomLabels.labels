@@ -590,6 +590,13 @@
         <value>Archive this group if there are no posts or comments for 90 days.</value>
     </labels>
     <labels>
+        <fullName>LBL_Archive_Group</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Archive Group</shortDescription>
+        <value>Archive Group</value>
+    </labels>
+    <labels>
         <fullName>LBL_Assign_New_Owner</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -637,6 +644,13 @@
         <protected>true</protected>
         <shortDescription>CancelRequest Message</shortDescription>
         <value>Are you sure want to cancel this request?</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Cancel_Request</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Cancel Request</shortDescription>
+        <value>Cancel Request</value>
     </labels>
     <labels>
         <fullName>LBL_ChangePassword</fullName>
@@ -2366,6 +2380,13 @@
         <protected>true</protected>
         <shortDescription>LBL View All</shortDescription>
         <value>View All</value>
+    </labels>
+    <labels>
+        <fullName>LBL_View_Group</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL View Group</shortDescription>
+        <value>View Group</value>
     </labels>
     <labels>
         <fullName>LBL_View_Previous_Comments</fullName>
