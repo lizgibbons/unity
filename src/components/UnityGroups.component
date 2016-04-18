@@ -161,6 +161,9 @@
                     <ul>
                         <li><a role="button" href="{!$Page.CommunityGroupDetailPage}?gr=<%- rc.groupId %>" class="it-memberMenuView">{!$Label.LBL_View_Group}</a></li>
                         <li><a role="button" class="it-memberMenuLeave" onclick="chckabtn('2','<%- rc.groupId %>');">{!$Label.LBL_Leave_Group}</a></li>
+                        <apex:outputPanel layout="none" rendered="{!isModifyAllData}">
+                            <li><a role="button" class="it-memberMenuArchive" onclick="archGroup('<%- rc.groupId %>');">{!$Label.LBL_Archive_Group}</a></li>
+                        </apex:outputPanel>
                     </ul>
                 </div>
             </div>    
@@ -171,7 +174,10 @@
                     <a role="button" class="it-memberMenu" onclick="dropmenu(this);"><i class="lrm lrm-more"></i></a>
                     <ul>
                         <li><a href="{!$Page.CommunityGroupDetailPage}?gr=<%- rc.groupId %>" role="button" class="it-memberMenuView">{!$Label.LBL_View_Group}</a></li>
-                        <li><a role="button" class="it-memberMenuLeave" onclick="chckabtn('6','<%- rc.groupId %>');">{!$Label.LBL_Leave_Group}</a></li>
+                        <li><a role="button" class="it-memberMenuLeave" onclick="chckabtn('6','<%- rc.groupId %>');">{!$Label.LBL_Cancel_Request}</a></li>
+                        <apex:outputPanel layout="none" rendered="{!isModifyAllData}">
+                            <li><a role="button" class="it-memberMenuArchive" onclick="archGroup('<%- rc.groupId %>');">{!$Label.LBL_Archive_Group}</a></li>
+                        </apex:outputPanel>
                     </ul>
                 </div>
             </div>
