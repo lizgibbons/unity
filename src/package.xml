@@ -599,6 +599,8 @@
         <members>LBL_Search_Help_Tooltip</members>
         <members>LBL_Search_Placeholder</members>
         <members>LBL_Search_Question</members>
+        <members>LBL_Search_followers</members>
+        <members>LBL_Search_followings</members>
         <members>LBL_Select_Image</members>
         <members>LBL_Select_Prim_Tags</members>
         <members>LBL_Select_Tags</members>
@@ -618,6 +620,7 @@
         <members>LBL_ShowMore</members>
         <members>LBL_Show_All</members>
         <members>LBL_Sign_Out</members>
+        <members>LBL_Sort_By</members>
         <members>LBL_Sorted_By</members>
         <members>LBL_TagHelper_Link</members>
         <members>LBL_TermsAndConditions</members>

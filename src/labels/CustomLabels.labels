@@ -2045,6 +2045,20 @@
         <value>What can we help you find ...</value>
     </labels>
     <labels>
+        <fullName>LBL_Search_followers</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Search followers</shortDescription>
+        <value>Search followers...</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Search_followings</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Search followings</shortDescription>
+        <value>Search following...</value>
+    </labels>
+    <labels>
         <fullName>LBL_Select_Image</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -2178,11 +2192,11 @@
         <value>Sign Out</value>
     </labels>
     <labels>
-        <fullName>LBL_Sure_To_Delete_Topic</fullName>
+        <fullName>LBL_Sort_By</fullName>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>LBL Shue To Delete Topic</shortDescription>
-        <value>Are you sure you want to delete this topic ?</value>
+        <shortDescription>LBL Sort By</shortDescription>
+        <value>Sort by</value>
     </labels>
     <labels>
         <fullName>LBL_Sorted_By</fullName>
@@ -2190,6 +2204,13 @@
         <protected>true</protected>
         <shortDescription>LBL Sorted By</shortDescription>
         <value>Sorted by</value>
+    </labels>
+    <labels>
+        <fullName>LBL_Sure_To_Delete_Topic</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Shue To Delete Topic</shortDescription>
+        <value>Are you sure you want to delete this topic ?</value>
     </labels>
     <labels>
         <fullName>LBL_TagHelper_Link</fullName>

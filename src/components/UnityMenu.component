@@ -149,7 +149,7 @@
 				<li class="icon">
 					<a href="#" class="search it-navMastheadOpenSearch">&nbsp;<span class="icon"><span class="helper">{!$Label.LBL_Search}</span></span></a>
 				</li>
-				<li class="profileNav hasChildren"><a href="{!$Page.UnityProfilePage}?id={!JSENCODE(currentUser.Id)}" class="view it-navMastheadViewSubNav"><span class="avatar" style="background-image: url({!JSENCODE(currentUser.SmallPhotoUrl)});">My Account</span></a>
+				<li class="profileNav hasChildren"><a href="{!$Page.UnityProfilePage}?id={!JSENCODE(currentUser.Id)}" class="view it-navMastheadViewSubNav"><span class="avatar" style="background-image: url({!JSENCODE(currentUser.SmallPhotoUrl)});">{!$Label.LBL_My_Account}</span></a>
                     <div class="dropdown">
                         <ul class="userInfo">
                             <li>
