@@ -76,6 +76,13 @@
                         </div>
                     </apex:outputPanel>
                     <!-- Unity Profile Followers -->
+                    <!-- Unity Profile Followings -->    
+                    <apex:outputPanel layout="none" rendered="{!IF($CurrentPage.parameters.tab == '5', true, false)}">
+                        <div class="col-xs-24">
+                            <c:UnityProfileFollow profFS="{!profilesFS}" profileFollowing="true" currentUsId="{!currentUserId}"/>
+                        </div>
+                    </apex:outputPanel>
+                    <!-- Unity Profile Followings -->
                 </div>    
                     <!-- Unity Profile Groups -->
                 <apex:outputPanel layout="none" rendered="{!IF($CurrentPage.parameters.tab == '3', true, false)}">
