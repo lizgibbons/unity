@@ -389,6 +389,7 @@
 				p.MemberIsFollowing = false;
 				$scope.followUnfollow(p.MemberId, p.MemberIsFollowing);
                 p.isSubscribeUser = !p.isSubscribeUser;
+				$('#dr'+p.MemberId+' ul').slideToggle();
 			}
 			$scope.followUnfollow = function(pId, isFollow) {
 				jQuery('.follow').attr('disabled','disabled');
