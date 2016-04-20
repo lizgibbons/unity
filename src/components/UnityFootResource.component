@@ -30,7 +30,7 @@
 <apex:component access="global">
 	<!-- JS Global Compulsory -->
 	<apex:includeScript value="{!$Resource.CommunityResources}/js/underscore/underscore-min.js"/>
-	<apex:includeScript value="{!$Resource.assets}/js/custom.js"/>
+	<apex:includeScript value="{!$Resource.assets2}/js/custom.js"/>
 	
 	<apex:stylesheet value="{!$Resource.assets2}/css/mentionsList.css" />
 	

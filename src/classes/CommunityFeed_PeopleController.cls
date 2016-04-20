@@ -59,9 +59,11 @@ public with sharing class CommunityFeed_PeopleController {
 		List<User> uList = CommunityHelperWithoutSharing.getCommunityUsers(usId, 50000, new List<String>{'FirstName', 'LastName', 'SmallPhotoUrl', 'FullPhotoUrl', 'ContactId', 'Contact.Primary_Role__c', 'Community_Contact_ID__c'}, 'Name', true);
 		securityWrapper sw = new securityWrapper();
 		Map<Id,String> contactRoles = sw.prepareRoles(uList);
+		Set<Id> subscrUser = sw.isSubscribeUser(uList);
 		for (User uItem2 : uList) {
 			Id cId2 = getId(uItem2);
-			peoples.add(new UserItem(uItem2, followingsIds.contains(uItem2.Id), followersIds.contains(uItem2.Id), cId2 == NULL ? '' : contactRoles.get(cId2)));
+			Boolean sU = uItem2.Id != UserInfo.getUserId() ? subscrUser.contains(uItem2.Id) : NULL;				
+			peoples.add(new UserItem(uItem2, followingsIds.contains(uItem2.Id), followersIds.contains(uItem2.Id), sU, cId2 == NULL ? '' : contactRoles.get(cId2)));
 		}
 		return peoples;
 	}
@@ -84,7 +86,7 @@ public with sharing class CommunityFeed_PeopleController {
 		Map<Id,String> contactRoles = sw.prepareRoles(uList);
 		for (User uItem2 : uList) {
 			Id cId2 = getId(uItem2);
-			peoples.add(new UserItem(uItem2, followingsIds.contains(uItem2.Id), false,  cId2 == NULL ? '' : contactRoles.get(cId2)));
+			peoples.add(new UserItem(uItem2, followingsIds.contains(uItem2.Id), false, false,  cId2 == NULL ? '' : contactRoles.get(cId2)));
 		}
 		return peoples;
 	}
@@ -108,6 +110,7 @@ public with sharing class CommunityFeed_PeopleController {
 		public Id MemberId { get; set; }
 		public String MemberName { get; set; }
 		public String MemberRole { get; set; }
+		public Boolean isSubscribeUser { get; set; }
 		public String MemberPhotoUrl {
 			get {
 				if (String.isBlank(this.MemberPhotoUrl)) {
@@ -121,7 +124,7 @@ public with sharing class CommunityFeed_PeopleController {
 		public Boolean MemberIsFollowing { get; set; }
 		public Boolean MemberIsFollowers { get; set; }
 
-		public UserItem(User member, Boolean isFollowing, Boolean isFollowers, String role) {
+		public UserItem(User member, Boolean isFollowing, Boolean isFollowers, Boolean isSubscribe, String role) {
 			this.MemberId = member.Id;
 			this.MemberName = String.format('{0}{1}',
 				new List<String> {
@@ -133,6 +136,7 @@ public with sharing class CommunityFeed_PeopleController {
 			this.MemberPhotoUrl = CommunityUtils.getUnity20TemplateUse() ? CommunityUtils.checkUrlForImage(member.SmallPhotoUrl, 'medium') : member.SmallPhotoUrl;
 			this.MemberIsFollowing = isFollowing;
 			this.MemberIsFollowers = isFollowers;
+			this.isSubscribeUser = isSubscribe;
 		}
 	}
 
@@ -158,6 +162,20 @@ public with sharing class CommunityFeed_PeopleController {
 				}
 			}
 			return resultRoles;
+		}
+
+		public Set<Id> isSubscribeUser(List<User> inUsers){
+			Set<Id> resultSubscrUser = new Set<Id>();
+			Set<Id> userIds = new Set<Id>();
+			for (User uItem : inUsers) {
+				userIds.add(uItem.Id);
+			}
+			for(EntitySubscription es : [SELECT SubscriberId, ParentId, IsDeleted 
+										FROM EntitySubscription 
+										WHERE SubscriberId =:UserInfo.getUserId() AND ParentId IN :userIds AND IsDeleted = false LIMIT 1000]){
+				resultSubscrUser.add(es.ParentId);
+			}
+			return resultSubscrUser;
 		}
 	}
 }
