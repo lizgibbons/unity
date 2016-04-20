@@ -72,6 +72,44 @@
             </div>
         </apex:outputPanel>
 
+        <apex:outputPanel layout="none" rendered="{!profileFollowing}">
+            <h2 id="h2following">{!$Label.BTN_Following} ()</h2>
+            <div class="row">
+                <div class="col-sm-12">
+                    <input type="text" ng-model="quickSearchQuery" class="search it-searchFollowers" placeholder="{!$Label.LBL_Search_followings}" value="" id="quickSearchInput" />
+                </div>
+                <div class="col-sm-offset-4 col-sm-8">
+                    <select class="selectpicker" title="--{!$Label.LBL_Sort_By}--">
+                        <apex:repeat var="sortItem" value="{!profFS}">
+                        	<option>{!sortItem}</option>
+                        </apex:repeat>
+                    </select>
+                </div>
+            </div>
+            <div class="row" id="profilefollowings">
+                <div class="col-sm-12 col-md-8" ng-repeat="p in allPeople | quickSort:this | quickSearch:this | peopleIFollowing:this | limitTo:page.pageFollowingsSize">
+                    <div class="card user-card">
+                        <div class="card-header">
+                            <a href="{!$Page.UnityProfilePage}?id={{ p.MemberId }}" class="avatar it-profilePhoto"><img ng-src="{{ p.MemberPhotoUrl }}" /></a>
+                            <h3>
+                                <a href="{!$Page.UnityProfilePage}?id={{ p.MemberId }}" class="it-profile">{{ replaceCharacters(p.MemberName) }}</a>
+                                <small>{{ replaceCharacters(p.MemberRole) }}</small>
+                                <a id="f{{ p.MemberId }}" ng-hide="p.isSubscribeUser == null || p.isSubscribeUser == true" class="btn-fill-custom it-followBtn" ng-click="followAction(p);">{!$Label.BTN_Follow}</a>
+                                <p id="uf{{ p.MemberId }}" ng-hide="p.isSubscribeUser == null || p.isSubscribeUser == false"><i class="lrm lrm-check"></i>&nbsp;{!$Label.BTN_Following}</p>
+                            </h3>
+                            <div id="dr{{ p.MemberId }}" class="dropmenu it-dropmenu" ng-hide="p.isSubscribeUser == null">
+                                <a role="button" onclick="dropmenu(this);"><i class="lrm lrm-more"></i></a>
+                                <ul>
+                                    <li><a role="button" data-href="#sendMessageModal" class="it-dropmenuOptionA simpleModal">{!$Label.LBL_Message}</a></li>
+                                    <li ng-hide="p.isSubscribeUser == false"><a role="button" class="it-dropmenuOptionB" ng-click="unFollowAction(p);">{!$Label.LBL_Unfollow}</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </apex:outputPanel>
+
     </div>
     
     <div class="loader" style="display:none;">
@@ -328,6 +366,7 @@
 			$scope.page = {
 				pageSize: 6,
                 pageFollowersSize: 18,
+                pageFollowingsSize: 18,
                 currentPage: 1,
 				totalRecords: 1,
 				totalPages: function() {
@@ -335,6 +374,9 @@
 				},
                 hasMoreFollowers: function() {
                     return $scope.page.totalRecords > $scope.page.pageFollowersSize;
+                },
+                hasMoreFollowings: function() {
+                    return $scope.page.totalRecords > $scope.page.pageFollowingsSize;
                 },
                	changePageNumber : function () {
 					if($scope.page.currentPage < 1) {
@@ -371,6 +413,10 @@
                     $scope.page.pageFollowersSize +=  $scope.page.pageFollowersSize;
                     scope.updatePeopleScope();
                 },
+                showMoreFollowings: function() {
+                    $scope.page.pageFollowingsSize +=  $scope.page.pageFollowingsSize;
+                    scope.updatePeopleScope();
+                }
             
 			};
 
