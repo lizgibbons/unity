@@ -82,7 +82,7 @@
                     	<c:UnityGroups />
                     </apex:outputPanel> -->
                     <!-- Unity Profile Groups -->
-                </div>
+                
             </apex:outputpanel>
              <apex:outputpanel rendered="{!!isCommunityUser}" layout="block">
                 <div class="row">
