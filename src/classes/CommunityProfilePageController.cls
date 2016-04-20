@@ -64,6 +64,18 @@ global with sharing class CommunityProfilePageController {
 		return false;
     }
 
+    public Set<String> getProfilesFS(){
+        Set<String> resProfilesSF = new Set<String>();
+        Schema.DescribeSObjectResult cpDescr = Community_Profile__c.SObjectType.getDescribe();
+        List<Schema.RecordTypeInfo> recordTypeInf = cpDescr.getRecordTypeInfos();
+        if(!recordTypeInf.isEmpty()){
+            for(Schema.RecordTypeInfo item : recordTypeInf){
+                if(item.getName() != 'Master') resProfilesSF.add(item.getName()); 
+            }
+        }
+        return resProfilesSF;
+    }
+
 	public CommunityProfilePageController() {
 		try {
 			String tempContactId = CommunityUtils.validateId(ApexPages.currentPage().getParameters().get('cid'));
