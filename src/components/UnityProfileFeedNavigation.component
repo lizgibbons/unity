@@ -65,14 +65,16 @@
 		                            </apex:form>
 		                        </apex:outputPanel>
 		                        <apex:outputPanel layout="none" id="btnEditPhoto" rendered="{!currentUser}">
-		                        	<a data-href="" role="button" class="btn-fill-custom block-btn-full simpleModal it-editPhoto">{!$Label.LBL_Edit_Photo}</a>
+		                        	<a data-href="#uploadPhotoModal" role="button" class="btn-fill-custom block-btn-full simpleModal it-editPhoto">{!$Label.LBL_Edit_Photo}</a>
 		                        </apex:outputPanel>
 	                        </div>
 	                    </div>
 	                    <div class="user-information">
 	                        <h1>{!StudentName}</h1>
 	                        <small class="subheader">{!StudentRole}</small>
+	                        <apex:outputPanel layout="none" id="btnSendMessage" rendered="{!!currentUser}">
 	                        <a role="button" data-href="#sendMessageModal" class="btn-outline-white simpleModal it-sendMessageBtn">{!$Label.LBL_Send_Message}</a>
+	                        </apex:outputPanel>
 	                    </div>
 	                </div>
 	            </div>
@@ -178,6 +180,31 @@
 	                        <div class="blockBtnWrapper">
 	                            <a role="button" class="block-btn-half btn-fill-custom addItem it-sendMessageModal">{!$Label.LBL_Send}</a>
 	                            <a role="button" class="block-btn-half btn-fill-light closeModal it-cancelMessageModal">{!$Label.BTN_Cancel}</a>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	    </section>
+	</div>
+
+	<div id="uploadPhotoModal" class="simpleModalBox" >
+	    <div class="backdrop"></div>
+	    <section class="modalContent">
+	        <div class="inner">
+	            <div class="row">
+	                <div class="column col-xs-24">
+	                    <div class="card">
+	                        <div class="card-content multiselectHolder">
+	                            <a role="button" class="minimize closeModal it-closeModalX"><i class="lrm lrm-close"></i></a>
+	                            <h2>{!$Label.LBL_Upload_A_Profile_Photo}</h2>
+	                            <p class="list-header"><strong>{!$Label.LBL_PictureUploadModal_SizeWarning}</strong></p>
+	                            <div class="input-btn-wrapper">
+	                                <input type="text"/><a class="btn-fill-custom it-browseForPicture" role="button">{!$Label.BTN_Browse}</a>
+	                            </div>
+	                        </div>
+	                        <div class="blockBtnWrapper">
+	                            <a role="button" class="block-btn-full btn-fill-light closeModal it-closeModalBtn">{!$Label.BTN_Cancel}</a>
 	                        </div>
 	                    </div>
 	                </div>
