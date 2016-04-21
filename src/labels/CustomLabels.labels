@@ -2354,6 +2354,13 @@
         <value>Update Managers</value>
     </labels>
     <labels>
+        <fullName>LBL_Upload_A_Profile_Photo</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LBL Upload A Profile Photo</shortDescription>
+        <value>Upload A Profile Photo</value>
+    </labels>
+    <labels>
         <fullName>LBL_Upload_File</fullName>
         <language>en_US</language>
         <protected>true</protected>
